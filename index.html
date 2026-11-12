@@ -59,7 +59,19 @@ h2{font-size:22px; font-weight:700; margin:0; letter-spacing:.1em}
 .sub{margin:0; font-style:italic; font-size:17px; letter-spacing:.06em}
 .pic{display:block; width:44px; height:55px; background-size:100% 100%; background-repeat:no-repeat}
 .picrow{display:flex; gap:4px; justify-content:center}
-#title .frame{width:min(100%,320px); display:flex; flex-direction:column; align-items:center; gap:14px; padding:34px 20px}
+.vh{position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%)}
+#press{position:relative; width:min(100%,330px); aspect-ratio:320/212}
+#plate,#paper{position:absolute; inset:0; border-radius:3px}
+#plate{background:repeating-linear-gradient(92deg,#B98F57 0 7px,#AD844E 7px 9px,#C19964 9px 16px); box-shadow:0 0 0 2px var(--ink), 4px 5px 0 var(--ink)}
+#plate svg,#paper svg{position:absolute; inset:0; width:100%; height:100%}
+#plate .dry{opacity:.3}
+#plate .wet{clip-path:inset(0 100% 0 0)}
+#paper{background:var(--face); box-shadow:0 0 0 2px var(--ink), 3px 4px 0 var(--ink); opacity:0}
+#paper .pl{opacity:0}
+#roller{position:absolute; top:-7%; height:114%; width:9%; left:-16%; border-radius:7px; box-shadow:0 0 0 1.5px var(--ink);
+  background:linear-gradient(90deg,var(--ink) 0,#4B4038 38%,#6A5C50 50%,#4B4038 62%,var(--ink) 100%)}
+#roller::after{content:""; position:absolute; left:38%; width:24%; top:-16%; height:16%; background:var(--ink)}
+#board.gl .tile{visibility:hidden}
 
 button{
   font:inherit; font-size:15px; color:var(--ink); background:var(--face); border:2px solid var(--ink);
@@ -118,7 +130,7 @@ button.armed{background:var(--ink); color:var(--face)}
 #comboLabel{min-width:52px; font-weight:700}
 #comboBar{flex:1; height:5px; border:1.5px solid var(--ink); box-sizing:border-box; overflow:hidden}
 #comboBar i{display:block; height:100%; width:0; background:var(--ink)}
-#boardWrap{padding:var(--mg); outline:1.5px solid var(--ink); outline-offset:-1px; flex:none}
+#boardWrap{background:rgba(27,23,20,.1); padding:var(--mg); outline:1.5px solid var(--ink); outline-offset:-1px; flex:none}
 #board{
   position:relative; display:grid; grid-template-columns:repeat(8,var(--cw)); grid-auto-rows:var(--ch);
   background-image:radial-gradient(circle, var(--ink) 0 1px, transparent 1.6px);
@@ -183,11 +195,8 @@ button.armed{background:var(--ink); color:var(--face)}
 <div id="grain"></div>
 <div id="sheet">
   <section id="title" class="screen">
-    <div class="frame">
-      <div class="picrow"><i class="pic t05"></i><i class="pic t15"></i><i class="pic t25"></i><i class="pic t35"></i><i class="pic t45"></i></div>
-      <h1>사천성 머지</h1>
-      <p class="sub">Shisen-Sho Merge</p>
-    </div>
+    <h1 class="vh">사천성 머지</h1>
+    <div id="press"><div id="plate"></div><div id="paper"></div><div id="roller"></div></div>
     <button id="btnStart" type="button">시작</button>
   </section>
 
@@ -252,6 +261,7 @@ button.armed{background:var(--ink); color:var(--face)}
   </div></div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 (()=>{
 const COLS=8, ROWS=10, MAXL=5, COMBO_MS=3000, STAGES=30;
@@ -372,6 +382,7 @@ function paperGrain(){
 
 
 // 장애물 추가 종류: 가시덤불(옆에서 한 번 합치면 걷힘), 바위(두 번)
+const OBS={};
 {
   const stone=crack=>`<svg xmlns="${NS}" viewBox="0 0 80 100" preserveAspectRatio="none"><defs>${inkFilter('ink',57,2.6,-7.4)}<clipPath id="s"><path d="M46 22 62 28 73 54 68 84H44L52 56Z"/></clipPath></defs>
 <g filter="url(#ink)"><path d="M9 84 15 46 36 21 62 28 73 54 68 84Z" fill="${P}" stroke="${K}" stroke-width="4.4" stroke-linejoin="round"/>
@@ -381,6 +392,7 @@ ${crack?`<path d="M40 22 46 42 36 56 47 68 42 84M46 42 58 46M36 56 22 62" fill="
   const bramble=`<svg xmlns="${NS}" viewBox="0 0 80 100" preserveAspectRatio="none"><defs>${inkFilter('ink',73,2.4,-7.6)}</defs>
 <g filter="url(#ink)" fill="none" stroke="${K}" stroke-linecap="round" stroke-linejoin="round"><path stroke-width="4" d="M8 90C22 62 8 40 30 26 52 12 72 32 62 52 53 70 30 66 35 48M72 94C60 78 76 62 60 46M12 12C26 22 22 40 40 44"/>
 <path stroke-width="2.6" d="M17 68l-9-3M21 46l-10-5M36 23l-3-10M56 21l6-9M67 40l9-3M57 63l8 7M40 63l-2 10M67 78l8-4M24 26l-8 4M47 30l2-9M30 56l-8 6"/></g></svg>`;
+  OBS.stone=stone(false); OBS.stone2=stone(true); OBS.bramble=bramble;
   const st=document.createElement('style');
   st.textContent=`.stone{background-image:${uri(stone(false))}}.stone2{background-image:${uri(stone(true))}}.bramble{background-image:${uri(bramble)}}`;
   document.head.appendChild(st);
@@ -444,11 +456,268 @@ const rockCls=g=>g.type==='stone'?(g.hp>1?'stone':'stone2'):g.type==='bramble'?'
 function paint(x,y){
   const g=grid[y][x], t=tiles[y][x];
   if(g&&!g.rock) S.seen[''+g.k+g.l]=1;
-  t.className='tile '+(g?(g.rock?rockCls(g):'t'+g.k+g.l):'empty')+(sel&&sel.x===x&&sel.y===y?' sel':'')+(mode==='basket'&&g&&!isFree(x,y)?' dim':'');
+  R.paint(x,y,g,!!(sel&&sel.x===x&&sel.y===y),mode==='basket'&&!!g&&!isFree(x,y));
 }
 function paintAll(){ for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++)paint(x,y); }
 function hud(){ $('#score').textContent=fmtN(score); }
 function toast(msg,ms=1500){ const t=$('#toast'); t.textContent=msg; t.classList.add('on'); clearTimeout(toastTO); toastTO=setTimeout(()=>t.classList.remove('on'),ms); }
+
+/* ───────── 렌더러: 2D(예비) / 3D 목판 블록 ───────── */
+const kf=(t,a)=>{ const n=a.length-1, p=Math.min(n-1e-6,Math.max(0,t)*n), i=p|0; return a[i]+(a[i+1]-a[i])*(p-i); };
+const R2D={
+  is3d:false,
+  paint(x,y,g,s,d){ tiles[y][x].className='tile '+(g?(g.rock?rockCls(g):'t'+g.k+g.l):'empty')+(s?' sel':'')+(d?' dim':''); },
+  shake(x,y){ const t=tiles[y][x]; t.classList.add('no'); setTimeout(()=>t.classList.remove('no'),260); },
+  pulse(x,y){ tiles[y][x].animate({scale:['1.15','1']},{duration:200}); },
+  press(x,y){ tiles[y][x].animate({scale:['1','.9 .84','1.1']},{duration:170,easing:'ease-out'}); },
+  leave(a){ const an=tiles[a.y][a.x].animate({scale:['1','.55'],opacity:[1,0]},{duration:200,easing:'ease-in',fill:'forwards'}); return {cancel:()=>an.cancel()}; },
+  bounce(x,y){ tiles[y][x].animate({scale:['1 1','1.2 .68','.88 1.16','1.05 .96','1 1']},{duration:380,easing:'ease-out'}); },
+  flipOut(){ tiles.flat().forEach(t=>t.animate({scale:['1 1','0 1']},{duration:160,easing:'ease-in',fill:'forwards'})); },
+  flipIn(){ tiles.flat().forEach(t=>{ t.getAnimations().forEach(n=>n.cancel()); t.animate({scale:['0 1','1 1']},{duration:160,easing:'ease-out'}); }); },
+  hint(cells){ tiles.flat().forEach(t=>t.classList.remove('hint')); cells.forEach(p=>tiles[p.y][p.x].classList.add('hint')); },
+  boardShake(){ board.animate({translate:['0 0','-4px 3px','4px -3px','-2px 2px','0 0']},{duration:260}); },
+  debris(){ return false; }, resize(){}
+};
+let R=R2D;
+
+const GLSL_COMMON=`
+precision highp float;
+uniform float uPR; uniform float uTime; uniform vec3 uPaper; uniform vec3 uInk; uniform vec3 uGold; uniform vec3 uGoldL; uniform vec3 uGoldD;
+float hash(vec2 p){ return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453); }
+float noise(vec2 p){ vec2 i=floor(p), f=fract(p); f=f*f*(3.-2.*f); return mix(mix(hash(i),hash(i+vec2(1.,0.)),f.x),mix(hash(i+vec2(0.,1.)),hash(i+vec2(1.,1.)),f.x),f.y); }
+// 해칭 한 방향: w = 선이 차지하는 비율
+float hl(vec2 p,float a,float w){ float v=abs(fract(dot(p,vec2(cos(a),sin(a)))/3.6)-.5)*2.; return smoothstep(1.-w-.2,1.-w+.1,v)*step(.03,w); }
+vec2 handPx(){ vec2 sp=gl_FragCoord.xy/uPR;
+#ifndef SIMPLE
+  sp+=vec2(sin(sp.y*.19),sin(sp.x*.23))*.9;
+#endif
+  return sp; }
+`;
+const VS_BLOCK=`
+attribute vec4 aTex; attribute vec4 aFx; uniform float uShear; uniform float uOut;
+varying vec3 vN; varying vec2 vF; varying vec4 vTex; varying vec4 vFx; varying vec3 vObj; varying vec3 vWN;
+void main(){
+  vec3 p=position;
+#ifdef OUTLINE
+  float o=uOut*(1.+aFx.z*.9);
+  p.xy+=sign(p.xy)*o; if(p.z<-.2) p.z-=o;
+#endif
+  vN=normal; vF=position.xy/vec2(1.,1.26)+.5; vTex=aTex; vFx=aFx; vObj=position;
+  vWN=normalize(mat3(instanceMatrix)*normal);
+  vec4 wp=modelMatrix*instanceMatrix*vec4(p,1.);
+  wp.xy+=vec2(-wp.z,wp.z)*uShear;
+  gl_Position=projectionMatrix*viewMatrix*wp;
+}`;
+const FS_OUTLINE=`
+precision highp float; uniform vec3 uInk; varying vec4 vTex;
+void main(){ if(vTex.z>1.5) discard; gl_FragColor=vec4(uInk,1.); }`;
+const FS_BLOCK=GLSL_COMMON+`
+uniform sampler2D uAtlas;
+varying vec3 vN; varying vec2 vF; varying vec4 vTex; varying vec4 vFx; varying vec3 vObj; varying vec3 vWN;
+void main(){
+  vec2 sp=handPx();
+  float kind=vTex.z; vec3 col;
+  vec3 wood=kind>.5&&kind<1.5?vec3(.33,.28,.24):vec3(.71,.58,.44);
+  if(vN.z>.5){
+    // 윗면: 판각된 그림
+    vec2 f=vec2(vF.x,1.-vF.y);
+    vec2 c0=kind>1.5?vec2(0.):vec2(6.4,6.4), cs=kind>1.5?vec2(256.,320.):vec2(230.4,294.4);
+    vec2 uv=(vTex.xy*vec2(256.,320.)+c0+clamp(f,0.,1.)*cs)/2048.; uv.y=1.-uv.y;
+    vec4 t=texture2D(uAtlas,uv);
+    if(kind>1.5&&t.a<.5) discard;
+    vec3 base=mix(vec3(.93,.87,.72),t.rgb,step(.5,t.a));
+    float paperish=1.-smoothstep(.05,.2,distance(base,uPaper));
+    // 나무 결
+    float gr=smoothstep(.74,.95,fract(vObj.x*6.+noise(vObj.xy*vec2(2.2,.7)+vFx.y*9.)*1.7));
+    base=mix(base,base*vec3(.88,.86,.8),gr*paperish*.75);
+    col=base;
+#ifndef SIMPLE
+    // 깎인 홈: 찍히는 면(먹·채색)은 솟고 나머지는 파였다
+    float h=smoothstep(.1,.34,distance(t.rgb,uPaper));
+    vec2 dh=vec2(dFdx(h),dFdy(h))*uPR;
+    float d=dot(normalize(vec3(-dh*1.5,1.)),normalize(vec3(-.5,.5,.72)))/.72;
+    col=mix(col,uInk,clamp((1.-d)*.9,0.,.55));
+    col+=(vec3(1.)-col)*clamp((d-1.)*.7,0.,.3);
+    if(vTex.w>4.5){ // 5단계 금박: 반사
+      float gm=1.-smoothstep(.1,.24,min(distance(t.rgb,uGold),distance(t.rgb,uGoldL)));
+      vec3 n2=normalize(vWN+vec3(-dh*.5,0.));
+      vec3 rf=reflect(vec3(0.,0.,-1.),n2);
+      float env=.5+.5*sin((rf.x*3.+rf.y*2.)*5.+sp.x*.06+sp.y*.045+uTime*2.4);
+      float spec=pow(max(dot(rf,normalize(vec3(-.3+sin(uTime*1.3)*.25,.45+cos(uTime)*.2,.8))),0.),30.);
+      vec3 gold=mix(uGoldD,uGoldL,smoothstep(.15,.85,env))+spec*vec3(1.,.95,.8);
+      col=mix(col,gold,gm);
+    }
+#else
+    if(vTex.w>4.5){ float gm=1.-smoothstep(.1,.24,min(distance(t.rgb,uGold),distance(t.rgb,uGoldL)));
+      col=mix(col,mix(uGold,uGoldL,.5+.5*sin(sp.x*.06+sp.y*.045+uTime*2.4)),gm); }
+#endif
+  } else {
+    if(kind>1.5) discard;
+    // 옆면: 나무 + 해칭 음영
+    float tone=dot(vN,normalize(vec3(-.45,.55,.7)))*.5+.5;
+    float gr=smoothstep(.6,.95,fract((vObj.x+vObj.y)*5.+noise(vObj.xz*vec2(3.,9.)+vFx.y*9.)*1.5));
+    col=wood*(1.-.12*gr);
+    float w=clamp((.66-tone)*1.5,0.,.7);
+    float ln=hl(sp,.785,w);
+#ifndef SIMPLE
+    if(tone<.3) ln=max(ln,hl(sp,-.785,w*.75));
+#endif
+    col=mix(col,uInk,ln*.85);
+    // 모서리 마모
+    float bev=step(.2,vN.z);
+    col=mix(col,vec3(.9,.84,.7),bev*smoothstep(.45,.6,noise(vObj.xy*11.+vFx.y*31.))*.8);
+  }
+  col=mix(col,vec3(.855,.824,.745),.6*vFx.x);
+  gl_FragColor=vec4(col,1.);
+}`;
+const VS_CHIP=`
+attribute vec4 aCol; varying vec4 vCol; varying vec3 vWN;
+void main(){ vCol=aCol; vWN=normalize(mat3(instanceMatrix)*normal); gl_Position=projectionMatrix*viewMatrix*modelMatrix*instanceMatrix*vec4(position,1.); }`;
+const FS_CHIP=GLSL_COMMON+`
+varying vec4 vCol; varying vec3 vWN;
+void main(){
+  vec2 sp=handPx(); vec3 n=normalize(vWN); vec3 L=normalize(vec3(-.45,.55,.7));
+  float tone=abs(dot(n,L))*.6+.35; vec3 col=vCol.rgb;
+  if(vCol.a>.5){ vec3 rf=reflect(vec3(0.,0.,-1.),n); float spec=pow(abs(dot(rf,L)),14.);
+    col=mix(uGoldD,uGoldL,smoothstep(.4,.85,tone))+spec*vec3(1.,.95,.8); }
+  else col=mix(col,uInk,hl(sp,.785,clamp((.7-tone)*1.6,0.,.7))*.85);
+  gl_FragColor=vec4(col,1.);
+}`;
+
+function make3D(simple){
+  const T=window.THREE; if(!T) return null;
+  const canvas=document.createElement('canvas'); canvas.id='gl';
+  let rr; try{ rr=new T.WebGLRenderer({canvas,alpha:true,antialias:true,powerPreference:'low-power'}); }catch(e){ return null; }
+  rr.setClearColor(0x000000,0);
+  const scene=new T.Scene(), cam=new T.OrthographicCamera(0,1,1,0,.1,3000); cam.position.z=1500;
+  const N=COLS*ROWS, FH=1.26, D=.36, BV=.045;
+  const sh=new T.Shape(), w=.5-BV, h=FH/2-BV, r=.06;
+  sh.moveTo(-w+r,-h); sh.lineTo(w-r,-h); sh.quadraticCurveTo(w,-h,w,-h+r); sh.lineTo(w,h-r); sh.quadraticCurveTo(w,h,w-r,h);
+  sh.lineTo(-w+r,h); sh.quadraticCurveTo(-w,h,-w,h-r); sh.lineTo(-w,-h+r); sh.quadraticCurveTo(-w,-h,-w+r,-h);
+  const geo=new T.ExtrudeGeometry(sh,{depth:D,bevelEnabled:true,bevelThickness:BV,bevelSize:BV,bevelSegments:2,curveSegments:5});
+  geo.translate(0,0,-(D+BV));
+  const aTex=new T.InstancedBufferAttribute(new Float32Array(N*4),4), aFx=new T.InstancedBufferAttribute(new Float32Array(N*4),4);
+  geo.setAttribute('aTex',aTex); geo.setAttribute('aFx',aFx);
+  const col=hex=>new T.Color(hex);
+  const U={uPR:{value:1},uTime:{value:0},uShear:{value:.5},uOut:{value:.04},uAtlas:{value:null},
+    uPaper:{value:col(P)},uInk:{value:col(K)},uGold:{value:col(G)},uGoldL:{value:col(GL)},uGoldD:{value:col('#A8781A')}};
+  const defs=()=>simple?{SIMPLE:1}:{};
+  const mat=new T.ShaderMaterial({uniforms:U,vertexShader:VS_BLOCK,fragmentShader:FS_BLOCK,defines:defs(),extensions:{derivatives:true}});
+  const matO=new T.ShaderMaterial({uniforms:U,vertexShader:VS_BLOCK,fragmentShader:FS_OUTLINE,defines:{OUTLINE:1},side:T.BackSide});
+  const mesh=new T.InstancedMesh(geo,mat,N), hull=new T.InstancedMesh(geo,matO,N);
+  hull.instanceMatrix=mesh.instanceMatrix; mesh.frustumCulled=hull.frustumCulled=false;
+  scene.add(hull); scene.add(mesh);
+  // 파편: 나무 조각·금박
+  const CN=120, cgeo=new T.BoxGeometry(1,1,.3), aCol=new T.InstancedBufferAttribute(new Float32Array(CN*4),4);
+  cgeo.setAttribute('aCol',aCol);
+  const matC=new T.ShaderMaterial({uniforms:U,vertexShader:VS_CHIP,fragmentShader:FS_CHIP,defines:defs(),side:T.DoubleSide});
+  const chips=new T.InstancedMesh(cgeo,matC,CN); chips.frustumCulled=false; chips.count=0; scene.add(chips);
+  let parts=[];
+
+  const st=[]; for(let i=0;i<N;i++) st.push({vis:false,sel:false,decal:false,ox:0,oy:0,oz:0,sx:1,sy:1,sz:1,rz:0,rx:0});
+  let tw=[], gflip=1, pending=false, rafId=0, toId=0, last=0, lastDraw=0, slow=0, ready=false, dead=false;
+  const m4=new T.Matrix4(), q=new T.Quaternion(), e=new T.Euler(), v3=new T.Vector3(), s3=new T.Vector3();
+  const idx=(x,y)=>y*COLS+x;
+  function kick(){ if(pending||dead) return; pending=true; rafId=requestAnimationFrame(t=>run(t,true)); toId=setTimeout(()=>run(performance.now(),false),90); }
+  function run(now,viaRaf){
+    if(!pending) return; pending=false; cancelAnimationFrame(rafId); clearTimeout(toId);
+    now=performance.now();
+    if(viaRaf&&now-lastDraw<15.5){ kick(); return; } // 고주사율 화면에서도 60fps까지만
+    lastDraw=now; const dt=Math.min(.05,last?(now-last)/1000:0), gap=last?now-last:0;
+    let active=false; gflip=1; scene.position.set(0,0,0);
+    for(const s of st){ s.ox=s.oy=s.rz=s.rx=0; s.sx=s.sy=s.sz=1; s.oz=s.sel?cw*.2:0; if(s.sel) s.sx=s.sy=1.05; }
+    tw=tw.filter(o=>{ const t=Math.min(1,(now-o.t0)/o.dur); o.fn(t,o.i>=0?st[o.i]:null); if(t<1) active=true; return t<1||o.hold; });
+    const fw=cw-4.5, fh=(ch-4.5)/FH;
+    for(let i=0;i<N;i++){ const s=st[i], x=i%COLS, y=i/COLS|0;
+      if(!s.vis){ m4.makeScale(0,0,0); mesh.setMatrixAt(i,m4); continue; }
+      e.set(s.rx,0,s.rz); q.setFromEuler(e);
+      v3.set((x+.5)*cw+s.ox,-((y+.5)*ch+s.oy),s.oz+(s.decal?-cw*.24:0));
+      s3.set(fw*s.sx*gflip,fh*s.sy,cw*.8*(s.decal?.12:s.sz));
+      m4.compose(v3,q,s3); mesh.setMatrixAt(i,m4);
+    }
+    mesh.instanceMatrix.needsUpdate=true;
+    if(parts.length){
+      parts=parts.filter(p=>(p.age+=dt)<p.life);
+      parts.forEach((p,i)=>{ p.vy+=1100*dt; p.x+=p.vx*dt; p.y+=p.vy*dt; p.z+=p.vz*dt; p.vz-=600*dt; p.a+=p.w*dt;
+        const k=1-Math.pow(p.age/p.life,3); e.set(p.a,p.a*.7+p.ph,p.a*1.3); q.setFromEuler(e);
+        v3.set(p.x,-p.y,Math.max(20,p.z+60)); s3.set(p.s*k,p.s*p.asp*k,p.s*k); m4.compose(v3,q,s3); chips.setMatrixAt(i,m4);
+        aCol.setXYZW(i,p.c[0],p.c[1],p.c[2],p.gold); });
+      chips.count=parts.length; chips.instanceMatrix.needsUpdate=true; aCol.needsUpdate=true; if(parts.length) active=true;
+    } else chips.count=0;
+    U.uTime.value=now/1000;
+    rr.render(scene,cam);
+    // 저사양 자동 전환: 애니메이션 프레임이 계속 느리면 단순 셰이더로
+    if(viaRaf&&gap>0&&gap<200){ slow=gap>30?slow+1:Math.max(0,slow-1); if(slow>24&&!simple) setSimple(); }
+    last=active?now:0;
+    if(active) kick();
+  }
+  function setSimple(){ simple=true; slow=0; mat.defines={SIMPLE:1}; matC.defines={SIMPLE:1}; mat.needsUpdate=matC.needsUpdate=true; api.simple=true; resize(); }
+  function add(i,dur,fn,hold){ const o={i,t0:performance.now(),dur,fn,hold:!!hold}; tw.push(o); kick(); return o; }
+  const drop=o=>{ tw=tw.filter(x=>x!==o); kick(); };
+  function resize(){
+    const W=COLS*cw, H=ROWS*ch, pr=Math.min(window.devicePixelRatio||1,simple?1.5:2);
+    canvas.style.cssText=`position:absolute;left:${-mg}px;top:${-mg}px;width:${W+2*mg}px;height:${H+2*mg}px;pointer-events:none;z-index:2`;
+    rr.setPixelRatio(pr); rr.setSize(W+2*mg,H+2*mg,false);
+    cam.left=-mg; cam.right=W+mg; cam.top=mg; cam.bottom=-(H+mg); cam.updateProjectionMatrix();
+    U.uPR.value=pr; U.uOut.value=1.5/Math.max(10,cw-4.5); kick();
+  }
+  let hintTw=[], flipTw=null;
+  const api={
+    is3d:true, simple, canvas,
+    paint(x,y,g,s,d){ const i=idx(x,y), o=st[i]; o.vis=!!g; o.sel=!!s;
+      if(g){ const n=g.rock?(g.type==='stone'?(g.hp>1?26:27):g.type==='bramble'?28:25):g.k*5+g.l-1;
+        const kind=g.rock?(g.type==='wall'||!g.type?1:2):0; o.decal=kind===2;
+        aTex.setXYZW(i,n%8,n/8|0,kind,g.rock?0:g.l); aFx.setXYZW(i,d?1:0,(i*.618)%1,s?1:0,0); aTex.needsUpdate=aFx.needsUpdate=true; }
+      kick(); },
+    shake(x,y){ add(idx(x,y),260,(t,s)=>{ s.ox=Math.sin(t*12.566)*4.5*(1-t); }); },
+    pulse(x,y){ add(idx(x,y),200,(t,s)=>{ s.sx=s.sy=1.15-.15*t; }); },
+    press(x,y){ add(idx(x,y),230,(t,s)=>{ s.sz=kf(t,[1,.5,1.25,1]); s.oz+=cw*.22*kf(t,[-1,-1.1,.35,0]); s.sx=s.sy=s.sx*kf(t,[1,1.07,.97,1]); }); },
+    leave(a,b,path){
+      const pts=path.map(p=>[gx(p.x),gy(p.y)]), len=[0]; for(let i=1;i<pts.length;i++) len.push(len[i-1]+Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]));
+      const tot=len[len.length-1]||1, ax=pts[0][0], ay=pts[0][1];
+      const o1=add(idx(a.x,a.y),200,(t,s)=>{ const dd=t*t*tot; let i=1; while(i<pts.length-1&&len[i]<dd) i++;
+        const u=(dd-len[i-1])/((len[i]-len[i-1])||1); s.ox=pts[i-1][0]+(pts[i][0]-pts[i-1][0])*u-ax; s.oy=pts[i-1][1]+(pts[i][1]-pts[i-1][1])*u-ay;
+        s.oz=cw*(.25+.45*Math.sin(Math.PI*Math.min(1,t)*.9)); s.rz=.3*Math.sin(t*3.); s.sx=s.sy=1-.2*t; s.sz=1-.45*Math.max(0,(t-.75)/.25); },true);
+      const o2=add(idx(b.x,b.y),200,(t,s)=>{ const k=Math.max(0,(t-.7)/.3); s.sz=1-.45*k; s.sx*=1+.1*k; s.sy*=1+.1*k; },true);
+      return {cancel(){ drop(o1); drop(o2); }};
+    },
+    bounce(x,y){ add(idx(x,y),400,(t,s)=>{ s.sx*=kf(t,[1.12,1.2,.88,1.05,1]); s.sy*=kf(t,[1.12,.72,1.14,.97,1]); s.sz=kf(t,[.5,.55,1.4,.9,1]); s.oz+=cw*.3*Math.sin(Math.PI*t); }); },
+    flipOut(){ if(flipTw) drop(flipTw); flipTw=add(-1,160,t=>{ gflip=1-t*t; },true); },
+    flipIn(){ if(flipTw) drop(flipTw); flipTw=add(-1,160,t=>{ gflip=1-(1-t)*(1-t); }); },
+    hint(cells){ hintTw.forEach(drop); hintTw=cells.map(p=>add(idx(p.x,p.y),1350,(t,s)=>{ s.rz=Math.sin(t*18.85)*.14; s.oz+=cw*.14*Math.sin(Math.PI*t); })); },
+    boardShake(){ add(-1,280,t=>{ scene.position.set(kf(t,[0,-4,4,-2,0]),kf(t,[0,-3,3,-2,0]),0); }); },
+    debris(cx,cy){
+      const woods=[[.71,.58,.44],[.58,.46,.34],[.93,.87,.72]];
+      for(let i=0;i<26&&parts.length<CN;i++){ const a=rnd()*6.283, v=(140+rnd()*330)*(cw/40), gold=i%5<2?1:0;
+        parts.push({x:cx+Math.cos(a)*cw*.2,y:cy+Math.sin(a)*cw*.2,z:20,vx:Math.cos(a)*v,vy:Math.sin(a)*v-200,vz:120+rnd()*260,a:rnd()*6,w:(rnd()*14+5)*(rnd()<.5?-1:1),ph:rnd()*6,
+          s:cw*(gold?.16+rnd()*.14:.12+rnd()*.2),asp:gold?.7+rnd()*.6:.35+rnd()*.4,c:woods[i%3],gold,age:0,life:.65+rnd()*.5}); }
+      kick(); return true; },
+    resize,
+    setAtlas(cv){ const tx=new T.CanvasTexture(cv); tx.minFilter=T.LinearMipmapLinearFilter; tx.magFilter=T.LinearFilter; tx.anisotropy=Math.min(4,rr.capabilities.getMaxAnisotropy()); U.uAtlas.value=tx; ready=true; },
+    stats:()=>({simple,pr:rr.getPixelRatio(),pending,tweens:tw.length,chips:parts.length,calls:rr.info.render.calls,frame:rr.info.render.frame})
+  };
+  canvas.addEventListener('webglcontextlost',ev=>{ ev.preventDefault(); dead=true; use2D(); });
+  return api;
+}
+function use2D(){ R=R2D; board.classList.remove('gl'); if(grid.length) paintAll(); }
+// 패 그림 26+3장을 한 장의 판(아틀라스)으로 찍어 3D 블록 윗면에 쓴다
+function buildAtlas(){
+  const list=[]; for(let k=0;k<5;k++)for(let l=1;l<=MAXL;l++) list.push(tileSVG(k,l));
+  list.push(rockSVG(),OBS.stone,OBS.stone2,OBS.bramble);
+  const cv=document.createElement('canvas'); cv.width=cv.height=2048; const cx=cv.getContext('2d');
+  return Promise.all(list.map((svg,i)=>new Promise((res,rej)=>{ const im=new Image();
+    im.onload=()=>{ try{ cx.drawImage(im,(i%8)*256,(i/8|0)*320,256,320); res(); }catch(e){ rej(e); } }; im.onerror=rej;
+    im.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg.replace('<svg ','<svg width="256" height="320" ').replace(/<g clip-path="url\(#face\)">.*?<\/g>/,'')); })))
+    .then(()=>{ cx.getImageData(0,0,1,1); return cv; });
+}
+const GFX=(()=>{ try{ return new URLSearchParams(location.search).get('gfx'); }catch(e){ return null; } })();
+(function init3D(){
+  if(GFX==='2d') return;
+  const low=GFX==='simple'||(navigator.deviceMemory&&navigator.deviceMemory<=3)||(navigator.hardwareConcurrency&&navigator.hardwareConcurrency<=3);
+  const r3=make3D(!!low); if(!r3) return;
+  buildAtlas().then(cv=>{ r3.setAtlas(cv); board.insertBefore(r3.canvas,pathLayer); board.classList.add('gl'); R=r3; r3.resize(); if(grid.length) paintAll(); })
+    .catch(()=>{});
+})();
 
 /* ───────── 경로: 꺾임 2번 이하, 판 바깥 1칸 허용 ───────── */
 const DX=[1,0,-1,0], DY=[0,1,0,-1];
@@ -540,6 +809,7 @@ function layout(){
   const r=document.documentElement.style; r.setProperty('--cw',cw+'px'); r.setProperty('--ch',ch+'px'); r.setProperty('--mg',mg+'px');
   const w=COLS*cw+2*mg, h=ROWS*ch+2*mg;
   pathLayer.setAttribute('width',w); pathLayer.setAttribute('height',h); pathLayer.setAttribute('viewBox',`${-mg} ${-mg} ${w} ${h}`);
+  R.resize();
 }
 const gx=x=>x<0?-mg*.62:x>=COLS?COLS*cw+mg*.62:(x+.5)*cw;
 const gy=y=>y<0?-mg*.62:y>=ROWS?ROWS*ch+mg*.62:(y+.5)*ch;
@@ -566,6 +836,7 @@ function burst(cx,cy,big){
   const ring=fxEl('ring',cx,cy,cw*(big?3.2:1.7));
   ring.animate({scale:['.25','1'],opacity:[1,0]},{duration:big?560:360,easing:'cubic-bezier(.2,.7,.3,1)',fill:'both'}).onfinish=()=>ring.remove();
   if(big){ const disc=fxEl('disc',cx,cy,cw*2.6); disc.animate({scale:['.15','1'],opacity:[.95,0],rotate:['0deg','25deg']},{duration:480,easing:'ease-out',fill:'both'}).onfinish=()=>disc.remove(); }
+  if(big&&R.debris(cx,cy)) return; // 3D: 나무 조각·금박 파편
   for(let i=0,n=big?24:7;i<n;i++){
     const a=rnd()*6.283, r=cw*(big?.9+rnd()*1.6:.6+rnd()*.6), dot=fxEl(big?'leaf':'dot',cx,cy,big?6+rnd()*9:3+rnd()*5);
     if(big){ const q=()=>(rnd()*30|0); dot.style.clipPath=`polygon(${q()}% ${q()}%,${100-q()}% ${q()}%,${100-q()}% ${100-q()}%,${q()}% ${100-q()}%)`; }
@@ -581,11 +852,11 @@ function setCombo(c){
   if(comboAnim) comboAnim.cancel(); clearTimeout(comboTO);
   if(c>0){ comboAnim=bar.animate({width:['100%','0%']},{duration:COMBO_MS,easing:'linear'}); comboTO=setTimeout(()=>{$('#comboLabel').textContent='연속 ×1';},COMBO_MS); }
 }
-const buzz=p=>{ try{ navigator.vibrate&&navigator.vibrate(p); }catch(e){} };
+const buzz=p=>{ try{ if(navigator.vibrate&&(!navigator.userActivation||navigator.userActivation.hasBeenActive)) navigator.vibrate(p); }catch(e){} };
 
 
 /* ───────── 한 수 ───────── */
-function select(p){ const old=sel; sel=p; if(old) paint(old.x,old.y); if(p) paint(p.x,p.y); }
+function select(p){ const old=sel; sel=p; if(old) paint(old.x,old.y); if(p){ paint(p.x,p.y); R.press(p.x,p.y); } }
 function tap(x,y){
   if(lock||over||x<0||y<0||x>=COLS||y>=ROWS) return;
   if(bombArmed){ bombAt(x,y); return; }
@@ -598,8 +869,7 @@ function tap(x,y){
   if(a.k===g.k&&a.l===g.l){
     const path=findPath(sel,{x,y});
     if(path){ doMatch(sel,{x,y},path,g); return; }
-    const t1=tiles[sel.y][sel.x], t2=tiles[y][x]; sfx.bad();
-    [t1,t2].forEach(t=>{ t.classList.add('no'); setTimeout(()=>t.classList.remove('no'),260); });
+    sfx.bad(); R.shake(sel.x,sel.y); R.shake(x,y);
   } else sfx.tap();
   select({x,y});
 }
@@ -611,15 +881,15 @@ function crumble(c){
     const x=c.x+dx, y=c.y+dy; if(x<0||y<0||x>=COLS||y>=ROWS) continue;
     const g=grid[y][x]; if(!g||!g.rock||g.type==='wall') continue;
     if(g.type==='stone'&&g.hp>1) g.hp=1; else { grid[y][x]=null; n++; }
-    paint(x,y); tiles[y][x].animate({scale:['1.15','1']},{duration:200});
+    paint(x,y); R.pulse(x,y);
   }
   return n;
 }
 function doMatch(a,b,path,g){
   lock=true; select(null);
-  const mult=bumpCombo(), lvl=g.l, ta=tiles[a.y][a.x], tb=tiles[b.y][b.x];
+  const mult=bumpCombo(), lvl=g.l;
   brush(path);
-  const leave=ta.animate({scale:['1','.55'],opacity:[1,0]},{duration:200,easing:'ease-in',fill:'forwards'});
+  const leave=R.leave(a,b,path); // 첫 패가 길을 따라 날아가 둘째 패와 맞눌린다
   setTimeout(()=>{
     leave.cancel(); if(over) return;
     const cx=(b.x+.5)*cw, cy=(b.y+.5)*ch; let pts;
@@ -627,7 +897,7 @@ function doMatch(a,b,path,g){
       grid[a.y][a.x]=null; grid[b.y][b.x]={k:g.k,l:lvl+1}; paint(a.x,a.y); paint(b.x,b.y);
       if(lvl+1===MAXL) S.rec[mode].gold++;
       // 눌렸다 튕김
-      tb.animate({scale:['1 1','1.2 .68','.88 1.16','1.05 .96','1 1']},{duration:380,easing:'ease-out'});
+      R.bounce(b.x,b.y);
       burst(cx,cy,false); pts=(10*Math.pow(2,lvl-1)+20*crumble(b))*mult; sfx.match(lvl,mult); buzz(30);
     } else {
       grid[a.y][a.x]=null; grid[b.y][b.x]=null; let rocks=0;
@@ -637,7 +907,7 @@ function doMatch(a,b,path,g){
       }
       paint(a.x,a.y); paint(b.x,b.y);
       burst((a.x+.5)*cw,(a.y+.5)*ch,true); burst(cx,cy,true);
-      board.animate({translate:['0 0','-4px 3px','4px -3px','-2px 2px','0 0']},{duration:260});
+      R.boardShake();
       pts=(300+50*rocks)*mult; sfx.boom(); buzz([30,40,30]);
     }
     score+=pts; hud(); setCombo(combo); pop(cx,cy-ch*.3,'+'+pts+(mult>1?' ×'+mult:''));
@@ -646,9 +916,9 @@ function doMatch(a,b,path,g){
 }
 function shuffleAnim(){
   lock=true; sfx.shuffle();
-  const all=tiles.flat(); all.forEach(t=>t.animate({scale:['1 1','0 1']},{duration:160,easing:'ease-in',fill:'forwards'}));
+  R.flipOut();
   setTimeout(()=>{ reshuffle(); sel=null; paintAll();
-    all.forEach(t=>{ t.getAnimations().forEach(n=>n.cancel()); t.animate({scale:['0 1','1 1']},{duration:160,easing:'ease-out'}); });
+    R.flipIn();
     setTimeout(()=>{ if(!over) lock=false; },170);
   },170);
 }
@@ -660,8 +930,8 @@ function afterMove(){
   setTimeout(()=>{ if(!over) shuffleAnim(); },450);
 }
 let hintEls=[];
-function clearHint(){ hintEls.forEach(t=>t.classList.remove('hint')); hintEls=[]; }
-function hint(){ if(lock||over) return false; clearHint(); const m=findMove(); if(!m) return false; hintEls=m.map(p=>tiles[p.y][p.x]); hintEls.forEach(t=>t.classList.add('hint')); return true; }
+function clearHint(){ if(hintEls.length) R.hint([]); hintEls=[]; }
+function hint(){ if(lock||over) return false; clearHint(); const m=findMove(); if(!m) return false; hintEls=m; R.hint(m); return true; }
 
 /* ───────── 부스터 (여정) ───────── */
 function bombAt(x,y){
@@ -697,7 +967,7 @@ function drawBasket(fresh){
 }
 function basketTap(x,y){
   const g=grid[y][x]; if(!g||g.rock) return;
-  if(!isFree(x,y)){ const t=tiles[y][x]; sfx.bad(); t.classList.add('no'); setTimeout(()=>t.classList.remove('no'),260); return; }
+  if(!isFree(x,y)){ sfx.bad(); R.shake(x,y); return; }
   grid[y][x]=null; const item={k:g.k,l:g.l};
   let at=-1; basket.forEach((b,i)=>{ if(b.k===g.k&&b.l===g.l) at=i; });
   basket.splice(at<0?basket.length:at+1,0,item);
@@ -711,7 +981,7 @@ function basketTap(x,y){
       const mult=bumpCombo(), cx=(x+.5)*cw, cy=(y+.5)*ch; let pts;
       if(g.l<MAXL-1){
         grid[y][x]={k:g.k,l:g.l+1}; paintAll();
-        tiles[y][x].animate({scale:['1 1','1.2 .68','.88 1.16','1.05 .96','1 1']},{duration:380,easing:'ease-out'});
+        R.bounce(x,y);
         burst(cx,cy,false); pts=10*Math.pow(3,g.l-1)*mult; sfx.match(g.l,mult); buzz(30);
       } else { // 4단계 셋 = 황금 패
         S.rec[mode].gold++; S.seen[g.k+'5']=1; burst(cx,cy,true); pts=500*mult; sfx.boom(); buzz([30,40,30]);
@@ -892,7 +1162,7 @@ function go(id){
 board.addEventListener('pointerdown',e=>{ const r=board.getBoundingClientRect(); tap(Math.floor((e.clientX-r.left)/cw),Math.floor((e.clientY-r.top)/ch)); e.preventDefault(); });
 document.querySelectorAll('[data-go]').forEach(b=>{ b.onclick=()=>go(b.dataset.go); });
 const askNick=()=>{ $('#nickInput').value=S.nick||''; $('#nickDlg').hidden=false; setTimeout(()=>$('#nickInput').focus(),50); };
-$('#btnStart').onclick=()=>{ if(S.nick) go('menu'); else askNick(); };
+$('#btnStart').onclick=()=>{ if(!titleDone||performance.now()-titleSkipAt<350) return; if(S.nick) go('menu'); else askNick(); };
 $('#btnNick').onclick=askNick;
 $('#nickForm').addEventListener('submit',e=>{ e.preventDefault(); const v=$('#nickInput').value.trim().slice(0,12); if(!v) return; S.nick=v; save(); $('#nickDlg').hidden=true; go('menu'); });
 $('#btnBack').onclick=()=>go(mode==='journey'?'map':'menu');
@@ -900,7 +1170,62 @@ const soundLabel=()=>{ $('#btnSound').textContent=soundOn?'소리 켬':'소리 �
 $('#btnSound').onclick=()=>{ soundOn=!soundOn; soundLabel(); try{ localStorage.setItem('scm-sound',soundOn?'1':'0'); }catch(e){} if(soundOn) sfx.tap(); };
 let rz=0; window.addEventListener('resize',()=>{ clearTimeout(rz); rz=setTimeout(()=>{ if(!$('#game').hidden) layout(); },80); });
 soundLabel();
-window.scm={ stageCfg, fetchBoard, tap, findMove, findPath, startGame, go, endGame, S, grid:()=>grid, set:g=>{grid=g;paintAll();}, state:()=>({mode,score,combo,lock,over,tiles:tileCount(),basket:basket.length}) };
+/* ───────── 타이틀: 인쇄 연출 (롤러 → 종이 압착 → 색판 4번) ───────── */
+let titleDone=false, titleSkipAt=0; const titleTimers=[], titleAnims=[];
+function buildTitle(){
+  const tf=k=>`transform="translate(${22+k*56} 24) scale(.62)"`;
+  const plate=ks=>ks.map(k=>`<g ${tf(k)} fill="${KC[k]}" stroke="${KC[k]}" stroke-width="2.8" stroke-linejoin="round">${MOTIF[k].plate}</g>`).join('');
+  const key=id=>`<g fill="none" stroke="${K}" stroke-linejoin="round" stroke-linecap="round">`
+    +[0,1,2,3,4].map(k=>`<clipPath id="${id}c${k}"><path d="${MOTIF[k].shade}"/></clipPath><g ${tf(k)}><g stroke-width="4.2">${MOTIF[k].line}</g><g clip-path="url(#${id}c${k})"><path d="${HATCH}" stroke-width="1.15"/></g></g>`).join('')
+    +`<rect x="5" y="5" width="310" height="202" rx="3" stroke-width="2.6"/><rect x="10.5" y="10.5" width="299" height="191" rx="2" stroke-width="1.1"/></g>`
+    +`<text x="160" y="150" text-anchor="middle" font-family="'Gowun Batang','Batang',serif" font-weight="700" font-size="46" letter-spacing="3" fill="${K}">사천성 머지</text>`
+    +`<path fill="${K}" d="M62 171l7 6-7 6-7-6zM258 171l7 6-7 6-7-6z"/>`
+    +`<text x="160" y="183" text-anchor="middle" font-family="'IM Fell English','Gowun Batang',serif" font-style="italic" font-size="19" letter-spacing="1" fill="${K}">Shisen-Sho Merge</text>`;
+  const svg=(id,cls,inner)=>`<svg class="${cls}" xmlns="${NS}" viewBox="0 0 320 212" preserveAspectRatio="none" aria-hidden="true"><defs>${inkFilter(id+'f',41,1.6,-7.9)}</defs>${inner}</svg>`;
+  $('#plate').innerHTML=svg('pd','dry',key('pd'))+svg('pw','wet',key('pw'));
+  $('#paper').innerHTML=svg('pp','',
+    `<g class="pl" transform="translate(1.6 1.2)" filter="url(#ppf)">${plate([0,2])}</g>`
+   +`<g class="pl" transform="translate(-1.3 1.4)" filter="url(#ppf)">${plate([1,3])}</g>`
+   +`<g class="pl" transform="translate(1.1 -1.2)" filter="url(#ppf)">${plate([4])}</g>`
+   +`<g class="pl" filter="url(#ppf)">${key('pp')}</g>`);
+}
+function finishTitle(){
+  if(titleDone) return; titleDone=true;
+  titleTimers.forEach(clearTimeout); titleAnims.forEach(a=>{ try{ a.cancel(); }catch(e){} });
+  $('#plate').style.opacity=0; $('#roller').style.opacity=0; $('#paper').style.opacity=1;
+  document.querySelectorAll('#paper .pl').forEach(g=>{ g.style.opacity=1; });
+  const b=$('#btnStart'); b.style.opacity=1; b.style.pointerEvents='auto';
+}
+function runTitle(){
+  buildTitle();
+  const press=$('#press'), plate=$('#plate'), paper=$('#paper'), roller=$('#roller'), btn=$('#btnStart'), wet=plate.querySelector('.wet');
+  btn.style.opacity=0; btn.style.pointerEvents='none';
+  if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches){ finishTitle(); return; }
+  const an=(el,k,o)=>{ const a=el.animate(k,Object.assign({fill:'both'},o)); titleAnims.push(a); return a; };
+  const at=(ms,fn)=>titleTimers.push(setTimeout(()=>{ if(!titleDone) fn(); },ms));
+  // 1. 잉크 롤러가 판을 지나며 먹을 올린다
+  an(roller,{left:['-16%','106%']},{duration:850,easing:'ease-in-out'});
+  an(wet,{clipPath:['inset(0 100% 0 0)','inset(0 0% 0 0)']},{duration:850,easing:'ease-in-out'});
+  an(roller,{opacity:[1,0]},{duration:160,delay:860});
+  at(60,()=>hiss(0,.7,.1,1800));
+  // 2. 종이를 덮고 누른다
+  an(paper,{opacity:[0,1,1],translate:['0 -70%','0 -8%','0 0'],rotate:['-4deg','-1.2deg','0deg']},{duration:500,delay:900,easing:'ease-in'});
+  an(press,{scale:['1','.955','1']},{duration:280,delay:1400,fill:'none'});
+  at(1430,()=>{ knock(90,0,.35,.25); buzz(30); });
+  // 3. 들어 올리면 색판이 네 번 겹쳐 찍힌다
+  an(plate,{opacity:[1,0]},{duration:200,delay:1700});
+  an(paper,{translate:['0 0','0 -7%','0 0'],scale:['1','1.035','1']},{duration:420,delay:1720,fill:'none',easing:'ease-out'});
+  document.querySelectorAll('#paper .pl').forEach((g,i)=>{ const t=1900+i*470;
+    an(g,{opacity:[0,1]},{duration:80,delay:t});
+    an(paper,{scale:['1','.972','1']},{duration:210,delay:t,fill:'none'});
+    at(t,()=>{ knock(i===3?105:150+i*22,0,.3,.16); buzz(20); }); });
+  an(btn,{opacity:[0,1]},{duration:300,delay:3700});
+  at(4050,finishTitle);
+}
+$('#title').addEventListener('pointerdown',e=>{ if(!titleDone){ finishTitle(); titleSkipAt=performance.now(); e.preventDefault(); } },true);
+runTitle();
+
+window.scm={ gfx:()=>R.is3d?R.stats():{is3d:false}, stageCfg, fetchBoard, tap, findMove, findPath, startGame, go, endGame, S, grid:()=>grid, set:g=>{grid=g;paintAll();}, state:()=>({mode,score,combo,lock,over,tiles:tileCount(),basket:basket.length}) };
 })();
 </script>
 </body>
