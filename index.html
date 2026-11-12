@@ -42,7 +42,12 @@ body{
 #sheet > *{position:relative; z-index:1}
 .screen{width:100%; flex:1; min-height:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px}
 .screen[hidden], #result[hidden], #basket[hidden]{display:none}
-#game{gap:6px}
+#game{gap:6px; justify-content:flex-start}
+#game #boardWrap{margin-block:auto}
+.boardBox:empty{display:none}
+#result button{font-size:17px; padding:10px 18px}
+#result button.primary{background:var(--ink); color:var(--face)}
+#result #resMsg{font-size:16px}
 
 /* 목판 테두리 */
 .frame{
@@ -126,6 +131,22 @@ button.armed{background:var(--ink); color:var(--face)}
 #time.low{text-decoration:underline; text-underline-offset:3px}
 #time.crit{color:var(--seal)}
 #boardWrap.danger{outline:3px solid var(--seal)}
+#game #hud{width:100%; display:flex; align-items:stretch; gap:8px}
+#hud #btnBack{font-size:22px; padding:4px 4px; align-self:center}
+.hc{display:flex; flex-direction:column; align-items:center; justify-content:center; min-width:60px; padding:3px 10px 4px; border:2px solid var(--ink); background:var(--face); box-shadow:2px 2px 0 var(--ink)}
+.hc.wide{flex:1}
+.hc[hidden]{display:none}
+.hc small{font-size:12px; line-height:1.25}
+.hc b{font-size:26px; line-height:1.05; font-family:var(--num); font-variant-numeric:lining-nums tabular-nums}
+#coach{margin:2px 0; width:100%; text-align:center; font-size:17px; font-weight:700; line-height:1.3; text-wrap:balance}
+#coach[hidden]{display:none}
+#finger{position:absolute; width:46px; height:58px; margin:-2px 0 0 -18px; pointer-events:none; z-index:8; animation:tapbob .9s ease-in-out infinite; filter:drop-shadow(2px 3px 0 rgba(27,23,20,.35)); transition:left .25s ease-out, top .25s ease-out}
+#finger[hidden]{display:none}
+@keyframes tapbob{0%,100%{translate:0 12px}50%{translate:0 0}}
+#tools .boost{position:relative; flex:1; max-width:112px; min-height:66px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; font-size:15px; padding:6px 4px}
+.boost svg{width:28px; height:28px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round}
+.boost em{position:absolute; top:-10px; right:-8px; min-width:26px; height:26px; box-sizing:border-box; padding:0 4px; border-radius:13px; background:var(--ink); color:var(--face); font-family:var(--num); font-variant-numeric:lining-nums; font-style:normal; font-weight:700; font-size:17px; line-height:26px; text-align:center}
+#tools{gap:14px!important; padding-top:8px}
 #comboRow{width:100%; display:flex; align-items:center; gap:10px; font-size:13px; height:16px}
 #comboLabel{min-width:52px; font-weight:700}
 #comboBar{flex:1; height:5px; border:1.5px solid var(--ink); box-sizing:border-box; overflow:hidden}
@@ -133,7 +154,7 @@ button.armed{background:var(--ink); color:var(--face)}
 #boardWrap{background:rgba(27,23,20,.1); padding:var(--mg); outline:1.5px solid var(--ink); outline-offset:-1px; flex:none}
 #board{
   position:relative; display:grid; grid-template-columns:repeat(8,var(--cw)); grid-auto-rows:var(--ch);
-  background-image:radial-gradient(circle, var(--ink) 0 1px, transparent 1.6px);
+  background-image:radial-gradient(circle, rgba(27,23,20,.4) 0 1px, transparent 1.6px);
   background-size:var(--cw) var(--ch); cursor:pointer;
 }
 .cell{position:relative}
@@ -233,11 +254,13 @@ button.armed{background:var(--ink); color:var(--face)}
   </section>
 
   <section id="game" class="screen" hidden>
-    <header>
-      <button id="btnBack" class="plain" type="button" aria-label="메뉴로">←</button>
-      <span id="modeLabel"></span>
-      <div class="stats"><span>점수 <b id="score">0</b></span><span><b id="time">0:00</b></span></div>
+    <header id="hud">
+      <button id="btnBack" class="plain" type="button" aria-label="나가기">←</button>
+      <div class="hc"><small id="hudStageL">단계</small><b id="hudStage"></b></div>
+      <div class="hc wide"><small id="goalL">남은 패</small><b id="goalV"></b></div>
+      <div class="hc" id="timeCell"><small>시간</small><b id="time">0:00</b></div>
     </header>
+    <p id="coach" hidden></p>
     <div id="comboRow"><span id="comboLabel">연속 ×1</span><div id="comboBar"><i></i></div></div>
     <div id="boardWrap"><div id="board"></div></div>
     <div id="basket" hidden></div>
@@ -264,7 +287,7 @@ button.armed{background:var(--ink); color:var(--face)}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 (()=>{
-const COLS=8, ROWS=10, MAXL=5, COMBO_MS=3000, STAGES=30;
+let COLS=8, ROWS=10; const MAXL=5, COMBO_MS=3000, STAGES=30, TUT_N=5, GROW_END=15;
 const P='#F3ECD8', K='#1B1714', G='#E2B437', GL='#F7E391';
 const KC=['#DB3A1C','#2443B0','#A31F70','#178F84','#BF7F17']; // 해 주홍·달 군청·장미 자주·열쇠 청록·왕관 황토
 const NS='http://www.w3.org/2000/svg';
@@ -345,7 +368,7 @@ function tileSVG(k,l){
   // 4단계: 배경 문양
   if(l>=4) s+=`<g clip-path="url(#in)" fill="none" stroke="${c}" stroke-width="1.2">${BG[k](c)}</g>`;
   // 5단계: 금빛 광채
-  if(l>=5) s+=`<g clip-path="url(#in)"><path d="${RAYS}" fill="${G}"/></g>`;
+  if(l>=5) s+=`<g clip-path="url(#in)"><rect x="9" y="9" width="58" height="78" fill="${K}"/><path d="${RAYS}" fill="${G}"/></g>`;
   if(l>=4) s+=`<g ${MT} fill="${P}" stroke="${P}" stroke-width="10" stroke-linejoin="round" stroke-linecap="round">${m.line}</g>`;
   // 2단계: 손 채색 (선 밖으로 살짝 삐져나옴)
   if(l>=2) s+=`<g transform="translate(1.9 1.4)" filter="url(#ink2)"><g ${MT} fill="${c}" stroke="${c}" stroke-width="2.8" stroke-linejoin="round">${m.plate}</g></g>`;
@@ -354,10 +377,13 @@ function tileSVG(k,l){
   // 먹판: 윤곽 + 해칭
   s+=`<g filter="url(#ink)"><rect x="2" y="2" width="72" height="92" rx="7" fill="none" stroke="${K}" stroke-width="2.8"/>`;
   if(l>=3){ // 3단계: 테두리 장식
-    s+=`<rect x="8.5" y="8.5" width="59" height="79" rx="2" fill="none" stroke="${K}" stroke-width="1.5"/>`;
-    s+=`<path fill="${K}" d="M8.5 8.5h9a9 9 0 0 1-9 9zM67.5 8.5h-9a9 9 0 0 0 9 9zM8.5 87.5h9a9 9 0 0 0-9-9zM67.5 87.5h-9a9 9 0 0 1 9-9zM38 5.2l4 3.3-4 3.3-4-3.3zM38 84.2l4 3.3-4 3.3-4-3.3zM5.4 48l3.1-4 3.1 4-3.1 4zM64.4 48l3.1-4 3.1 4-3.1 4z"/>`;
+    s+=`<rect x="8.5" y="8.5" width="59" height="79" rx="2" fill="none" stroke="${K}" stroke-width="2.5"/>`;
+    s+=`<path fill="${K}" d="M8.5 8.5h13a13 13 0 0 1-13 13zM67.5 8.5h-13a13 13 0 0 0 13 13zM8.5 87.5h13a13 13 0 0 0-13-13zM67.5 87.5h-13a13 13 0 0 1 13-13zM38 5.2l4 3.3-4 3.3-4-3.3zM5.4 48l3.1-4 3.1 4-3.1 4zM64.4 48l3.1-4 3.1 4-3.1 4z"/>`;
   }
   s+=`<g ${MT} fill="none" stroke="${K}" stroke-linejoin="round" stroke-linecap="round"><g stroke-width="4.2">${m.line}</g><g clip-path="url(#sh)"><path d="${HATCH}" stroke-width="1.15"/></g></g></g>`;
+  // 단계 점: 흑백에서도 단계를 셀 수 있게
+  if(l>=5) s+=`<rect x="8.5" y="79.2" width="59" height="12.6" rx="2" fill="${K}"/>`; // 5단계는 먹 띠 위에 금빛 점
+  for(let i=0;i<l;i++) s+=`<circle cx="${(38+(i-(l-1)/2)*9.6).toFixed(1)}" cy="85.5" r="3.9" fill="${l>=5?GL:K}" stroke="${l>=5?K:P}" stroke-width="1.3"/>`;
   return s+'</svg>';
 }
 function rockSVG(){
@@ -427,13 +453,14 @@ if(!S.rec){ // 모드별 기록 (예전 통합 기록은 여정으로 옮김)
   if(S.best) Object.assign(S.rec.journey,S.best,{games:S.games||0,gold:S.gold||0,cur:S.streak||0});
   delete S.best; delete S.games; delete S.gold; delete S.streak;
 }
+if(!S.v3){ if(S.jour>0){ const ns={}; for(const k in S.stars) ns[+k+15]=S.stars[k]; for(let i=1;i<=15;i++) ns[i]=3; S.stars=ns; S.jour+=15; } S.v3=1; }
 const save=()=>{ try{ localStorage.setItem(SAVE,JSON.stringify(S)); }catch(e){} };
 const fmtT=ms=>{ const s=Math.max(0,Math.round(ms/1000)); return (s/60|0)+':'+String(s%60).padStart(2,'0'); };
 const fmtN=n=>n.toLocaleString('en-US');
 const today=()=>{ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); };
 const seeded=a=>()=>{ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; };
 const BN={hint:'힌트',shuffle:'셔플',bomb:'폭탄'};
-const boostTotal=()=>S.boost.hint+S.boost.shuffle+S.boost.bomb;
+const boostTotal=()=>S.boost.shuffle+S.boost.bomb;
 
 /* ───────── 상태 ───────── */
 let grid=[], sel=null, lock=false, score=0, combo=0, lastMatch=-1e9;
@@ -443,14 +470,15 @@ let cw=40, ch=50, mg=12, comboAnim=null, comboTO=0, toastTO=0, uid=0;
 const board=$('#board'), tiles=[];
 const pathLayer=document.createElementNS(NS,'svg'); pathLayer.id='pathLayer';
 const fx=document.createElement('div'); fx.id='fx';
+function buildCells(){ board.querySelectorAll('.cell').forEach(c=>c.remove()); tiles.length=0; const first=board.firstChild;
 for(let y=0;y<ROWS;y++){ tiles[y]=[]; for(let x=0;x<COLS;x++){
   const c=document.createElement('div'); c.className='cell';
   const t=document.createElement('div'); t.className='tile empty';
   t.style.setProperty('--r',(rnd()*1.8-.9).toFixed(2)+'deg');
   t.style.setProperty('--jx',(rnd()*1.2-.6).toFixed(2)+'px'); t.style.setProperty('--jy',(rnd()*1.2-.6).toFixed(2)+'px');
-  c.appendChild(t); board.appendChild(c); tiles[y][x]=t;
-}}
-board.appendChild(pathLayer); board.appendChild(fx);
+  c.appendChild(t); board.insertBefore(c,first); tiles[y][x]=t;
+}} board.style.gridTemplateColumns=`repeat(${COLS},var(--cw))`; }
+board.appendChild(pathLayer); board.appendChild(fx); buildCells();
 
 const rockCls=g=>g.type==='stone'?(g.hp>1?'stone':'stone2'):g.type==='bramble'?'bramble':'rock';
 function paint(x,y){
@@ -459,7 +487,6 @@ function paint(x,y){
   R.paint(x,y,g,!!(sel&&sel.x===x&&sel.y===y),mode==='basket'&&!!g&&!isFree(x,y));
 }
 function paintAll(){ for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++)paint(x,y); }
-function hud(){ $('#score').textContent=fmtN(score); }
 function toast(msg,ms=1500){ const t=$('#toast'); t.textContent=msg; t.classList.add('on'); clearTimeout(toastTO); toastTO=setTimeout(()=>t.classList.remove('on'),ms); }
 
 /* ───────── 렌더러: 2D(예비) / 3D 목판 블록 ───────── */
@@ -476,7 +503,8 @@ const R2D={
   flipIn(){ tiles.flat().forEach(t=>{ t.getAnimations().forEach(n=>n.cancel()); t.animate({scale:['0 1','1 1']},{duration:160,easing:'ease-out'}); }); },
   hint(cells){ tiles.flat().forEach(t=>t.classList.remove('hint')); cells.forEach(p=>tiles[p.y][p.x].classList.add('hint')); },
   boardShake(){ board.animate({translate:['0 0','-4px 3px','4px -3px','-2px 2px','0 0']},{duration:260}); },
-  debris(){ return false; }, resize(){}
+  debris(){ return false; }, resize(){}, reset(){},
+  glint(cells){ cells.forEach(p=>tiles[p.y][p.x].animate({scale:['1','1.07','1'],filter:['none','brightness(1.12)','none']},{duration:900})); }
 };
 let R=R2D;
 
@@ -590,7 +618,7 @@ function make3D(simple){
   let rr; try{ rr=new T.WebGLRenderer({canvas,alpha:true,antialias:true,powerPreference:'low-power'}); }catch(e){ return null; }
   rr.setClearColor(0x000000,0);
   const scene=new T.Scene(), cam=new T.OrthographicCamera(0,1,1,0,.1,3000); cam.position.z=1500;
-  const N=COLS*ROWS, FH=1.26, D=.36, BV=.045;
+  const N=80, FH=1.26, D=.36, BV=.045;
   const sh=new T.Shape(), w=.5-BV, h=FH/2-BV, r=.06;
   sh.moveTo(-w+r,-h); sh.lineTo(w-r,-h); sh.quadraticCurveTo(w,-h,w,-h+r); sh.lineTo(w,h-r); sh.quadraticCurveTo(w,h,w-r,h);
   sh.lineTo(-w+r,h); sh.quadraticCurveTo(-w,h,-w,h-r); sh.lineTo(-w,-h+r); sh.quadraticCurveTo(-w,-h,-w+r,-h);
@@ -685,6 +713,8 @@ function make3D(simple){
     flipOut(){ if(flipTw) drop(flipTw); flipTw=add(-1,160,t=>{ gflip=1-t*t; },true); },
     flipIn(){ if(flipTw) drop(flipTw); flipTw=add(-1,160,t=>{ gflip=1-(1-t)*(1-t); }); },
     hint(cells){ hintTw.forEach(drop); hintTw=cells.map(p=>add(idx(p.x,p.y),1350,(t,s)=>{ s.rz=Math.sin(t*18.85)*.14; s.oz+=cw*.14*Math.sin(Math.PI*t); })); },
+    glint(cells){ cells.forEach(p=>add(idx(p.x,p.y),900,(t,s)=>{ const k=Math.sin(Math.PI*t); s.sx*=1+.07*k; s.sy*=1+.07*k; s.oz+=cw*.12*k; })); },
+    reset(){ st.forEach(o=>{ o.vis=false; o.sel=false; }); tw=tw.filter(o=>o.i<0); kick(); },
     boardShake(){ add(-1,280,t=>{ scene.position.set(kf(t,[0,-4,4,-2,0]),kf(t,[0,-3,3,-2,0]),0); }); },
     debris(cx,cy){
       const woods=[[.71,.58,.44],[.58,.46,.34],[.93,.87,.72]];
@@ -762,8 +792,7 @@ function deal(cfg,rng){
   grid=Array.from({length:ROWS},()=>Array(COLS).fill(null));
   let n=0; const put=(c,o)=>{ for(let j=0;j<c;j++){ const p=pos[n++]; grid[p.y][p.x]=Object.assign({rock:true},o); } };
   put(cfg.wall,{type:'wall'}); put(cfg.stone,{type:'stone',hp:2}); put(cfg.bramble,{type:'bramble'});
-  const T=COLS*ROWS-n, base=Math.floor(T/5), extra=T%5, bag=[];
-  for(let k=0;k<5;k++){ const c=SETS[base+(k<extra?1:0)]; c.forEach((cnt,i)=>{ for(let j=0;j<cnt;j++)bag.push({k,l:i+1}); }); }
+  const bag=genBag(COLS*ROWS-n,rng);
   const spots=pos.slice(n);
   do{ shuffle(bag,rng); spots.forEach((p,i)=>grid[p.y][p.x]=bag[i]); }while(!findMove());
 }
@@ -782,12 +811,12 @@ function reshuffle(){
   return false;
 }
 // 30단계까지는 고정 곡선, 그 뒤로는 10단계마다 한 단계씩 어려워지고 50단계마다 쉬어가는 판
-const isRest=s=>s>STAGES&&s%50===0;
+const isRest=s=>s-GROW_END>STAGES&&(s-GROW_END)%50===0;
 const starsOf=s=>s<=S.jour?(S.stars[s]||1):0;
 const starTotal=()=>{ let n=0; for(let i=1;i<=S.jour;i++) n+=starsOf(i); return n; };
 const starStr=n=>'★'.repeat(n)+'☆'.repeat(3-n);
-function stageCfg(s){
-  if(isRest(s)) return {wall:0,stone:0,bramble:6,limit:180000};
+function oldCfg(s){
+  if(s>STAGES&&s%50===0) return {wall:0,stone:0,bramble:6,limit:180000};
   if(s>STAGES){
     const t=Math.floor((s-1)/10)-2, n=Math.min(25,16+t), wall=Math.min(10,6+t), stone=Math.min(8,6+Math.floor(t/2));
     return {wall,stone,bramble:n-wall-stone,limit:Math.max(100,122-4*t)*1000};
@@ -802,9 +831,9 @@ function layout(){
   const sheet=$('#sheet'), cs=getComputedStyle(sheet);
   const W=sheet.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight);
   const bk=mode==='basket';
-  const used=$('#game header').offsetHeight+$('#comboRow').offsetHeight+$('#tools').offsetHeight+6*4+12+8;
+  const used=$('#game header').offsetHeight+$('#comboRow').offsetHeight+$('#coach').offsetHeight+$('#tools').offsetHeight+6*6+12+8;
   const H=sheet.clientHeight-used, M=.32;
-  cw=Math.max(20,Math.floor(Math.min(W/(COLS+2*M), bk?(H-16)/((ROWS+2*M+1)*1.25):H/((ROWS+2*M)*1.25))));
+  cw=Math.max(20,Math.floor(Math.min(84,W/(COLS+2*M), bk?(H-16)/((ROWS+2*M+1)*1.25):H/((ROWS+2*M)*1.25))));
   ch=Math.round(cw*1.25); mg=Math.round(cw*M);
   const r=document.documentElement.style; r.setProperty('--cw',cw+'px'); r.setProperty('--ch',ch+'px'); r.setProperty('--mg',mg+'px');
   const w=COLS*cw+2*mg, h=ROWS*ch+2*mg;
@@ -848,17 +877,18 @@ function pop(cx,cy,text){
   e.animate({translate:['0 0',`0 ${-ch*.9}px`],opacity:[1,1,0]},{duration:800,easing:'ease-out',fill:'both'}).onfinish=()=>e.remove();
 }
 function setCombo(c){
-  const bar=$('#comboBar i'); $('#comboLabel').textContent='연속 ×'+Math.max(1,c);
+  const bar=$('#comboBar i'); $('#comboLabel').textContent='연속 ×'+Math.max(1,c); $('#comboRow').style.visibility=c>1?'visible':'hidden';
   if(comboAnim) comboAnim.cancel(); clearTimeout(comboTO);
-  if(c>0){ comboAnim=bar.animate({width:['100%','0%']},{duration:COMBO_MS,easing:'linear'}); comboTO=setTimeout(()=>{$('#comboLabel').textContent='연속 ×1';},COMBO_MS); }
+  if(c>0){ comboAnim=bar.animate({width:['100%','0%']},{duration:COMBO_MS,easing:'linear'}); comboTO=setTimeout(()=>{$('#comboLabel').textContent='연속 ×1'; $('#comboRow').style.visibility='hidden';},COMBO_MS); }
 }
 const buzz=p=>{ try{ if(navigator.vibrate&&(!navigator.userActivation||navigator.userActivation.hasBeenActive)) navigator.vibrate(p); }catch(e){} };
 
 
 /* ───────── 한 수 ───────── */
-function select(p){ const old=sel; sel=p; if(old) paint(old.x,old.y); if(p){ paint(p.x,p.y); R.press(p.x,p.y); } }
+function select(p){ const old=sel; sel=p; if(old) paint(old.x,old.y); if(p){ paint(p.x,p.y); R.press(p.x,p.y); } if(tutOn) guide(); }
 function tap(x,y){
   if(lock||over||x<0||y<0||x>=COLS||y>=ROWS) return;
+  touch();
   if(bombArmed){ bombAt(x,y); return; }
   if(mode==='basket'){ basketTap(x,y); return; }
   const g=grid[y][x]; if(!g||g.rock) return;
@@ -910,6 +940,7 @@ function doMatch(a,b,path,g){
       R.boardShake();
       pts=(300+50*rocks)*mult; sfx.boom(); buzz([30,40,30]);
     }
+    merges++; if(lvl<MAXL) madeMax=Math.max(madeMax,lvl+1); else booms++;
     score+=pts; hud(); setCombo(combo); pop(cx,cy-ch*.3,'+'+pts+(mult>1?' ×'+mult:''));
     lock=false; afterMove();
   },200);
@@ -919,13 +950,14 @@ function shuffleAnim(){
   R.flipOut();
   setTimeout(()=>{ reshuffle(); sel=null; paintAll();
     R.flipIn();
-    setTimeout(()=>{ if(!over) lock=false; },170);
+    setTimeout(()=>{ if(!over){ lock=false; guide(); } },170);
   },170);
 }
 function afterMove(){
-  if(over) return;
-  if(tileCount()===0){ endGame(true); return; }
-  if(findMove()) return;
+  if(over) return; hud();
+  if(goalMet()){ endGame(true); return; }
+  if(findMove()){ guide(); return; }
+  if(tutOn&&!pairExists()){ lock=true; finger.hidden=true; toast('합쳐진 패는 둘째로 누른 자리에 생깁니다. 다시 해 봅시다',2200); setTimeout(()=>{ if(!over) startGame('journey',jStage); },1600); return; }
   lock=true; toast('막혔습니다. 패를 섞습니다');
   setTimeout(()=>{ if(!over) shuffleAnim(); },450);
 }
@@ -944,18 +976,26 @@ function bombAt(x,y){
   bombArmed=false; S.boost.bomb--; save(); burst((x+.5)*cw,(y+.5)*ch,true); sfx.boom(); buzz([30,40,30]);
   score+=50*n; hud(); tools(); afterMove();
 }
+const boostLeft=t=>t==='hint'?hintsLeft:S.boost[t];
 function useBoost(t){
-  if(lock||over||S.boost[t]<=0) return;
+  if(lock||over||boostLeft(t)<=0) return; touch();
   if(t==='bomb'){ bombArmed=!bombArmed; if(bombArmed){ select(null); toast('터뜨릴 칸을 누르세요'); } tools(); return; }
-  if(t==='hint'){ if(!hint()) return; }
+  if(t==='hint'){ if(!hint()) return; hintsLeft--; tools(); return; } // 힌트는 매 판 3개
   if(t==='shuffle'){ select(null); clearHint(); shuffleAnim(); }
   S.boost[t]--; save(); tools();
 }
+const ICON={
+  hint:'<path d="M9 21h6M10 18h4M12 3a6 6 0 0 0-4 10.4c1 1 1.4 2 1.4 3.1h5.2c0-1.1.4-2.1 1.4-3.1A6 6 0 0 0 12 3z"/>',
+  shuffle:'<path d="M3 7h4l8 10h5M3 17h4l2.4-3M13.6 9 15 7h5M17.5 4.5 20 7l-2.5 2.5M17.5 14.5 20 17l-2.5 2.5"/>',
+  bomb:'<circle cx="10.5" cy="14" r="6.5"/><path d="M15 9l2.5-2.5M17.5 6.5c.5-2.5 3.5-2.5 3.5 0"/>'
+};
 function tools(){
   const el=$('#tools'); el.textContent='';
-  const add=(label,fn,o={})=>{ const b=document.createElement('button'); b.type='button'; b.textContent=label; b.onclick=fn; if(o.off) b.disabled=true; if(o.armed) b.className='armed'; el.appendChild(b); };
-  if(mode==='journey') for(const t of ['hint','shuffle','bomb']) add(BN[t]+' '+S.boost[t],()=>useBoost(t),{off:S.boost[t]<=0,armed:t==='bomb'&&bombArmed});
-  else if(mode==='daily') add('힌트 (+10초)',()=>{ if(hint()){ hints++; toast('힌트 벌점 +10초',1100); tick(); } });
+  const add=(t,label,n,fn,o={})=>{ const b=document.createElement('button'); b.type='button'; b.className='boost'+(o.armed?' armed':'');
+    b.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true">'+ICON[t]+'</svg><span></span>'+(n===null?'':'<em></em>');
+    b.querySelector('span').textContent=label; if(n!==null) b.querySelector('em').textContent=n; b.onclick=fn; if(o.off) b.disabled=true; el.appendChild(b); };
+  if(mode==='journey'&&!tutOn) for(const t of ['hint','shuffle','bomb']) add(t,BN[t],boostLeft(t),()=>useBoost(t),{off:boostLeft(t)<=0,armed:t==='bomb'&&bombArmed});
+  else if(mode==='daily') add('hint','힌트 +10초',null,()=>{ if(hint()){ hints++; toast('힌트 벌점 +10초',1100); tick(); } });
 }
 
 /* ───────── 바구니 모드 ───────── */
@@ -971,7 +1011,7 @@ function basketTap(x,y){
   grid[y][x]=null; const item={k:g.k,l:g.l};
   let at=-1; basket.forEach((b,i)=>{ if(b.k===g.k&&b.l===g.l) at=i; });
   basket.splice(at<0?basket.length:at+1,0,item);
-  sfx.tap(); paintAll(); drawBasket(item);
+  sfx.tap(); paintAll(); drawBasket(item); hud();
   const same=basket.filter(b=>b.k===g.k&&b.l===g.l);
   if(same.length>=3){
     lock=true;
@@ -992,20 +1032,108 @@ function basketTap(x,y){
   } else if(basket.length>=7) endGame(false,'바구니가 가득 찼습니다');
 }
 
+/* ───────── 3.0: 목표·튜토리얼·손가락 안내 ───────── */
+let goal={type:'clear'}, merges=0, madeMax=0, booms=0, hintsLeft=3, tutOn=false, usedCont=false, paused=false, lastAct=0;
+const touch=()=>{ lastAct=performance.now(); };
+const rockCount=()=>{ let n=0; for(const r of grid) for(const g of r) if(g&&g.rock) n++; return n; };
+function pairExists(){ const c={}; for(const r of grid) for(const g of r) if(g&&!g.rock){ const k=g.k*10+g.l; if(c[k]) return true; c[k]=1; } return false; }
+function goalMet(){ return goal.type==='clear'?tileCount()===0:goal.type==='merge'?merges>=goal.n:goal.type==='make'?madeMax>=goal.level:goal.type==='rocks'?rockCount()===0:booms>=goal.n; }
+function setSize(c,r){ if(c!==COLS||r!==ROWS){ COLS=c; ROWS=r; buildCells(); } R.reset(); }
+function hud(){
+  const L=$('#goalL'), V=$('#goalV');
+  if(goal.type==='clear'){ L.textContent='남은 패'; V.textContent=tileCount(); }
+  else if(goal.type==='merge'){ L.textContent='같은 패 잇기'; V.textContent=Math.min(merges,goal.n)+'/'+goal.n; }
+  else if(goal.type==='make'){ L.textContent=goal.level+'단계 패 만들기'; V.textContent=(madeMax>=goal.level?1:0)+'/1'; }
+  else if(goal.type==='rocks'){ L.textContent='남은 덤불'; V.textContent=rockCount(); }
+  else { L.textContent='황금 폭발'; V.textContent=Math.min(booms,goal.n)+'/'+goal.n; }
+}
+// 튜토리얼 5판: 글자=종류(S 해·M 달·R 장미·K 열쇠·C 왕관)+단계, B 덤불, W 벽
+const TUT=[
+ {cols:4,rows:4,grid:['. . . .','S1 S1 M1 M1','. R1 . R1','. . . .'],goal:{type:'merge',n:3},text:'같은 그림 두 개를 차례로 누르세요'},
+ {cols:4,rows:4,grid:['. . . .','K1 K1 K1 K1','. . . .','. . . .'],goal:{type:'make',level:3},text:'이으면 한 단계 위 패로 합쳐집니다'},
+ {cols:4,rows:4,grid:['C1 M1 R1 .','. . . .','R1 . . .','. . M1 C1'],goal:{type:'merge',n:3},text:'선은 두 번까지 꺾이고 판 바깥으로도 돕니다'},
+ {cols:4,rows:4,grid:['S1 B . S1','. . . .','K1 K1 B .','. . . .'],goal:{type:'rocks'},text:'덤불 옆 패를 나중에 누르면 덤불이 걷힙니다'},
+ {cols:4,rows:4,grid:['W . . W','S4 S4 . .','. . S4 S4','W . . W'],goal:{type:'boom',n:1},text:'5단계 두 장을 이으면 터지며 벽을 치웁니다'}
+];
+function dealFixed(rows){
+  grid=rows.map(r=>r.split(' ').map(t=>t==='.'?null:t==='B'?{rock:true,type:'bramble'}:t==='W'?{rock:true,type:'wall'}:t==='T'?{rock:true,type:'stone',hp:2}:{k:'SMRKC'.indexOf(t[0]),l:+t[1]}));
+}
+// 6~15단계: 판이 조금씩 커진다 [칸, 줄, 덤불, 바위]
+const GROW=[[5,6,0,0],[5,6,2,0],[6,6,2,0],[6,7,2,1],[6,8,3,0],[7,8,3,1],[7,8,2,2],[7,9,4,1],[8,9,4,1],[8,10,4,2]];
+function stageCfg(s){
+  if(s<=TUT_N) return Object.assign({tut:s},TUT[s-1]);
+  if(s<=GROW_END){ const i=s-TUT_N-1, g=GROW[i], tiles=g[0]*g[1]-g[2]-g[3];
+    return {cols:g[0],rows:g[1],wall:0,stone:g[3],bramble:g[2],limit:Math.round(tiles*(6-i/3))*1000}; }
+  return oldCfg(s-GROW_END);
+}
+// 판 크기에 맞춰 패 묶음을 만든다: 종류마다 끝까지 합치면 5단계 두 장이 남도록(합 32)
+function splitKind(c){
+  if(SETS[c]) return SETS[c].concat(0);
+  let best=null;
+  for(let d=0;d<=4;d++)for(let c3=0;c3<=8;c3++)for(let b=0;b<=16;b++){ const a=c-b-c3-d; if(a<0||a+2*b+4*c3+8*d!==32) continue;
+    const sc=d*100+Math.abs(a-4)*3+c3; if(!best||sc<best.sc) best={sc,v:[a,b,c3,d]}; }
+  return best?best.v:[0,0,0,4];
+}
+function genBag(T,rng){
+  let nk=Math.max(1,Math.min(5,Math.round(T/14)));
+  const kinds=shuffle([0,1,2,3,4],rng).slice(0,nk), bag=[];
+  kinds.forEach((k,i)=>{ const c=Math.floor(T/nk)+(i<T%nk?1:0); splitKind(c).forEach((cnt,l)=>{ for(let j=0;j<cnt;j++) bag.push({k,l:l+1}); }); });
+  return bag;
+}
+// 손가락 안내
+const finger=document.createElement('div'); finger.id='finger'; finger.hidden=true;
+finger.innerHTML=`<svg viewBox="0 0 48 60" aria-hidden="true"><path d="M17 57C10 50 5 42 7 36c1.5-4 6.5-4 8.5 0V10c0-6.5 9-6.5 9 0v17c2-4 9-3 9 2 2-3.5 8-2.5 8 2.5V44c0 6-3 10-6 13z" fill="${P}" stroke="${K}" stroke-width="3" stroke-linejoin="round"/><path d="M24.5 27v8M33.5 29v7" fill="none" stroke="${K}" stroke-width="2" stroke-linecap="round"/></svg>`;
+fx.appendChild(finger);
+const nearRock=p=>{ for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){ const x=p.x+dx,y=p.y+dy; if(x<0||y<0||x>=COLS||y>=ROWS) continue; const g=grid[y][x]; if(g&&g.rock&&g.type!=='wall') return true; } return false; };
+function movesAll(){
+  const by={}, out=[];
+  for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){ const g=grid[y][x]; if(g&&!g.rock)(by[g.k*10+g.l]||(by[g.k*10+g.l]=[])).push({x,y}); }
+  for(const k in by){ const a=by[k]; for(let i=0;i<a.length;i++)for(let j=i+1;j<a.length;j++) if(findPath(a[i],a[j])) out.push([a[i],a[j]]); }
+  return out;
+}
+function guide(){
+  if(!tutOn||over||!grid.length){ finger.hidden=true; return; }
+  const ms=movesAll(); if(!ms.length){ finger.hidden=true; return; }
+  let best=null; // 덤불 옆 패가 '둘째'가 되는 순서를 먼저 권한다
+  ms.forEach(([a,b])=>[[a,b],[b,a]].forEach(([p,q])=>{ const sc=(nearRock(q)?2:0)-(nearRock(p)?1:0); if(!best||sc>best.sc) best={sc,p,q}; }));
+  let t=best.p;
+  if(sel){ const same=(a,b)=>a.x===b.x&&a.y===b.y, mine=ms.filter(m=>same(m[0],sel)||same(m[1],sel)).map(m=>same(m[0],sel)?m[1]:m[0]);
+    if(mine.length){ t=mine.find(nearRock)||mine[0]; if(goal.type==='rocks'&&nearRock(sel)&&!nearRock(t)) t=sel; } }
+  finger.hidden=false; finger.style.left=((t.x+.5)*cw)+'px'; finger.style.top=((t.y+.5)*ch)+'px';
+}
+// 첫 시간 초과에는 30초를 한 번 더 준다
+function offerContinue(){
+  paused=true; lock=true; const t0=performance.now(); select(null); clearHint();
+  $('#resTitle').textContent='시간이 다 됐어요'; $('#resMsg').textContent='이번 한 번은 30초를 더 드립니다'; $('#resMsg').hidden=false;
+  $('#resTable').hidden=true; $('#resBoard').textContent=''; $('#shareBox').hidden=true; $('#stamp').hidden=true;
+  const btns=$('#resBtns'); btns.textContent='';
+  const add=(label,fn)=>{ const x=document.createElement('button'); x.type='button'; x.textContent=label; x.onclick=fn; btns.appendChild(x); };
+  const resume=()=>{ startT+=performance.now()-t0; paused=false; lock=false; $('#resTable').hidden=false; };
+  add('+30초 이어하기',()=>{ usedCont=true; limit+=30000; resume(); $('#result').hidden=true; clearWarn(); touch(); tick(); });
+  add('그만하기',()=>{ resume(); endGame(false,'시간이 다 되었습니다'); });
+  btns.firstChild.className='primary';
+  $('#result').hidden=false;
+}
+
 /* ───────── 판 시작 / 종료 ───────── */
 function startGame(m,stage){
-  mode=m; jStage=stage||1; over=false; lock=false; bombArmed=false; basket=[]; sel=null;
-  score=0; combo=0; maxCombo=0; hints=0; gotStars=0; subP=null; clearWarn(); lastMatch=-1e9; limit=0; setCombo(0); clearHint();
-  $('#result').hidden=true; $('#basket').hidden=m!=='basket'; show('game'); tools();
+  mode=m; jStage=stage||1; over=false; lock=false; paused=false; bombArmed=false; basket=[]; sel=null;
+  score=0; combo=0; maxCombo=0; hints=0; gotStars=0; subP=null; merges=madeMax=booms=0; hintsLeft=3; usedCont=false; clearWarn();
+  lastMatch=-1e9; limit=0; setCombo(0); clearHint(); goal={type:'clear'}; tutOn=false;
+  $('#result').hidden=true; $('#resTable').hidden=false; $('#basket').hidden=m!=='basket'; show('game');
+  const coach=$('#coach'); coach.hidden=true;
   if(m==='journey'){
-    const c=stageCfg(jStage); limit=c.limit; deal(c,rnd); $('#modeLabel').innerHTML='여정 <span class="num">'+jStage+'</span>';
-    if(S.pending){ S.pending=0; if(boostTotal()<3){ const t=['hint','shuffle','bomb'][rnd()*3|0]; S.boost[t]++; setTimeout(()=>toast('연승 보상: '+BN[t]+' +1',2200),300); } save(); tools(); }
+    const c=stageCfg(jStage); setSize(c.cols||8,c.rows||10); limit=c.limit||0; $('#hudStageL').textContent='단계'; $('#hudStage').textContent=jStage;
+    if(c.tut){ tutOn=true; goal=c.goal; dealFixed(c.grid); coach.textContent=c.text; coach.hidden=false; }
+    else { deal(c,rnd);
+      if(S.pending){ S.pending=0; if(boostTotal()<3){ const t=['shuffle','bomb'][rnd()*2|0]; S.boost[t]++; setTimeout(()=>toast('연승 보상: '+BN[t]+' +1',2200),300); } save(); } }
   } else if(m==='daily'){
-    deal({wall:3,stone:3,bramble:4},seeded(+today().replace(/-/g,''))); $('#modeLabel').textContent='오늘의 판';
+    setSize(8,10); deal({wall:3,stone:3,bramble:4},seeded(+today().replace(/-/g,''))); $('#hudStageL').textContent='오늘의'; $('#hudStage').textContent='판';
   } else {
-    dealBasket(); drawBasket(); $('#modeLabel').textContent='바구니'; setTimeout(()=>toast('빈칸이나 가장자리에 닿은 패만 집을 수 있습니다',2600),300);
+    setSize(8,10); dealBasket(); drawBasket(); $('#hudStageL').textContent='바구니'; $('#hudStage').textContent='7칸'; setTimeout(()=>toast('빈칸이나 가장자리에 닿은 패만 집을 수 있습니다',2600),300);
   }
-  layout(); paintAll(); hud(); startT=performance.now(); tick();
+  $('#timeCell').hidden=tutOn;
+  tools(); layout(); paintAll(); hud(); startT=performance.now(); touch(); tick(); guide();
 }
 // 남은 시간 알림 (여정): 30초 예고, 10초부터 초읽기, 5초부터 판 테두리까지 붉게
 let warnSec=1e9;
@@ -1021,29 +1149,31 @@ function timeWarn(sec){
 }
 function clearWarn(){ warnSec=1e9; $('#time').classList.remove('low','crit'); $('#boardWrap').classList.remove('danger'); }
 function tick(){
-  if(over) return;
+  if(over||paused) return;
   const el=elapsed();
   $('#time').textContent=fmtT(limit?limit-el:el);
   if(limit){ const sec=Math.ceil((limit-el)/1000); if(sec!==warnSec){ warnSec=sec; timeWarn(sec); } }
-  if(limit&&el>=limit&&!lock) endGame(false,'시간이 다 되었습니다');
+  if(limit&&el>=limit&&!lock){ if(mode==='journey'&&!usedCont) offerContinue(); else endGame(false,'시간이 다 되었습니다'); return; }
+  // 5초 넘게 손이 멈추면 이어지는 쌍 하나가 살짝 반짝인다
+  if(mode==='journey'&&!tutOn&&!lock&&performance.now()-lastAct>5000){ const m=findMove(); if(m) R.glint(m); touch(); }
 }
 setInterval(tick,250);
 function endGame(win,why){
   if(over) return; const t=elapsed(); over=true; lock=true; select(null); clearHint(); $('#boardWrap').classList.remove('danger');
-  const b=S.rec[mode], was={score:b.score}, neu={};
+  const tut=mode==='journey'&&jStage<=TUT_N, b=tut?{score:0,time:0,streak:0,combo:0,games:0,gold:0,cur:0}:S.rec[mode], was={score:b.score}, neu={};
   b.games++;
   if(win){
     b.cur++; if(mode==='journey'&&b.cur>=2) S.pending=1;
     if(score>b.score){ b.score=score; neu.score=1; }
     if(!b.time||t<b.time){ b.time=t; neu.time=1; }
     if(b.cur>b.streak){ b.streak=b.cur; neu.streak=1; }
-    if(mode==='journey'){ S.jour=Math.max(S.jour,jStage); const fr=(limit-t)/limit; gotStars=fr>=.6?3:fr>=.4?2:1; S.stars[jStage]=Math.max(S.stars[jStage]||0,gotStars); }
+    if(mode==='journey'){ S.jour=Math.max(S.jour,jStage); const fr=limit?(limit-t)/limit:1; gotStars=fr>=.6?3:fr>=.4?2:1; S.stars[jStage]=Math.max(S.stars[jStage]||0,gotStars); }
   } else b.cur=0;
   if(maxCombo>b.combo){ b.combo=maxCombo; neu.combo=1; }
   let dailyNote='';
   if(mode==='daily'&&win){ const d=today(); if(S.daily[d]) dailyNote='오늘 기록은 이미 남겼습니다'; else S.daily[d]={score,time:t,combo:maxCombo,hints}; subP=sendDaily(); }
   save();
-  setTimeout(()=>showResult(win,why||dailyNote,t,was,neu),win?550:350);
+  setTimeout(()=>showResult(win,why||dailyNote,t,was,tut?{}:neu),win?550:350);
 }
 function showResult(win,msg,t,was,neu){
   const b=S.rec[mode]; win?sfx.win():sfx.bad();
@@ -1057,6 +1187,7 @@ function showResult(win,msg,t,was,neu){
     +row('점수',fmtN(score),fmtN(win?b.score:was.score),neu.score)
     +row('시간',win?fmtT(t):'–',b.time?fmtT(b.time):'–',neu.time)
     +row('연속','×'+Math.max(1,maxCombo),'×'+Math.max(1,b.combo),neu.combo);
+  $('#resTable').hidden=mode==='journey'&&jStage<=TUT_N;
   const btns=$('#resBtns'), sb=$('#shareBox'); btns.textContent=''; sb.hidden=true;
   const add=(label,fn)=>{ const x=document.createElement('button'); x.type='button'; x.textContent=label; x.onclick=()=>fn(x); btns.appendChild(x); };
   if(mode==='journey'){ if(win) add('다음 단계',()=>startGame('journey',jStage+1)); else if(!win) add('다시 도전',()=>startGame('journey',jStage)); }
@@ -1067,6 +1198,7 @@ function showResult(win,msg,t,was,neu){
     try{ navigator.clipboard.writeText(text).then(()=>{ x.textContent='복사했습니다'; },fallback); }catch(e){ fallback(); }
   });
   add('메뉴',()=>go('menu'));
+  if(btns.children.length>1) btns.firstChild.className='primary';
   const rb=$('#resBoard'); rb.textContent='';
   if(mode==='daily') Promise.resolve(subP).then(r=>drawBoard(rb,5,r==='fail'?'내 기록을 보내지 못했습니다':''));
   const st=$('#stamp'); st.hidden=!(win&&Object.keys(neu).length); st.classList.remove('hit');
@@ -1082,13 +1214,13 @@ function drawMap(){
   const el=$('#mapGrid'), from=mapPage*STAGES+1; el.textContent='';
   for(let s=from;s<from+STAGES;s++){ const b=document.createElement('button'); b.type='button';
     const n=document.createElement('span'); n.textContent=s; b.appendChild(n);
-    const sub=s<=S.jour?starStr(starsOf(s)):isRest(s)?'쉼':'';
+    const sub=s<=S.jour?starStr(starsOf(s)):s<=TUT_N?'배움':isRest(s)?'쉼':'';
     if(sub){ const t=document.createElement('span'); t.className='st'; t.textContent=sub; b.appendChild(t); }
     if(s<=S.jour) b.className='done'; else if(s===S.jour+1) b.className='now'; else b.disabled=true;
     if(isRest(s)) b.classList.add('rest');
     b.onclick=()=>startGame('journey',s); el.appendChild(b); }
   $('#mapPage').textContent=from+' ~ '+(from+STAGES-1); $('#mapPrev').disabled=mapPage<=0; $('#mapNext').disabled=mapPage>=maxPage;
-  $('#mapNote').textContent=`★ ${starTotal()}  ·  힌트 ${S.boost.hint} · 셔플 ${S.boost.shuffle} · 폭탄 ${S.boost.bomb}`+(S.rec.journey.cur>=2?`  ·  ${S.rec.journey.cur}연승`:'');
+  $('#mapNote').textContent=`★ ${starTotal()}  ·  셔플 ${S.boost.shuffle} · 폭탄 ${S.boost.bomb}`+(S.rec.journey.cur>=2?`  ·  ${S.rec.journey.cur}연승`:'');
 }
 $('#mapPrev').onclick=()=>{ mapPage--; drawMap(); };
 $('#mapNext').onclick=()=>{ mapPage++; drawMap(); };
@@ -1136,7 +1268,7 @@ const SCREENS=['title','menu','map','records','codex','game'];
 function show(id){ SCREENS.forEach(s=>{ $('#'+s).hidden=s!==id; }); }
 function go(id){
   $('#result').hidden=true;
-  if(id==='daily'){ startGame('daily'); return; }
+  if(id==='daily'){ if(!S.nick){ askNick('daily'); return; } startGame('daily'); return; }
   if(id==='basket'){ startGame('basket'); return; }
   over=true; save();
   if(id==='menu'){
@@ -1161,10 +1293,11 @@ function go(id){
 /* ───────── 입력 ───────── */
 board.addEventListener('pointerdown',e=>{ const r=board.getBoundingClientRect(); tap(Math.floor((e.clientX-r.left)/cw),Math.floor((e.clientY-r.top)/ch)); e.preventDefault(); });
 document.querySelectorAll('[data-go]').forEach(b=>{ b.onclick=()=>go(b.dataset.go); });
-const askNick=()=>{ $('#nickInput').value=S.nick||''; $('#nickDlg').hidden=false; setTimeout(()=>$('#nickInput').focus(),50); };
-$('#btnStart').onclick=()=>{ if(!titleDone||performance.now()-titleSkipAt<350) return; if(S.nick) go('menu'); else askNick(); };
+let nickNext='menu';
+const askNick=n=>{ nickNext=typeof n==='string'?n:'menu'; $('#nickInput').value=S.nick||''; $('#nickDlg').hidden=false; setTimeout(()=>$('#nickInput').focus(),50); };
+$('#btnStart').onclick=()=>{ if(!titleDone||performance.now()-titleSkipAt<350) return; if(S.jour<TUT_N) startGame('journey',S.jour+1); else go('menu'); }; // 처음이면 바로 첫 판으로
 $('#btnNick').onclick=askNick;
-$('#nickForm').addEventListener('submit',e=>{ e.preventDefault(); const v=$('#nickInput').value.trim().slice(0,12); if(!v) return; S.nick=v; save(); $('#nickDlg').hidden=true; go('menu'); });
+$('#nickForm').addEventListener('submit',e=>{ e.preventDefault(); const v=$('#nickInput').value.trim().slice(0,12); if(!v) return; S.nick=v; save(); $('#nickDlg').hidden=true; go(nickNext); });
 $('#btnBack').onclick=()=>go(mode==='journey'?'map':'menu');
 const soundLabel=()=>{ $('#btnSound').textContent=soundOn?'소리 켬':'소리 끔'; };
 $('#btnSound').onclick=()=>{ soundOn=!soundOn; soundLabel(); try{ localStorage.setItem('scm-sound',soundOn?'1':'0'); }catch(e){} if(soundOn) sfx.tap(); };
