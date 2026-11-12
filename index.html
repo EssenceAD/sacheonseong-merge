@@ -65,7 +65,7 @@ h2{font-size:22px; font-weight:700; margin:0; letter-spacing:.1em}
 .pic{display:block; width:44px; height:55px; background-size:100% 100%; background-repeat:no-repeat}
 .picrow{display:flex; gap:4px; justify-content:center}
 .vh{position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%)}
-#press{position:relative; width:min(100%,330px); aspect-ratio:320/212}
+#press{position:relative; width:min(100%,320px); aspect-ratio:320/300}
 #plate,#paper{position:absolute; inset:0; border-radius:3px}
 #plate{background:repeating-linear-gradient(92deg,#B98F57 0 7px,#AD844E 7px 9px,#C19964 9px 16px); box-shadow:0 0 0 2px var(--ink), 4px 5px 0 var(--ink)}
 #plate svg,#paper svg{position:absolute; inset:0; width:100%; height:100%}
@@ -90,7 +90,14 @@ button.armed{background:var(--ink); color:var(--face)}
 
 #menu nav{width:min(100%,300px); display:flex; flex-direction:column; gap:12px}
 #menu nav button{display:flex; justify-content:space-between; align-items:baseline; font-size:18px; padding:11px 16px}
-#menu nav small{font-size:16px}
+#menu nav small{font-size:16px; margin-left:auto}
+#menu nav button{justify-content:flex-start!important; gap:10px}
+#menu nav button::before{content:""; flex:none; width:17px; height:27px; background:url(art/sprig.png) center/contain no-repeat}
+.pedi{position:relative; width:min(86%,270px); margin-bottom:-12px; -webkit-mask-image:radial-gradient(ellipse 52% 62% at 50% 62%,#000 62%,transparent 100%); mask-image:radial-gradient(ellipse 52% 62% at 50% 62%,#000 62%,transparent 100%)}
+.pedi img{position:relative; display:block; width:100%; mix-blend-mode:multiply}
+.pedi i{position:absolute; display:block}
+.pedi .w1{left:9%; right:9%; top:5%; height:70%; background:#178F84; opacity:.45; border-radius:50% 50% 0 0 / 100% 100% 0 0}
+.pedi .w2{left:33%; right:33%; top:36%; bottom:8%; background:#BF7F17; opacity:.6; border-radius:50% 50% 8% 8% / 70% 70% 8% 8%}
 
 .bar{width:100%; display:flex; align-items:center; justify-content:space-between; gap:10px}
 .note{margin:0; font-size:14px; text-align:center}
@@ -223,6 +230,7 @@ button.armed{background:var(--ink); color:var(--face)}
 
   <section id="menu" class="screen" hidden>
     <h2>사천성 머지</h2>
+    <div class="pedi" aria-hidden="true"><i class="w1"></i><i class="w2"></i><img src="art/pediment.png" alt=""></div>
     <nav class="frame">
       <button type="button" data-go="map">여정 <small id="mJour"></small></button>
       <button type="button" data-go="daily">오늘의 판 <small id="mDaily"></small></button>
@@ -284,6 +292,7 @@ button.armed{background:var(--ink); color:var(--face)}
   </div></div>
 </div>
 
+<script src="art.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 (()=>{
@@ -360,7 +369,11 @@ const MT='transform="translate(38 48) scale(.86) translate(-40 -50)"';
 
 function tileSVG(k,l){
   const m=MOTIF[k], c=KC[k], seed=3+k*13+l*5;
-  let s=`<svg xmlns="${NS}" viewBox="0 0 80 100" preserveAspectRatio="none"><defs>${inkFilter('ink',seed)}${inkFilter('ink2',seed+31,1.6,-7.9)}${grainFilter}<clipPath id="in"><rect x="9.5" y="9.5" width="57" height="77" rx="2"/></clipPath><clipPath id="face"><rect x="2" y="2" width="72" height="92" rx="7"/></clipPath><clipPath id="sh"><path d="${m.shade}"/></clipPath></defs>`;
+  // 실제 목판화에서 오려 낸 문양(art.js). 없으면 예전 선화로 그린다
+  const A=window.ART&&window.ART[k]; let ax=0, ay=0, aw=0, ah=0;
+  if(A){ const r=A.w/A.h, z=l>=5?.78:1; if(r>54/61){ aw=54*z; ah=54*z/r; } else { ah=61*z; aw=61*z*r; } ax=38-aw/2; ay=43-ah/2; } // 5단계는 먹 바탕이 보이도록 조금 작게
+  const box=`x="${ax.toFixed(1)}" y="${ay.toFixed(1)}" width="${aw.toFixed(1)}" height="${ah.toFixed(1)}"`;
+  let s=`<svg xmlns="${NS}" viewBox="0 0 80 100" preserveAspectRatio="none"><defs>${inkFilter('ink',seed)}${inkFilter('ink2',seed+31,1.6,-7.9)}${grainFilter}<clipPath id="in"><rect x="9.5" y="9.5" width="57" height="67" rx="2"/></clipPath><clipPath id="face"><rect x="2" y="2" width="72" height="92" rx="7"/></clipPath><clipPath id="sh"><path d="${m.shade}"/></clipPath>${A?`<mask id="pm" maskUnits="userSpaceOnUse" ${box}><image href="${A.plate}" ${box} preserveAspectRatio="none"/></mask><filter id="hal" x="-15%" y="-15%" width="130%" height="130%"><feMorphology operator="dilate" radius="${l>=5?1.4:2.6}"/></filter>`:''}</defs>`;
   // 패 두께(먹) + 종이 면 + 종이 결
   s+=`<g filter="url(#ink)"><rect x="5.5" y="5.5" width="72" height="92" rx="7" fill="${K}"/></g>`;
   s+=`<rect x="2" y="2" width="72" height="92" rx="7" fill="${P}"/>`;
@@ -369,21 +382,23 @@ function tileSVG(k,l){
   if(l>=4) s+=`<g clip-path="url(#in)" fill="none" stroke="${c}" stroke-width="1.2">${BG[k](c)}</g>`;
   // 5단계: 금빛 광채
   if(l>=5) s+=`<g clip-path="url(#in)"><rect x="9" y="9" width="58" height="78" fill="${K}"/><path d="${RAYS}" fill="${G}"/></g>`;
-  if(l>=4) s+=`<g ${MT} fill="${P}" stroke="${P}" stroke-width="10" stroke-linejoin="round" stroke-linecap="round">${m.line}</g>`;
+  if(l>=5&&A) s+=`<ellipse cx="38" cy="43" rx="23.5" ry="27.5" fill="${P}" stroke="${K}" stroke-width="1.6"/>`;
+  else if(l>=4) s+=A?`<g filter="url(#hal)"><rect ${box} fill="${P}" mask="url(#pm)"/></g>`:`<g ${MT} fill="${P}" stroke="${P}" stroke-width="10" stroke-linejoin="round" stroke-linecap="round">${m.line}</g>`;
   // 2단계: 손 채색 (선 밖으로 살짝 삐져나옴)
-  if(l>=2) s+=`<g transform="translate(1.9 1.4)" filter="url(#ink2)"><g ${MT} fill="${c}" stroke="${c}" stroke-width="2.8" stroke-linejoin="round">${m.plate}</g></g>`;
+  if(l>=2) s+=A?`<g transform="translate(1.5 1.1)"><rect ${box} fill="${c}" mask="url(#pm)"/></g>`:`<g transform="translate(1.9 1.4)" filter="url(#ink2)"><g ${MT} fill="${c}" stroke="${c}" stroke-width="2.8" stroke-linejoin="round">${m.plate}</g></g>`;
   // 5단계: 금박 테두리
   if(l>=5) s+=`<g filter="url(#ink2)" fill="none"><rect x="5.6" y="5.6" width="64.8" height="84.8" rx="4.5" stroke="${G}" stroke-width="4.4"/><rect x="5" y="5" width="66" height="86" rx="5" stroke="${GL}" stroke-width="1.1"/></g>`;
   // 먹판: 윤곽 + 해칭
   s+=`<g filter="url(#ink)"><rect x="2" y="2" width="72" height="92" rx="7" fill="none" stroke="${K}" stroke-width="2.8"/>`;
+  if(l===4) s+=`<rect x="5.4" y="5.4" width="65.2" height="85.2" rx="4.5" fill="none" stroke="${K}" stroke-width="5"/>`; // 4단계: 굵은 먹 테
   if(l>=3){ // 3단계: 테두리 장식
-    s+=`<rect x="8.5" y="8.5" width="59" height="79" rx="2" fill="none" stroke="${K}" stroke-width="2.5"/>`;
-    s+=`<path fill="${K}" d="M8.5 8.5h13a13 13 0 0 1-13 13zM67.5 8.5h-13a13 13 0 0 0 13 13zM8.5 87.5h13a13 13 0 0 0-13-13zM67.5 87.5h-13a13 13 0 0 1 13-13zM38 5.2l4 3.3-4 3.3-4-3.3zM5.4 48l3.1-4 3.1 4-3.1 4zM64.4 48l3.1-4 3.1 4-3.1 4z"/>`;
+    s+=`<rect x="8.5" y="8.5" width="59" height="69" rx="2" fill="none" stroke="${K}" stroke-width="2.5"/>`;
+    s+=`<path fill="${K}" d="M8.5 8.5h13a13 13 0 0 1-13 13zM67.5 8.5h-13a13 13 0 0 0 13 13zM8.5 77.5h13a13 13 0 0 0-13-13zM67.5 77.5h-13a13 13 0 0 1 13-13zM38 5.2l4 3.3-4 3.3-4-3.3zM5.4 43l3.1-4 3.1 4-3.1 4zM64.4 43l3.1-4 3.1 4-3.1 4z"/>`;
   }
-  s+=`<g ${MT} fill="none" stroke="${K}" stroke-linejoin="round" stroke-linecap="round"><g stroke-width="4.2">${m.line}</g><g clip-path="url(#sh)"><path d="${HATCH}" stroke-width="1.15"/></g></g></g>`;
+  s+=A?`</g><image href="${A.ink}" ${box} preserveAspectRatio="none"/>`:`<g ${MT} fill="none" stroke="${K}" stroke-linejoin="round" stroke-linecap="round"><g stroke-width="4.2">${m.line}</g><g clip-path="url(#sh)"><path d="${HATCH}" stroke-width="1.15"/></g></g></g>`;
   // 단계 점: 흑백에서도 단계를 셀 수 있게
-  if(l>=5) s+=`<rect x="8.5" y="79.2" width="59" height="12.6" rx="2" fill="${K}"/>`; // 5단계는 먹 띠 위에 금빛 점
-  for(let i=0;i<l;i++) s+=`<circle cx="${(38+(i-(l-1)/2)*9.6).toFixed(1)}" cy="85.5" r="3.9" fill="${l>=5?GL:K}" stroke="${l>=5?K:P}" stroke-width="1.3"/>`;
+  if(l>=5) s+=`<rect x="8.5" y="79.4" width="59" height="12.2" rx="2" fill="${K}"/>`; // 5단계는 먹 띠 위에 금빛 점
+  for(let i=0;i<l;i++) s+=`<circle cx="${(38+(i-(l-1)/2)*10.4).toFixed(1)}" cy="85.4" r="4.3" fill="${l>=5?GL:K}" stroke="${l>=5?K:P}" stroke-width="1.3"/>`;
   return s+'</svg>';
 }
 function rockSVG(){
@@ -1306,21 +1321,19 @@ soundLabel();
 /* ───────── 타이틀: 인쇄 연출 (롤러 → 종이 압착 → 색판 4번) ───────── */
 let titleDone=false, titleSkipAt=0; const titleTimers=[], titleAnims=[];
 function buildTitle(){
-  const tf=k=>`transform="translate(${22+k*56} 24) scale(.62)"`;
-  const plate=ks=>ks.map(k=>`<g ${tf(k)} fill="${KC[k]}" stroke="${KC[k]}" stroke-width="2.8" stroke-linejoin="round">${MOTIF[k].plate}</g>`).join('');
-  const key=id=>`<g fill="none" stroke="${K}" stroke-linejoin="round" stroke-linecap="round">`
-    +[0,1,2,3,4].map(k=>`<clipPath id="${id}c${k}"><path d="${MOTIF[k].shade}"/></clipPath><g ${tf(k)}><g stroke-width="4.2">${MOTIF[k].line}</g><g clip-path="url(#${id}c${k})"><path d="${HATCH}" stroke-width="1.15"/></g></g>`).join('')
-    +`<rect x="5" y="5" width="310" height="202" rx="3" stroke-width="2.6"/><rect x="10.5" y="10.5" width="299" height="191" rx="2" stroke-width="1.1"/></g>`
-    +`<text x="160" y="150" text-anchor="middle" font-family="'Gowun Batang','Batang',serif" font-weight="700" font-size="46" letter-spacing="3" fill="${K}">사천성 머지</text>`
-    +`<path fill="${K}" d="M62 171l7 6-7 6-7-6zM258 171l7 6-7 6-7-6z"/>`
-    +`<text x="160" y="183" text-anchor="middle" font-family="'IM Fell English','Gowun Batang',serif" font-style="italic" font-size="19" letter-spacing="1" fill="${K}">Shisen-Sho Merge</text>`;
-  const svg=(id,cls,inner)=>`<svg class="${cls}" xmlns="${NS}" viewBox="0 0 320 212" preserveAspectRatio="none" aria-hidden="true"><defs>${inkFilter(id+'f',41,1.6,-7.9)}</defs>${inner}</svg>`;
-  $('#plate').innerHTML=svg('pd','dry',key('pd'))+svg('pw','wet',key('pw'));
+  const IW=196, IH=192, IX=62, IY=13; // 해와 달 판화가 놓이는 자리
+  const pic=`<image href="art/title.webp" x="${IX}" y="${IY}" width="${IW}" height="${IH}" preserveAspectRatio="none" style="-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 14%);mask-image:linear-gradient(90deg,transparent 0,#000 14%)"/>`;
+  const key=`${pic}<g fill="none" stroke="${K}"><rect x="5" y="5" width="310" height="290" rx="3" stroke-width="2.6"/><rect x="10.5" y="10.5" width="299" height="279" rx="2" stroke-width="1.1"/></g>`
+    +`<text x="160" y="250" text-anchor="middle" font-family="'Gowun Batang','Batang',serif" font-weight="700" font-size="44" letter-spacing="3" fill="${K}">사천성 머지</text>`
+    +`<text x="160" y="277" text-anchor="middle" font-family="'IM Fell English','Gowun Batang',serif" font-style="italic" font-size="18" letter-spacing="1" fill="${K}">Shisen-Sho Merge</text>`;
+  const svg=(id,cls,inner)=>`<svg class="${cls}" xmlns="${NS}" viewBox="0 0 320 300" preserveAspectRatio="none" aria-hidden="true"><defs>${inkFilter(id+'f',41,1.6,-7.9)}<mask id="${id}m" maskUnits="userSpaceOnUse" x="0" y="0" width="320" height="300"><circle cx="${IX+IW*.715}" cy="${IY+IH*.55}" r="${IW*.3}" fill="#fff"/><circle cx="${IX+IW*.63}" cy="${IY+IH*.535}" r="${IW*.265}" fill="#000"/></mask></defs>${inner}</svg>`;
+  $('#plate').innerHTML=svg('pd','dry',key)+svg('pw','wet',key);
+  // 색판 넷: 주홍(해) → 군청(달) → 황토(해의 얼굴) → 먹판
   $('#paper').innerHTML=svg('pp','',
-    `<g class="pl" transform="translate(1.6 1.2)" filter="url(#ppf)">${plate([0,2])}</g>`
-   +`<g class="pl" transform="translate(-1.3 1.4)" filter="url(#ppf)">${plate([1,3])}</g>`
-   +`<g class="pl" transform="translate(1.1 -1.2)" filter="url(#ppf)">${plate([4])}</g>`
-   +`<g class="pl" filter="url(#ppf)">${key('pp')}</g>`);
+    `<g class="pl" transform="translate(1.6 1.2)" filter="url(#ppf)"><circle cx="${IX+IW*.352}" cy="${IY+IH*.53}" r="${IW*.33}" fill="${KC[0]}"/></g>`
+   +`<g class="pl" transform="translate(-1.3 1.4)" filter="url(#ppf)"><rect x="${IX}" y="${IY}" width="${IW}" height="${IH}" fill="${KC[1]}" mask="url(#ppm)"/></g>`
+   +`<g class="pl" transform="translate(1.1 -1.2)" filter="url(#ppf)"><circle cx="${IX+IW*.365}" cy="${IY+IH*.535}" r="${IW*.14}" fill="${KC[4]}"/></g>`
+   +`<g class="pl">${key}</g>`);
 }
 function finishTitle(){
   if(titleDone) return; titleDone=true;
