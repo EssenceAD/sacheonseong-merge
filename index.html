@@ -47,7 +47,7 @@ body{
 .boardBox:empty{display:none}
 #result button{font-size:17px; padding:10px 18px}
 #result button.primary{background:var(--ink); color:var(--face)}
-#result #resMsg{font-size:16px}
+#result #resMsg{font-size:17px; font-weight:700; line-height:1.5; white-space:pre-line}
 
 /* 목판 테두리 */
 .frame{
@@ -122,6 +122,49 @@ button.armed{background:var(--ink); color:var(--face)}
 #nickDlg form{width:min(88%,280px); display:flex; flex-direction:column; gap:14px; align-items:center}
 #nickInput{width:100%; box-sizing:border-box; font:inherit; font-size:18px; text-align:center; color:var(--ink); background:var(--face); border:0; border-bottom:2px solid var(--ink); padding:6px; border-radius:0; -webkit-user-select:text; user-select:text}
 #nickInput:focus-visible{outline:2px solid var(--ink); outline-offset:3px}
+button.primary{background:var(--ink); color:var(--face)}
+#menu{gap:10px; justify-content:flex-start; overflow-y:auto; padding-block:4px 8px}
+#menu nav{width:min(100%,330px)!important; gap:10px!important}
+#menu nav button.big{font-size:21px; padding:13px 16px}
+#menu nav button.primary::before{filter:invert(.93)}
+.grid2{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+#menu .grid2 button{font-size:16px; padding:10px 10px; gap:7px}
+#menu .grid2 button::before{width:13px; height:21px}
+.paintCard{display:flex; flex-direction:column; gap:6px; width:min(100%,330px); padding:8px 8px 6px; align-items:stretch; flex:none}
+.paintCard .cap{display:flex; justify-content:space-between; align-items:baseline; font-size:16px}
+.paintCard .cap em{font-style:normal; font-size:14px; border:1.5px solid var(--ink); padding:3px 9px; border-radius:2px}
+.paintCard.can .cap em{background:var(--ink); color:var(--face)}
+.paintCard .cap b{font-size:18px}
+.paintCard.can .cap em{font-weight:700}
+.paintCard.can{animation:cardcall 1.6s ease-in-out infinite}
+@keyframes cardcall{50%{box-shadow:2px 2px 0 var(--ink), 0 0 0 4px var(--face), 0 0 0 6.5px var(--ink)}}
+#menuPaintPic{display:flex; justify-content:center; pointer-events:none}
+#menuPaintPic .pt{height:min(29vh,215px); max-width:100%}
+.pt{position:relative; background:var(--face); flex:none}
+.pt > svg,.pt > img{position:absolute; inset:0; width:100%; height:100%; display:block; max-width:none}
+.pt img{pointer-events:none}
+#ptStage{width:100%; display:flex; justify-content:center; padding:18px 0}
+#ptHud{width:100%; display:flex; align-items:center; gap:12px}
+#ptHud #ptNote{margin:0; flex:1; font-size:15px; font-weight:700; line-height:1.35; text-wrap:balance}
+#ptBtns button{font-size:17px; padding:11px 18px}
+.drop{position:absolute; translate:-50% -50%; height:34px; padding:0 9px 0 6px; border-radius:17px; display:flex; align-items:center; justify-content:center; gap:2px; box-shadow:2px 2px 0 var(--ink)}
+.drop b{font-family:var(--num); font-variant-numeric:lining-nums; font-size:19px; line-height:1}
+.drop svg{width:19px; height:19px; fill:var(--ink); flex:none}
+.drop:not(.can){background:var(--paper); box-shadow:none; border-style:dashed}
+.drop.can{animation:droppulse 1.2s ease-in-out infinite}
+@keyframes droppulse{50%{scale:1.14}}
+#ptStage .pt.framed{scale:.86}
+.pt.framed{box-shadow:0 0 0 4px var(--face), 0 0 0 6px var(--ink), 0 0 0 16px #9A7445, 0 0 0 18px var(--ink), 7px 9px 0 18px rgba(27,23,20,.28)}
+.pt.framed.in{animation:frameIn .9s cubic-bezier(.2,1.3,.4,1) both}
+@keyframes frameIn{0%{scale:1.14; rotate:-2.5deg; box-shadow:0 0 0 0 var(--face),0 0 0 0 var(--ink),0 0 0 0 #9A7445,0 0 0 0 var(--ink),0 0 0 0 rgba(27,23,20,0)}}
+#ptBtns{display:flex; gap:10px; min-height:44px}
+#albumGrid{display:grid; grid-template-columns:1fr 1fr; gap:10px 8px; width:100%; overflow-y:auto; align-items:start}
+#albumGrid figure{margin:0; display:flex; flex-direction:column; gap:4px; align-items:stretch}
+#albumGrid .slot{aspect-ratio:1 / 1; display:flex; align-items:center; justify-content:center}
+#albumGrid figcaption{font-size:13px; text-align:center; line-height:1.4; display:flex; flex-direction:column}
+#albumGrid figcaption b{font-size:15px}
+.pt.lock{border:2px dashed var(--ink); box-sizing:border-box; display:flex; align-items:center; justify-content:center; font-size:40px; opacity:.75; background:none}
+@media (prefers-reduced-motion: reduce){ .paintCard.can,.drop.can,.pt.framed.in{animation:none} }
 #recList{width:min(100%,320px); margin:0; display:grid; grid-template-columns:1fr auto; row-gap:12px; font-size:16px}
 #recList dd{margin:0; text-align:right; font-size:22px}
 .tabs{display:flex; gap:8px}
@@ -229,14 +272,19 @@ button.armed{background:var(--ink); color:var(--face)}
   </section>
 
   <section id="menu" class="screen" hidden>
-    <h2>사천성 머지</h2>
     <div class="pedi" aria-hidden="true"><i class="w1"></i><i class="w2"></i><img src="art/pediment.png" alt=""></div>
-    <nav class="frame">
-      <button type="button" data-go="map">여정 <small id="mJour"></small></button>
-      <button type="button" data-go="daily">오늘의 판 <small id="mDaily"></small></button>
-      <button type="button" data-go="basket">바구니 모드</button>
-      <button type="button" data-go="records">내 기록</button>
-      <button type="button" data-go="codex">도감 <small id="mCodex"></small></button>
+    <button id="menuPaint" class="paintCard" type="button" data-go="paint">
+      <span id="menuPaintPic"></span>
+      <span class="cap"><b id="menuInk"></b><em id="menuPaintHint"></em></span>
+    </button>
+    <nav>
+      <button type="button" class="primary big" data-go="map">여정 <small id="mJour"></small></button>
+      <div class="grid2">
+        <button type="button" data-go="daily">오늘의 판 <small id="mDaily"></small></button>
+        <button type="button" data-go="basket">바구니</button>
+        <button type="button" data-go="records">내 기록</button>
+        <button type="button" data-go="codex">도감 <small id="mCodex"></small></button>
+      </div>
     </nav>
     <div id="menuBoard" class="boardBox"></div>
     <div class="pager"><button id="btnNick" class="plain" type="button"></button><button id="btnSound" class="plain" type="button">소리 켬</button></div>
@@ -259,6 +307,19 @@ button.armed{background:var(--ink); color:var(--face)}
     <div class="bar"><button class="plain" type="button" data-go="menu">← 메뉴</button><h2>도감</h2><span style="width:56px"></span></div>
     <div id="cxGrid"></div>
     <p class="note" id="cxNote"></p>
+  </section>
+
+  <section id="paint" class="screen" hidden>
+    <div class="bar"><button class="plain" type="button" data-go="menu">← 메뉴</button><h2 id="ptTitle"></h2><button class="plain" type="button" data-go="album">앨범</button></div>
+    <p class="note" id="ptBy"></p>
+    <div id="ptHud"><div class="hc"><small>잉크</small><b id="ptInkV"></b></div><p id="ptNote"></p></div>
+    <div id="ptStage"></div>
+    <div id="ptBtns"></div>
+  </section>
+
+  <section id="album" class="screen" hidden>
+    <div class="bar"><button class="plain" type="button" data-go="paint">← 판화</button><h2>판화 앨범</h2><span style="width:56px"></span></div>
+    <div id="albumGrid"></div>
   </section>
 
   <section id="game" class="screen" hidden>
@@ -461,7 +522,7 @@ const sfx={
 
 /* ───────── 저장 ───────── */
 const SAVE='scm-save-v1';
-const S=Object.assign({nick:'',stars:{},pending:0,jour:0,boost:{hint:1,shuffle:0,bomb:0},daily:{},seen:{}},(()=>{try{return JSON.parse(localStorage.getItem(SAVE))||{};}catch(e){return {};}})());
+const S=Object.assign({nick:'',stars:{},pending:0,jour:0,ink:0,paint:{cur:0,done:{},album:[]},boost:{hint:1,shuffle:0,bomb:0},daily:{},seen:{}},(()=>{try{return JSON.parse(localStorage.getItem(SAVE))||{};}catch(e){return {};}})());
 if(!S.rec){ // 모드별 기록 (예전 통합 기록은 여정으로 옮김)
   const z=()=>({score:0,time:0,streak:0,combo:0,games:0,gold:0,cur:0});
   S.rec={journey:z(),daily:z(),basket:z()};
@@ -469,6 +530,7 @@ if(!S.rec){ // 모드별 기록 (예전 통합 기록은 여정으로 옮김)
   delete S.best; delete S.games; delete S.gold; delete S.streak;
 }
 if(!S.v3){ if(S.jour>0){ const ns={}; for(const k in S.stars) ns[+k+15]=S.stars[k]; for(let i=1;i<=15;i++) ns[i]=3; S.stars=ns; S.jour+=15; } S.v3=1; }
+if(!S.v31){ if(S.jour>=5&&!S.ink) S.ink=5; S.v31=1; } // 예전부터 하던 사람도 바로 한 칸 칠할 수 있게
 const save=()=>{ try{ localStorage.setItem(SAVE,JSON.stringify(S)); }catch(e){} };
 const fmtT=ms=>{ const s=Math.max(0,Math.round(ms/1000)); return (s/60|0)+':'+String(s%60).padStart(2,'0'); };
 const fmtN=n=>n.toLocaleString('en-US');
@@ -479,7 +541,7 @@ const boostTotal=()=>S.boost.shuffle+S.boost.bomb;
 
 /* ───────── 상태 ───────── */
 let grid=[], sel=null, lock=false, score=0, combo=0, lastMatch=-1e9;
-let mode='journey', jStage=1, over=true, startT=0, limit=0, maxCombo=0, bombArmed=false, basket=[], hints=0, gotStars=0, subP=null;
+let mode='journey', jStage=1, over=true, startT=0, limit=0, maxCombo=0, bombArmed=false, basket=[], hints=0, gotStars=0, gotInk=0, subP=null;
 const HINT_MS=10000, elapsed=()=>performance.now()-startT+hints*HINT_MS;
 let cw=40, ch=50, mg=12, comboAnim=null, comboTO=0, toastTO=0, uid=0;
 const board=$('#board'), tiles=[];
@@ -1133,7 +1195,7 @@ function offerContinue(){
 /* ───────── 판 시작 / 종료 ───────── */
 function startGame(m,stage){
   mode=m; jStage=stage||1; over=false; lock=false; paused=false; bombArmed=false; basket=[]; sel=null;
-  score=0; combo=0; maxCombo=0; hints=0; gotStars=0; subP=null; merges=madeMax=booms=0; hintsLeft=3; usedCont=false; clearWarn();
+  score=0; combo=0; maxCombo=0; hints=0; gotStars=0; gotInk=0; subP=null; merges=madeMax=booms=0; hintsLeft=3; usedCont=false; clearWarn();
   lastMatch=-1e9; limit=0; setCombo(0); clearHint(); goal={type:'clear'}; tutOn=false;
   $('#result').hidden=true; $('#resTable').hidden=false; $('#basket').hidden=m!=='basket'; show('game');
   const coach=$('#coach'); coach.hidden=true;
@@ -1182,7 +1244,7 @@ function endGame(win,why){
     if(score>b.score){ b.score=score; neu.score=1; }
     if(!b.time||t<b.time){ b.time=t; neu.time=1; }
     if(b.cur>b.streak){ b.streak=b.cur; neu.streak=1; }
-    if(mode==='journey'){ S.jour=Math.max(S.jour,jStage); const fr=limit?(limit-t)/limit:1; gotStars=fr>=.6?3:fr>=.4?2:1; S.stars[jStage]=Math.max(S.stars[jStage]||0,gotStars); }
+    if(mode==='journey'){ if(jStage>S.jour){ S.ink++; gotInk=1; } S.jour=Math.max(S.jour,jStage); const fr=limit?(limit-t)/limit:1; gotStars=fr>=.6?3:fr>=.4?2:1; S.stars[jStage]=Math.max(S.stars[jStage]||0,gotStars); }
   } else b.cur=0;
   if(maxCombo>b.combo){ b.combo=maxCombo; neu.combo=1; }
   let dailyNote='';
@@ -1196,7 +1258,8 @@ function showResult(win,msg,t,was,neu){
   const notes=[]; if(msg) notes.push(msg);
   if(mode==='daily') notes.push('힌트 '+hints+'회'+(hints?' (+'+hints*10+'초)':'')); else if(win&&b.cur>=2) notes.push(b.cur+'연승');
   if(mode==='journey'&&win) notes.unshift(starStr(gotStars));
-  $('#resMsg').textContent=notes.join(' · '); $('#resMsg').hidden=!notes.length;
+  if(gotInk) notes.push('\n잉크 +1 → 모은 잉크 '+S.ink+'\n판화 한 칸 = 잉크 '+INK_COST);
+  $('#resMsg').textContent=notes.join(' · ').replace(' · \n','\n'); $('#resMsg').hidden=!notes.length;
   const row=(name,now,best,isNew)=>`<tr><td>${name}</td><td class="${isNew?'new':''}">${now}</td><td>${best}</td></tr>`;
   $('#resTable').innerHTML='<tr><th></th><th>이번</th><th>최고</th></tr>'
     +row('점수',fmtN(score),fmtN(win?b.score:was.score),neu.score)
@@ -1206,6 +1269,7 @@ function showResult(win,msg,t,was,neu){
   const btns=$('#resBtns'), sb=$('#shareBox'); btns.textContent=''; sb.hidden=true;
   const add=(label,fn)=>{ const x=document.createElement('button'); x.type='button'; x.textContent=label; x.onclick=()=>fn(x); btns.appendChild(x); };
   if(mode==='journey'){ if(win) add('다음 단계',()=>startGame('journey',jStage+1)); else if(!win) add('다시 도전',()=>startGame('journey',jStage)); }
+  if(mode==='journey'&&win&&S.ink>=INK_COST&&S.paint.cur<PAINTS.length){ add('판화 칠하기',()=>go('paint')); if(jStage===TUT_N) btns.insertBefore(btns.lastChild,btns.firstChild); }
   if(mode==='basket') add('다시 하기',()=>startGame('basket'));
   if(mode==='daily'&&S.daily[today()]) add('공유 문구 복사',x=>{
     const d=today(), r=S.daily[d], text=`사천성 머지 · 오늘의 판 ${d}\n점수 ${fmtN(r.score)} · ${fmtT(r.time)} · 연속 ×${Math.max(1,r.combo)} · 힌트 ${r.hints||0}회`;
@@ -1219,6 +1283,103 @@ function showResult(win,msg,t,was,neu){
   const st=$('#stamp'); st.hidden=!(win&&Object.keys(neu).length); st.classList.remove('hit');
   $('#result').hidden=false;
   if(!st.hidden){ void st.offsetWidth; st.classList.add('hit'); setTimeout(()=>{ knock(140,0,.4,.18); buzz(40); },150); }
+}
+
+/* ───────── 판화 채색 메타: 잉크로 명작 판화를 한 칸씩 칠한다 ───────── */
+const INK_COST=3;
+// c = 물감(0 주홍·1 군청·2 자주·3 청록·4 황토), at = 물방울 자리, s = 칠해질 모양(먹선 아래에 깔려 조금 삐져나온다)
+const PAINTS=[
+ {id:'rhino',title:'코뿔소',by:'알브레히트 뒤러 · 1515',src:'art/rhino.webp',w:960,h:702,regions:[
+   {c:3,at:[800,640],s:'<polygon points="10,548 300,535 480,540 640,560 780,585 945,590 945,690 10,690"/>'},
+   {c:1,at:[230,565],s:'<polygon points="60,520 120,540 150,470 190,430 290,445 300,560 330,600 320,640 250,650 150,690 50,690 40,600"/><polygon points="480,440 580,450 600,560 650,600 640,640 520,690 470,680 470,560"/>'},
+   {c:2,at:[95,380],s:'<polygon points="22,290 60,250 165,235 185,330 190,430 150,470 120,540 60,520 22,440 15,360"/>'},
+   {c:4,at:[310,270],s:'<polygon points="165,150 200,110 280,95 480,100 500,170 470,235 440,300 450,420 380,440 290,445 200,420 170,330 160,230"/><polygon points="75,110 250,38 285,95 200,110 165,150 60,250 30,190"/>'},
+   {c:0,at:[550,290],s:'<polygon points="440,300 470,235 500,170 520,60 600,90 640,180 650,300 640,400 580,450 480,440 450,420"/>'},
+   {c:2,at:[760,340],s:'<polygon points="640,180 700,170 770,200 790,250 860,250 880,330 935,395 945,470 905,550 850,555 800,470 720,440 680,480 640,400 650,300"/>'},
+   {c:4,at:[815,205],s:'<polygon points="925,310 945,320 945,400 905,400"/><polygon points="775,170 840,165 875,180 850,250 790,250"/>'}
+ ]},
+ {id:'sunmoon',title:'해와 달',by:'뉘른베르크 연대기 · 1493',src:'art/title.webp',w:640,h:627,
+  defs:'<mask id="smc" maskUnits="userSpaceOnUse" x="0" y="0" width="640" height="627"><circle cx="455" cy="345" r="188" fill="#fff"/><circle cx="402" cy="336" r="168" fill="#000"/></mask>',regions:[
+   {c:0,at:[110,200],s:'<circle cx="225" cy="330" r="212"/>'},
+   {c:4,at:[235,340],s:'<circle cx="235" cy="336" r="88"/>'},
+   {c:1,at:[600,400],s:'<g mask="url(#smc)"><circle cx="455" cy="345" r="188"/></g>'},
+   {c:2,at:[490,385],s:'<ellipse cx="482" cy="352" rx="58" ry="112"/>'},
+   {c:3,at:[500,200],s:'<polygon points="445,150 540,170 560,250 470,272 440,210"/>'}
+ ]},
+ {id:'rosa',title:'장미',by:'건강의 정원 · 1485',src:'art/rosa.webp',w:640,h:864,regions:[
+   {c:4,at:[318,560],s:'<path fill="none" stroke-width="24" d="M270 195 300 430 325 610 395 770M300 330 380 210M250 420 205 300M330 600 392 440"/>'},
+   {c:3,at:[130,480],s:'<polygon points="40,370 120,345 200,400 250,470 215,600 60,615 35,500"/><ellipse cx="380" cy="262" rx="62" ry="36"/>'},
+   {c:0,at:[268,150],s:'<ellipse cx="268" cy="150" rx="28" ry="48"/>'},
+   {c:2,at:[425,130],s:'<circle cx="425" cy="130" r="82"/>'},
+   {c:0,at:[170,235],s:'<circle cx="170" cy="235" r="78"/>'},
+   {c:2,at:[460,395],s:'<circle cx="460" cy="395" r="82"/>'}
+ ]}
+];
+const DROP='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.500c4 5 6 8 6 11a6 6 0 0 1-12 0c0-3 2-6 6-11z"/></svg>'.replace('.500','.5');
+const curPaint=()=>PAINTS[Math.min(S.paint.cur,PAINTS.length-1)];
+const paintDone=p=>S.paint.done[p.id]||(S.paint.done[p.id]=[]);
+function ptBuild(p,done){
+  const el=document.createElement('div'); el.className='pt'; el.style.aspectRatio=p.w+' / '+p.h;
+  let g=''; p.regions.forEach((r,i)=>{ g+=`<g class="rg" data-i="${i}" fill="${KC[r.c]}" stroke="${KC[r.c]}" stroke-width="7" stroke-linejoin="round" stroke-linecap="round" filter="url(#${p.id}r)"${done.includes(i)?'':' style="display:none"'}>${r.s}</g>`; });
+  el.innerHTML=`<svg viewBox="0 0 ${p.w} ${p.h}" preserveAspectRatio="none" aria-hidden="true"><defs><filter id="${p.id}r" x="-8%" y="-8%" width="116%" height="116%"><feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="2" seed="7" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="${(p.w*.022).toFixed(1)}"/></filter>${p.defs||''}</defs><g opacity=".84">${g}</g></svg><img src="${p.src}" alt="" draggable="false">`;
+  return el;
+}
+// 손 채색: 물방울 자리에서 색이 번져 나간다
+function seep(el,p,i,x,y){
+  const g=el.querySelector('.rg[data-i="'+i+'"]'), svg=el.querySelector('svg'), id='sp'+(uid++), m=document.createElementNS(NS,'mask');
+  m.id=id; m.setAttribute('maskUnits','userSpaceOnUse'); m.setAttribute('x',0); m.setAttribute('y',0); m.setAttribute('width',p.w); m.setAttribute('height',p.h);
+  m.innerHTML=`<circle cx="${x}" cy="${y}" r="0" fill="#fff" filter="url(#${p.id}r)"/>`; svg.querySelector('defs').appendChild(m);
+  g.setAttribute('mask','url(#'+id+')'); g.style.display='';
+  let R=Math.hypot(p.w,p.h); try{ const b=g.getBBox(); R=Math.max(Math.hypot(b.x-x,b.y-y),Math.hypot(b.x+b.width-x,b.y-y),Math.hypot(b.x-x,b.y+b.height-y),Math.hypot(b.x+b.width-x,b.y+b.height-y))*1.15; }catch(e){}
+  const c=m.firstChild, t0=performance.now();
+  (function step(){ const t=Math.min(1,(performance.now()-t0)/1500), e=1-Math.pow(1-t,3); c.setAttribute('r',(R*e).toFixed(1)); g.style.opacity=(.45+.55*t).toFixed(2);
+    if(t<1) requestAnimationFrame(step); else { g.removeAttribute('mask'); m.remove(); g.style.opacity=''; } })();
+}
+let ptEl=null;
+function ptNote(){
+  const fin=S.paint.cur>=PAINTS.length, p=curPaint(), left=fin?0:p.regions.length-paintDone(p).length, n=$('#ptNote'), bt=$('#ptBtns');
+  $('#ptInkV').textContent=S.ink; bt.textContent='';
+  n.textContent=fin?'준비된 판화를 모두 완성했습니다':left===0?'':S.ink>=INK_COST?'물방울을 누르면 그 부분이 칠해집니다 (한 칸 = 잉크 '+INK_COST+')':'잉크가 '+(INK_COST-S.ink)+' 더 필요합니다. 여정 한 단계를 깨면 잉크 1';
+  if(!fin&&left>0&&S.ink<INK_COST){ const x=document.createElement('button'); x.type='button'; x.className='primary'; x.textContent='여정 계속하기 (잉크 +1)'; x.onclick=()=>startGame('journey',S.jour+1); bt.appendChild(x); }
+}
+function drawPaint(){
+  const fin=S.paint.cur>=PAINTS.length, p=curPaint(), done=fin?p.regions.map((r,i)=>i):paintDone(p);
+  $('#ptTitle').textContent=p.title; $('#ptBy').textContent=p.by; $('#ptBtns').textContent='';
+  const st=$('#ptStage'); st.textContent=''; ptEl=ptBuild(p,done); ptEl.style.width=`min(100%, ${(54*p.w/p.h).toFixed(1)}vh)`; if(fin) ptEl.classList.add('framed'); st.appendChild(ptEl);
+  p.regions.forEach((r,i)=>{ if(done.includes(i)) return; const b=document.createElement('button'); b.type='button'; b.className='drop'+(S.ink>=INK_COST?' can':'');
+    const cl=v=>Math.max(9,Math.min(91,v)); b.style.left=cl(r.at[0]/p.w*100)+'%'; b.style.top=cl(r.at[1]/p.h*100)+'%'; b.setAttribute('aria-label','이 부분 칠하기, 잉크 '+INK_COST); b.innerHTML=DROP+'<b>'+INK_COST+'</b>'; b.onclick=()=>paintAt(i,b); ptEl.appendChild(b); });
+  ptNote();
+}
+function paintAt(i,btn){
+  const p=curPaint(), done=paintDone(p); if(done.includes(i)) return;
+  if(S.ink<INK_COST){ toast('잉크가 모자랍니다. 여정을 깨면 잉크를 얻습니다',2000); return; }
+  S.ink-=INK_COST; done.push(i); save(); btn.remove(); const r=p.regions[i]; seep(ptEl,p,i,r.at[0],r.at[1]); hiss(0,.6,.08,1400); buzz(20);
+  ptEl.querySelectorAll('.drop').forEach(b=>b.classList.toggle('can',S.ink>=INK_COST)); ptNote();
+  if(done.length===p.regions.length) setTimeout(()=>framePaint(p),1700);
+}
+// 한 장 완성: 액자에 넣어 앨범으로
+function framePaint(p){
+  if(!S.paint.album.includes(p.id)) S.paint.album.push(p.id); S.paint.cur++; save();
+  ptEl.classList.add('framed','in'); knock(120,0,.3,.22); knock(660,.25,.18,.3); buzz([30,50,30]);
+  $('#ptNote').textContent='완성! 판화 앨범에 넣었습니다'; $('#ptInkV').textContent=S.ink;
+  const bt=$('#ptBtns'); bt.textContent='';
+  const add=(label,fn,cls)=>{ const x=document.createElement('button'); x.type='button'; x.textContent=label; if(cls) x.className=cls; x.onclick=fn; bt.appendChild(x); };
+  if(S.paint.cur<PAINTS.length) add('다음 판화',drawPaint,'primary'); add('앨범 보기',()=>go('album'));
+}
+function drawAlbum(){
+  const el=$('#albumGrid'); el.textContent='';
+  PAINTS.forEach(p=>{ const f=document.createElement('figure'), slot=document.createElement('div'), has=S.paint.album.includes(p.id); slot.className='slot';
+    const pic=has?ptBuild(p,p.regions.map((r,i)=>i)):document.createElement('div');
+    if(has) pic.classList.add('framed'); else { pic.className='pt lock'; pic.style.aspectRatio=p.w+' / '+p.h; pic.textContent='?'; }
+    pic.style.width=(p.w>=p.h?76:76*p.w/p.h).toFixed(1)+'%'; slot.appendChild(pic); f.appendChild(slot);
+    const c=document.createElement('figcaption'), b=document.createElement('b'), d=document.createElement('span'); b.textContent=has?p.title:'아직 칠하지 않은 판화'; d.textContent=has?p.by:''; c.appendChild(b); c.appendChild(d); f.appendChild(c); el.appendChild(f); });
+}
+function drawMenuPaint(){
+  const p=curPaint(), fin=S.paint.cur>=PAINTS.length, done=fin?p.regions.map((r,i)=>i):paintDone(p), box=$('#menuPaintPic');
+  box.textContent=''; box.appendChild(ptBuild(p,done));
+  $('#menuInk').textContent='잉크 '+S.ink;
+  $('#menuPaintHint').textContent=fin?'앨범 보기 ›':S.ink>=INK_COST?'판화 칠하기 ›':'판화 칠하기 › 잉크 '+INK_COST+' 필요';
+  $('#menuPaint').classList.toggle('can',!fin&&S.ink>=INK_COST);
 }
 
 /* ───────── 화면 ───────── */
@@ -1279,7 +1440,7 @@ function drawRec(){
   document.querySelectorAll('#recTabs button').forEach(x=>{ const on=x.dataset.tab===recTab; x.classList.toggle('armed',on); x.setAttribute('aria-pressed',on); });
 }
 document.querySelectorAll('#recTabs button').forEach(x=>{ x.onclick=()=>{ recTab=x.dataset.tab; drawRec(); }; });
-const SCREENS=['title','menu','map','records','codex','game'];
+const SCREENS=['title','menu','map','records','codex','game','paint','album'];
 function show(id){ SCREENS.forEach(s=>{ $('#'+s).hidden=s!==id; }); }
 function go(id){
   $('#result').hidden=true;
@@ -1287,7 +1448,7 @@ function go(id){
   if(id==='basket'){ startGame('basket'); return; }
   over=true; save();
   if(id==='menu'){
-    $('#mJour').textContent=S.jour?S.jour+'단계':''; $('#btnNick').textContent='닉네임 · '+(S.nick||'없음'); drawBoard($('#menuBoard'),3); retrySubmit(); $('#mDaily').textContent=S.daily[today()]?'완료':'';
+    drawMenuPaint(); $('#mJour').textContent=S.jour?S.jour+'단계':''; $('#btnNick').textContent='닉네임 · '+(S.nick||'없음'); drawBoard($('#menuBoard'),3); retrySubmit(); $('#mDaily').textContent=S.daily[today()]?'완료':'';
     $('#mCodex').textContent=Object.keys(S.seen).length+'/25';
   }
   if(id==='map'){
@@ -1296,6 +1457,8 @@ function go(id){
   if(id==='records'){
     drawRec();
   }
+  if(id==='paint') drawPaint();
+  if(id==='album') drawAlbum();
   if(id==='codex'){
     let h=''; for(let l=1;l<=MAXL;l++)for(let k=0;k<5;k++) h+=S.seen[''+k+l]?`<i class="pic t${k}${l}"></i>`:'<i class="pic unseen"></i>';
     const total=starTotal(); let lv=0; CX.forEach((c,i)=>{ if(total>=c[0]) lv=i; });
@@ -1371,7 +1534,7 @@ function runTitle(){
 $('#title').addEventListener('pointerdown',e=>{ if(!titleDone){ finishTitle(); titleSkipAt=performance.now(); e.preventDefault(); } },true);
 runTitle();
 
-window.scm={ gfx:()=>R.is3d?R.stats():{is3d:false}, stageCfg, fetchBoard, tap, findMove, findPath, startGame, go, endGame, S, grid:()=>grid, set:g=>{grid=g;paintAll();}, state:()=>({mode,score,combo,lock,over,tiles:tileCount(),basket:basket.length}) };
+window.scm={ PAINTS, paintAt:i=>{ const b=[...document.querySelectorAll('#ptStage .drop')][i]; if(b) b.click(); }, gfx:()=>R.is3d?R.stats():{is3d:false}, stageCfg, fetchBoard, tap, findMove, findPath, startGame, go, endGame, S, grid:()=>grid, set:g=>{grid=g;paintAll();}, state:()=>({mode,score,combo,lock,over,tiles:tileCount(),basket:basket.length}) };
 })();
 </script>
 </body>
