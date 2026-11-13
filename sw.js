@@ -1,5 +1,5 @@
 // 사천성 머지 서비스 워커: 한 번 받은 그림은 저장해 두고, 화면과 코드는 새 것을 먼저 받는다
-const V = 'scm-v1.0.2';
+const V = 'scm-v1.0.3';
 const CORE = ['./', 'art.js?v=36', 'paints.js?v=36', 'notes.js?v=36', 'art/title.webp', 'art/pediment.png', 'art/sprig.png', 'manifest.webmanifest', 'icon-192.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(V).then(c => Promise.all(CORE.map(u => c.add(u).catch(() => {})))).then(() => self.skipWaiting()));
@@ -12,6 +12,7 @@ self.addEventListener('fetch', e => {
   const req = e.request; if (req.method !== 'GET') return;
   const url = new URL(req.url);
   if (url.hostname.endsWith('supabase.co')) return; // 순위·협동은 늘 새로 받는다
+  if (/.mp3$/.test(url.pathname)) return; // 배경음은 브라우저가 구간별로 받게 그대로 둔다
   const same = url.origin === location.origin;
   const page = req.mode === 'navigate' || (same && /\.(html|js|webmanifest)$/.test(url.pathname)) || (same && url.pathname.endsWith('/'));
   if (page) { // 새 것 먼저, 안 되면 저장본

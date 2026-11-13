@@ -151,6 +151,11 @@ button.armed{background:var(--ink); color:var(--face)}
 .boardBox .note{font-size:13px}
 #nickDlg{position:absolute!important; inset:0; z-index:40!important; display:flex; align-items:center; justify-content:center}
 #nickDlg[hidden]{display:none}
+/* 새 버전 안내 띠 */
+#upd{position:absolute; left:50%; bottom:calc(12px + env(safe-area-inset-bottom,0px)); translate:-50% 0; z-index:60; max-width:calc(100% - 20px); white-space:nowrap; font-size:14.5px; font-weight:700; padding:8px 14px; background:var(--ink); color:var(--face); border:2px solid var(--face); border-radius:999px; box-shadow:0 0 0 2px var(--ink), 3px 4px 0 2px rgba(27,23,20,.3)}
+#upd[hidden]{display:none}
+#upd.up{bottom:calc(92px + env(safe-area-inset-bottom,0px))}
+#upd:active{translate:-50% 2px}
 /* 판화 해설 카드: 양피지 바탕에 고운바탕 글씨 */
 #note{position:absolute; inset:0; z-index:45; display:flex; align-items:center; justify-content:center; background:rgba(27,23,20,.76); padding:18px; box-sizing:border-box}
 #note[hidden]{display:none}
@@ -298,6 +303,21 @@ button.chip.can{background:var(--ink); color:var(--face); animation:cardcall 1.6
 #boardWrap.danger{outline:3px solid var(--seal)}
 #game #hud{width:100%; display:flex; align-items:stretch; gap:8px}
 #hud #btnBack{font-size:22px; padding:4px 4px; align-self:center}
+#hud #btnBgm{padding:0; align-self:center; flex:none; line-height:0; min-width:40px; min-height:40px; margin-right:-6px; display:flex; align-items:center; justify-content:center}
+#btnBgm svg{width:24px; height:24px; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round}
+#btnBgm .x{display:none; stroke-width:2.2}
+#btnBgm.off{opacity:.62}
+#btnBgm.off .x{display:inline}
+#setList .row.vol{gap:12px}
+#setList .row.vol div{flex:none}
+#setList .row.vol input{flex:1; min-width:0; height:40px; margin:0; background:none; -webkit-appearance:none; appearance:none; cursor:pointer}
+#setList .row.vol input::-webkit-slider-runnable-track{height:8px; border:2px solid var(--ink); background:linear-gradient(var(--ink),var(--ink)) 0 0/var(--fill,40%) 100% no-repeat, var(--face)}
+#setList .row.vol input::-moz-range-track{height:6px; border:2px solid var(--ink); background:var(--face)}
+#setList .row.vol input::-moz-range-progress{height:6px; background:var(--ink)}
+#setList .row.vol input::-webkit-slider-thumb{-webkit-appearance:none; width:24px; height:24px; margin-top:-10px; border-radius:50%; background:var(--ink); border:2px solid var(--face); box-shadow:0 0 0 2px var(--ink)}
+#setList .row.vol input::-moz-range-thumb{width:20px; height:20px; border-radius:50%; background:var(--ink); border:2px solid var(--face); box-shadow:0 0 0 2px var(--ink)}
+#setList .row.vol.off{opacity:.45}
+#setList .row.vol output{width:34px; text-align:right; font-family:var(--num); font-variant-numeric:lining-nums tabular-nums; font-weight:700; font-size:19px}
 .hc{display:flex; flex-direction:column; align-items:center; justify-content:center; min-width:60px; padding:3px 10px 4px; border:2px solid var(--ink); background:var(--face); box-shadow:2px 2px 0 var(--ink)}
 .hc.wide{flex:1}
 .hc[hidden]{display:none}
@@ -468,6 +488,7 @@ button.chip.can{background:var(--ink); color:var(--face); animation:cardcall 1.6
       <div class="hc"><small id="hudStageL">단계</small><b id="hudStage"></b></div>
       <div class="hc wide"><small id="goalL">남은 패</small><b id="goalV"></b></div>
       <div class="hc" id="timeCell"><small>시간</small><b id="time">0:00</b></div>
+      <button id="btnBgm" class="plain" type="button" aria-label="배경음 끄기"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 17.5V5.5l10-2v12"/><ellipse cx="6.4" cy="17.6" rx="2.9" ry="2.2" fill="currentColor"/><ellipse cx="16.4" cy="15.6" rx="2.9" ry="2.2" fill="currentColor"/><path class="x" d="M3.5 3.5l17 17"/></svg></button>
     </header>
     <p id="coach" hidden></p>
     <div id="comboRow"><span id="comboLabel">연속 ×1</span><div id="comboBar"><i></i></div></div>
@@ -483,6 +504,7 @@ button.chip.can{background:var(--ink); color:var(--face); animation:cardcall 1.6
     <div id="ntFact"><small>재미있는 사실</small><span></span></div>
     <em>화면을 누르면 닫힙니다</em>
   </article></div>
+  <button id="upd" type="button" hidden>새 버전이 있어요 · 눌러서 업데이트</button>
   <div id="toast"></div>
   <div id="nickDlg" hidden><form class="frame" id="nickForm">
     <h2>닉네임</h2>
@@ -683,7 +705,7 @@ ${crack?`<path d="M40 22 46 42 36 56 47 68 42 84M46 42 58 46M36 56 22 62" fill="
   document.head.appendChild(st);
 }
 
-/* ───────── 소리: 효과음(나무·프레스·금빛·인장·종)과 배경음(류트·하프시코드) ───────── */
+/* ───────── 소리: 효과음(나무·프레스·금빛·인장·종)과 배경음(bgm.mp3) ───────── */
 const LS=(k,v)=>{ try{ if(v===undefined) return localStorage.getItem(k); localStorage.setItem(k,v); }catch(e){} return null; };
 // scm-sound=0 은 전체 끔(예전 설정·시험용). 효과음·배경음·진동은 따로 끌 수 있다
 let muteAll=LS('scm-sound')==='0', sfxOn=LS('scm-sfx')!=='0', bgmOn=LS('scm-bgm')!=='0', vibOn=LS('scm-vib')!=='0';
@@ -739,60 +761,49 @@ const sfx={
   win:()=>{ stamp(0,.45); [523,659,784].forEach((f,i)=>bell(f,.18+i*.14,.11,1.5)); }
 };
 
-/* 배경음: 줄을 뜯는 소리(카플러스-스트롱)를 음마다 한 번 만들어 두고 박자에 맞춰 튼다 */
-const ksCache={};
-function ksBuf(a,m,ins){
-  const key=ins+m; if(ksCache[key]) return ksCache[key];
-  const sr=a.sampleRate, f=440*Math.pow(2,(m-69)/12), hp=ins==='h', b=hp?.2:.5, N=Math.max(2,Math.round(sr/f-b)), n=Math.ceil(sr*(hp?1.3:2.2)), buf=a.createBuffer(1,n,sr), ch=buf.getChannelData(0), d=new Float32Array(N), e=new Float32Array(N);
-  let prev=0; for(let i=0;i<N;i++){ const w=Math.random()*2-1; if(hp) d[i]=w; else { prev+=.42*(w-prev); d[i]=prev*1.7; } }
-  const pk=Math.max(1,Math.round(N*(hp?.11:.23))); for(let i=0;i<N;i++) e[i]=d[i]-d[(i+N-pk)%N]*.9; // 뜯는 자리에 따른 배음
-  const damp=hp?.9976:.9968; let p=0, peak=0;
-  for(let i=0;i<n;i++){ const k=(p+1)%N, v=e[p]; ch[i]=v; if(Math.abs(v)>peak) peak=Math.abs(v); e[p]=damp*((1-b)*e[p]+b*e[k]); p=k; }
-  const g=.9/(peak||1), fo=Math.floor(sr*.05); for(let i=0;i<n;i++) ch[i]*=g*(i>n-fo?(n-i)/fo:1)*(i<24?i/24:1);
-  return ksCache[key]=buf;
+/* 배경음: bgm.mp3 한 곡을 모든 화면에서 이어 튼다. 끝 2초와 처음 2초를 겹쳐(크로스페이드) 자연스럽게 되풀이한다.
+   첫 터치 전에는 틀지 않는다(폰의 자동재생 정책). 볼륨 0~100 은 기기에 저장한다(기본 40) */
+const BGM_SRC='bgm.mp3?v=1', XF=2;
+let bgmVol=(()=>{ const v=parseInt(LS('scm-bgmvol'),10); return isFinite(v)?Math.max(0,Math.min(100,v)):40; })();
+const bgm={els:[],gains:[],cur:0,on:false,want:null,swapping:false};
+const bgmLevel=()=>Math.pow(bgmVol/100,1.5);
+const bgmWanted=()=>!muteAll&&bgmOn&&bgmVol>0;
+function bgmSetup(){
+  if(bgm.els.length) return true; const a=AC(); if(!a) return false;
+  for(let i=0;i<2;i++){ const el=new Audio(); el.preload=i?'metadata':'auto'; el.src=BGM_SRC; const g=a.createGain(); g.gain.value=0;
+    try{ a.createMediaElementSource(el).connect(g); }catch(e){ return false; } g.connect(bgmBus);
+    el.addEventListener('timeupdate',()=>{ if(bgm.on&&bgm.cur===i&&!bgm.swapping&&el.duration&&el.currentTime>=el.duration-XF-.15) bgmSwap(); });
+    el.addEventListener('ended',()=>{ if(bgm.on&&bgm.cur===i&&!bgm.swapping) bgmSwap(); });
+    bgm.els.push(el); bgm.gains.push(g); }
+  return true;
 }
-// 코드: [베이스, [화음 셋]] · arp: [박, 화음 번호] · mel: 마디마다 [박, 음]
-const TRACKS={
- menu:{bpm:66,beats:3,ins:'l',melEvery:1,
-  ch:[[45,[57,60,64]],[41,[57,60,65]],[48,[55,60,64]],[43,[55,59,62]],[45,[57,60,64]],[41,[57,60,65]],[48,[55,60,64]],[40,[56,59,64]]],
-  bass:[[0,0]], arp:[[.5,0],[1,1],[1.5,2],[2,1],[2.5,0]],
-  mel:[[[0,76],[2,72]],[[0,69],[2,72]],[[0,76],[1.5,74],[2,72]],[[0,74]],[[0,72],[2,76]],[[0,77],[2,76]],[[0,72],[1,74],[2,76]],[[0,71],[2,68]]]},
- board:{bpm:100,beats:4,ins:'h',melEvery:2,
-  ch:[[38,[62,65,69]],[36,[60,64,67]],[41,[60,65,69]],[36,[60,64,67]],[34,[62,65,70]],[41,[60,65,69]],[43,[62,67,70]],[45,[61,64,69]]],
-  bass:[[0,0],[2,1]], arp:[[0,0],[.5,2],[1,1],[1.5,2],[2,0],[2.5,2],[3,1],[3.5,2]],
-  mel:[[[0,81],[2,77],[3,74]],[[0,76],[2,72]],[[0,77],[1,79],[2,81]],[[0,79],[2,76]],[[0,77],[2,74]],[[0,72],[2,77]],[[0,79],[1,77],[2,74]],[[0,73],[2,76]]]},
- paint:{bpm:56,beats:4,ins:'l',melEvery:1,
-  ch:[[43,[59,62,67]],[40,[59,64,67]],[48,[60,64,67]],[50,[57,62,66]],[43,[59,62,67]],[47,[59,62,66]],[48,[60,64,67]],[50,[57,62,67]]],
-  bass:[[0,0]], arp:[[1,0],[1.5,1],[2,2],[3,1]],
-  mel:[[[0,74],[2.5,71]],[[0,76],[2,79]],[[0,76],[2.5,72]],[[0,74],[2,69]],[[0,71],[2,74]],[[0,78],[2.5,74]],[[0,76],[2,72]],[[0,74],[2.5,66]]]}
-};
-const bgm={name:null,want:null,bar:0,pass:0,next:0,timer:0,sw:0,out:null};
-function bgmNote(m,t,v,ins){ const s=ac.createBufferSource(), g=ac.createGain(); s.buffer=ksBuf(ac,m,ins); g.gain.value=v; s.connect(g); g.connect(bgm.out); s.start(t);
-  if(ins==='h'){ const s2=ac.createBufferSource(), g2=ac.createGain(); s2.buffer=ksBuf(ac,m+12,'h'); g2.gain.value=v*.32; s2.connect(g2); g2.connect(bgm.out); s2.start(t+.004); } }
-function bgmBar(T,bar,t0,pass){
-  const spb=60/T.bpm, c=T.ch[bar%T.ch.length], h=()=>(Math.random()-.5)*.014;
-  T.bass.forEach(([bt,k])=>bgmNote(c[0]+(k?7:0),t0+bt*spb+h(),.5,'l'));
-  T.arp.forEach(([bt,i])=>bgmNote(c[1][i],t0+bt*spb+h(),(T.ins==='h'?.16:.26)+Math.random()*.05,T.ins));
-  if(pass%T.melEvery===T.melEvery-1) (T.mel[bar%T.mel.length]||[]).forEach(([bt,m])=>bgmNote(m,t0+bt*spb+h(),T.ins==='h'?.3:.42,T.ins));
+const bgmRamp=(g,to,d)=>{ const t=ac.currentTime; g.gain.cancelScheduledValues(t); g.gain.setValueAtTime(g.gain.value,t); g.gain.linearRampToValueAtTime(to,t+d); };
+// 끝나기 2초 전: 다른 쪽을 처음부터 틀며 서서히 키우고, 지금 쪽은 서서히 줄인다
+function bgmSwap(){
+  const o=bgm.cur, n=1-o, eo=bgm.els[o], en=bgm.els[n]; bgm.swapping=true;
+  const back=()=>{ bgm.swapping=false; eo.loop=true; }; // 둘째 재생이 막힌 기기: 겹침 없이 그냥 되풀이
+  try{ en.currentTime=0; }catch(e){}
+  let p; try{ p=en.play(); }catch(e){ back(); return; }
+  const go=()=>{ bgm.cur=n; bgmRamp(bgm.gains[n],1,XF); bgmRamp(bgm.gains[o],0,XF); setTimeout(()=>{ if(bgm.cur===n){ try{ eo.pause(); }catch(e){} } bgm.swapping=false; },XF*1000+250); };
+  if(p&&p.then) p.then(go).catch(back); else go();
 }
-function bgmTick(){
-  if(!ac||!bgm.name||ac.state!=='running') return; const T=TRACKS[bgm.name], len=T.beats*60/T.bpm;
-  while(bgm.next<ac.currentTime+.4){ if(bgm.next<ac.currentTime+.03) bgm.next=ac.currentTime+.06; bgmBar(T,bgm.bar,bgm.next,bgm.pass); bgm.next+=len; bgm.bar++; if(bgm.bar%T.ch.length===0) bgm.pass++; }
-}
-function bgmStop(){ clearInterval(bgm.timer); clearTimeout(bgm.sw); bgm.name=null; const o=bgm.out; bgm.out=null;
-  if(o&&ac){ o.gain.setTargetAtTime(0,ac.currentTime,.12); setTimeout(()=>{ try{ o.disconnect(); }catch(e){} },900); } }
+function bgmStop(){ if(!bgm.on) return; bgm.on=false; if(ac) bgm.gains.forEach(g=>bgmRamp(g,0,.25)); setTimeout(()=>{ if(!bgm.on) bgm.els.forEach(e=>{ try{ e.pause(); }catch(x){} }); },350); }
 function music(name){
   bgm.want=name; if(!gest) return;
-  if(muteAll||!bgmOn||!name){ bgmStop(); return; }
-  const a=AC(); if(!a||bgm.name===name) return;
-  const was=!!bgm.name; bgmStop();
-  bgm.sw=setTimeout(()=>{ if(bgm.want!==name||muteAll||!bgmOn) return;
-    bgm.out=a.createGain(); bgm.out.gain.value=0; bgm.out.connect(bgmIn); bgm.out.gain.setTargetAtTime(1,a.currentTime,.35);
-    bgm.name=name; bgm.bar=0; bgm.pass=0; bgm.next=a.currentTime+.15; bgm.timer=setInterval(bgmTick,150); bgmTick(); },was?450:30);
+  if(!name||!bgmWanted()){ bgmStop(); return; }
+  if(!bgmSetup()) return; AC(); bgmBus.gain.value=bgmLevel(); if(bgm.on) return;
+  bgm.on=true; bgm.swapping=false; const el=bgm.els[bgm.cur], other=bgm.els[1-bgm.cur];
+  bgm.gains[1-bgm.cur].gain.value=0; bgmRamp(bgm.gains[bgm.cur],1,.8);
+  const p=el.play(); if(p&&p.catch) p.catch(()=>{ bgm.on=false; });
+  // 둘째 재생기도 이 터치 안에서 한 번 깨워 둔다(iOS)
+  if(other.paused&&!other.dataset.ok){ try{ const q=other.play(); if(q&&q.then) q.then(()=>{ other.dataset.ok='1'; if(bgm.els[bgm.cur]!==other){ other.pause(); try{ other.currentTime=0; }catch(e){} } }).catch(()=>{}); }catch(e){} }
 }
-const musicFor=id=>id==='game'?'board':(id==='paint'||id==='album'||id==='coop')?'paint':'menu';
+const musicFor=id=>'bgm';
+function setBgmVol(v){ bgmVol=Math.max(0,Math.min(100,Math.round(+v||0))); LS('scm-bgmvol',''+bgmVol); if(ac&&bgmBus) bgmBus.gain.setTargetAtTime(bgmLevel(),ac.currentTime,.04); music(bgm.want||'bgm'); }
 addEventListener('pointerdown',()=>{ if(gest) return; gest=true; if(bgm.want) music(bgm.want); },{capture:true,passive:true});
-document.addEventListener('visibilitychange',()=>{ if(!ac) return; try{ if(document.hidden) ac.suspend(); else if(gest) ac.resume(); }catch(e){} });
+document.addEventListener('visibilitychange',()=>{ if(!ac) return; try{
+  if(document.hidden){ bgm.els.forEach(e=>e.pause()); ac.suspend(); }
+  else if(gest){ ac.resume(); if(bgm.on){ const p=bgm.els[bgm.cur].play(); if(p&&p.catch) p.catch(()=>{}); } } }catch(e){} });
 
 /* ───────── 저장 ───────── */
 const SAVE='scm-save-v1';
@@ -1738,15 +1749,22 @@ $('#note').addEventListener('click',closeNote);
 function setSound(which){
   const cur=!muteAll&&(which==='sfx'?sfxOn:bgmOn);
   if(muteAll){ muteAll=false; sfxOn=which==='sfx'; bgmOn=which==='bgm'; } else if(which==='sfx') sfxOn=!cur; else bgmOn=!cur;
-  LS('scm-sound','1'); LS('scm-sfx',sfxOn?'1':'0'); LS('scm-bgm',bgmOn?'1':'0'); if(which==='sfx'&&sfxOn) sfx.tap(); music(bgm.want||'menu');
+  LS('scm-sound','1'); LS('scm-sfx',sfxOn?'1':'0'); LS('scm-bgm',bgmOn?'1':'0'); if(which==='sfx'&&sfxOn) sfx.tap(); if(which==='bgm'&&bgmOn&&bgmVol===0) setBgmVol(40); music(bgm.want||'bgm'); drawBgmBtn();
 }
+// 판 화면 위의 음표 단추: 배경음을 바로 켜고 끈다
+function drawBgmBtn(){ const b=$('#btnBgm'), on=bgmWanted(); b.classList.toggle('off',!on); b.setAttribute('aria-pressed',on); b.setAttribute('aria-label','배경음 '+(on?'끄기':'켜기')); }
+$('#btnBgm').onclick=()=>{ setSound('bgm'); toast(bgmWanted()?'배경음 켬':'배경음 끔',900); };
+drawBgmBtn();
 function drawSettings(){
   const el=$('#setList'), simple=LS('scm-gfx')==='simple'; el.textContent='';
   const row=(name,sub,on,fn)=>{ const r=document.createElement('div'), d=document.createElement('div'), b=document.createElement('b'), sm=document.createElement('small'), x=document.createElement('button');
     r.className='row'; b.textContent=name; sm.textContent=sub; d.appendChild(b); d.appendChild(sm); x.type='button'; x.textContent=on?'켬':'끔'; if(on) x.className='armed'; x.setAttribute('aria-pressed',on); x.setAttribute('aria-label',name+' '+(on?'켬':'끔'));
     x.onclick=()=>{ fn(); drawSettings(); }; r.appendChild(d); r.appendChild(x); el.appendChild(r); };
   row('효과음','패 맞추는 소리, 인장, 종',!muteAll&&sfxOn,()=>setSound('sfx'));
-  row('배경음','류트와 하프시코드 음악',!muteAll&&bgmOn,()=>setSound('bgm'));
+  row('배경음','모든 화면에서 흐르는 음악',!muteAll&&bgmOn,()=>setSound('bgm'));
+  { const r=document.createElement('div'), d=document.createElement('div'), b=document.createElement('b'), sl=document.createElement('input'), out=document.createElement('output');
+    r.className='row vol'+(!muteAll&&bgmOn?'':' off'); b.textContent='배경음 크기'; sl.style.setProperty('--fill',bgmVol+'%'); d.appendChild(b); sl.type='range'; sl.min=0; sl.max=100; sl.step=1; sl.value=bgmVol; sl.id='bgmVol'; sl.setAttribute('aria-label','배경음 크기 0에서 100'); out.textContent=bgmVol;
+    sl.oninput=()=>{ setBgmVol(sl.value); out.textContent=bgmVol; sl.style.setProperty('--fill',bgmVol+'%'); drawBgmBtn(); }; r.appendChild(d); r.appendChild(sl); r.appendChild(out); el.appendChild(r); }
   row('진동','패를 맞출 때 짧게 떨림',vibOn,()=>{ vibOn=!vibOn; LS('scm-vib',vibOn?'1':'0'); if(vibOn) buzz(30); });
   row('단순 그래픽','느리거나 뜨거워지는 기기용',simple,()=>{ LS('scm-gfx',simple?'':'simple'); save(); location.reload(); });
   if(installEvt){ const r=document.createElement('div'), d=document.createElement('div'), b=document.createElement('b'), sm=document.createElement('small'), x=document.createElement('button');
@@ -1927,7 +1945,7 @@ function drawRec(){
 document.querySelectorAll('#recTabs button').forEach(x=>{ x.onclick=()=>{ recTab=x.dataset.tab; drawRec(); }; });
 document.querySelectorAll('#rankTabs button').forEach(x=>{ x.onclick=()=>{ rankTab=x.dataset.r; drawRank(); }; });
 const SCREENS=['settings','coop','title','menu','map','records','codex','game','paint','album'];
-function show(id){ SCREENS.forEach(s=>{ $('#'+s).hidden=s!==id; }); music(musicFor(id)); }
+function show(id){ SCREENS.forEach(s=>{ $('#'+s).hidden=s!==id; }); music(musicFor(id)); showUpd(); if(id!=='game') checkUpd(); }
 function go(id){
   $('#result').hidden=true; closeNote();
   if(id==='daily'){ if(!S.nick){ askNick('daily'); return; } startGame('daily'); return; }
@@ -2023,13 +2041,25 @@ $('#title').addEventListener('pointerdown',e=>{ if(!titleDone){ finishTitle(); t
 // 첫 로딩 화면: 글꼴과 제목 판화가 준비되면 걷고 인쇄 연출을 시작한다(길어도 4초)
 Promise.race([Promise.all([document.fonts&&document.fonts.ready, new Promise(r=>{ const i=new Image(); i.onload=i.onerror=r; i.src='art/title.webp'; })]), new Promise(r=>setTimeout(r,4000))])
   .catch(()=>{}).then(()=>{ const l=$('#loading'); if(l){ l.classList.add('off'); setTimeout(()=>l.remove(),350); } runTitle(); });
+// 새 버전 안내: 서버의 index.html 이 처음 받은 것과 달라지면 띠를 띄운다. 누르면 저장하고 새로 불러온다(진행은 기기에 남아 있다)
+let updTag=null, updReady=false, updAt=0;
+const pageTag=()=>fetch('./?upd='+Date.now(),{method:'HEAD',cache:'no-store'}).then(r=>r.ok?((r.headers.get('etag')||'').split('W/').join('').split(String.fromCharCode(34)).join('')||r.headers.get('last-modified')||''):'');
+function showUpd(){ const inGame=!$('#game').hidden, playing=inGame&&!over, b=$('#upd'); b.hidden=!updReady||playing; b.classList.toggle('up',inGame); } // 판을 푸는 중에는 가리고, 판이 끝나면 보인다
+function checkUpd(){
+  if(updReady||document.hidden||Date.now()-updAt<60000) return; updAt=Date.now();
+  pageTag().then(t=>{ if(!t) return; if(updTag===null){ updTag=t; return; } if(t!==updTag){ updReady=true; showUpd(); } }).catch(()=>{});
+}
+$('#upd').onclick=()=>{ const b=$('#upd'); b.disabled=true; b.textContent='업데이트하는 중…'; try{ save(); }catch(e){}
+  const go=()=>location.reload();
+  if('serviceWorker' in navigator) navigator.serviceWorker.getRegistration().then(r=>r?r.update():0).catch(()=>{}).then(go); else go(); setTimeout(go,4000); };
+if(location.protocol!=='file:'){ checkUpd(); setInterval(checkUpd,5*60000); setInterval(()=>{ if(updReady) showUpd(); },1500); document.addEventListener('visibilitychange',()=>{ if(!document.hidden) checkUpd(); }); }
 // 홈 화면 설치(PWA)
 let installEvt=null;
 addEventListener('beforeinstallprompt',e=>{ e.preventDefault(); installEvt=e; if(!$('#settings').hidden) drawSettings(); });
 if('serviceWorker' in navigator&&location.protocol==='https:') addEventListener('load',()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); });
 
 unlockSkins();
-window.scm={ openNote, NOTES, sfx, music, audioTest(){ const a=AC(); if(!a) return null; try{ sfxBus.disconnect(); bgmBus.disconnect(); }catch(e){} const an=a.createAnalyser(); an.fftSize=2048; sfxBus.connect(an); bgmBus.connect(an); muteAll=false; sfxOn=bgmOn=true; gest=true; return {an,ac:a,bgm}; }, coFetch, coGive, get coState(){ return coState; }, setSkin, SKINS, HALLS, logStage, fetchLeague, leagueBump, PAINTS, paintAt:i=>{ const b=[...document.querySelectorAll('#ptStage .drop')][i]; if(b) b.click(); }, gfx:()=>R.is3d?R.stats():{is3d:false}, stageCfg, fetchBoard, tap, findMove, findPath, startGame, go, endGame, S, grid:()=>grid, set:g=>{grid=g;paintAll();}, state:()=>({mode,score,combo,lock,over,tiles:tileCount(),basket:basket.length}) };
+window.scm={ upd:()=>({updTag,updReady,hidden:$('#upd').hidden}), checkUpd:()=>{ updAt=0; checkUpd(); }, bgmState:()=>({gest,ctx:!!ac,on:bgm.on,els:bgm.els.length,cur:bgm.cur,vol:bgmVol,want:bgm.want,wanted:bgmWanted(),swapping:bgm.swapping,t:bgm.els.map(e=>Math.round(e.currentTime*10)/10),paused:bgm.els.map(e=>e.paused),g:bgm.gains.map(g=>Math.round(g.gain.value*100)/100),bus:bgmBus?Math.round(bgmBus.gain.value*1000)/1000:null}), setBgmVol, openNote, NOTES, sfx, music, audioTest(){ const a=AC(); if(!a) return null; try{ sfxBus.disconnect(); bgmBus.disconnect(); }catch(e){} const an=a.createAnalyser(); an.fftSize=2048; sfxBus.connect(an); bgmBus.connect(an); muteAll=false; sfxOn=bgmOn=true; gest=true; return {an,ac:a,bgm}; }, coFetch, coGive, get coState(){ return coState; }, setSkin, SKINS, HALLS, logStage, fetchLeague, leagueBump, PAINTS, paintAt:i=>{ const b=[...document.querySelectorAll('#ptStage .drop')][i]; if(b) b.click(); }, gfx:()=>R.is3d?R.stats():{is3d:false}, stageCfg, fetchBoard, tap, findMove, findPath, startGame, go, endGame, S, grid:()=>grid, set:g=>{grid=g;paintAll();}, state:()=>({mode,score,combo,lock,over,tiles:tileCount(),basket:basket.length}) };
 })();
 </script>
 </body>
