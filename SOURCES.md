@@ -11,7 +11,7 @@
 | A | 『뉘른베르크 연대기』 76장 앞면의 해와 달 | 미하엘 볼게무트 공방(뒤러 작으로도 전함) · 1493 | Morse Library, Beloit College 스캔 | 퍼블릭 도메인 | https://commons.wikimedia.org/wiki/File:Nuremberg_chronicles_-_Sun_and_Moon_(LXXVIr).jpg |
 | B | 『건강의 정원 Gart der Gesundheit』 337장 "Rosa rosen" | 작가 미상, 마인츠 · 1485 | Wikimedia Commons | 퍼블릭 도메인 | https://commons.wikimedia.org/wiki/File:337_Rosa_rosen.jpg |
 | C | 막시밀리안 1세 개선문 중 "중앙 문의 둥근 지붕과 황제관" (DP-16116-081) | 한스 슈프링인클레(뒤러 공방) · 1515, 초판 1517~18 | The Metropolitan Museum of Art | CC0 | https://commons.wikimedia.org/wiki/File:The_Cupola_and_Imperial_Crown_on_the_Central_Portal,_from_The_Triumphal_Arch_of_Maximilian_I,_1st_edition_(1517-18)_MET_DP-16116-081.jpg |
-| D | 성 베드로 Heilige Petrus (RP-P-OB-22.183) | 작가 미상 · 1552 | Rijksmuseum | CC0 | https://commons.wikimedia.org/wiki/File:Heilige_Petrus,_RP-P-OB-22.183.jpg |
+| D | 성 베드로 Heilige Petrus (RP-P-OB-22.183) | 비르길 솔리스(작품에 이름이 적혀 있음), 인쇄 발렌틴 가이슬러 · 1552 | Rijksmuseum | CC0 | https://commons.wikimedia.org/wiki/File:Heilige_Petrus,_RP-P-OB-22.183.jpg |
 | E | 사도 베드로 Apostel Petrus (RP-P-OB-1522) | 작가 미상 · 1503 | Rijksmuseum | CC0 | https://commons.wikimedia.org/wiki/File:Apostel_Petrus,_RP-P-OB-1522.jpg |
 | F | 성 크리스토포로스 Saint Christopher (DP816418) | 알브레히트 뒤러 · 1511 | The Metropolitan Museum of Art | CC0 | https://commons.wikimedia.org/wiki/File:Saint_Christopher_MET_DP816418.jpg |
 | G | 코뿔소 The Rhinoceros (MM2134) | 알브레히트 뒤러 · 1515 | The Metropolitan Museum of Art | CC0 | https://commons.wikimedia.org/wiki/File:The_Rhinoceros_MET_MM2134.jpg |
@@ -81,12 +81,12 @@
 |---|---|---|---|---|
 | 일각수 | 콘라트 게스너 『동물지』 · 1551 | `art/ge_title.webp` | 퍼블릭 도메인 | https://commons.wikimedia.org/wiki/File:Conradi_Gesneri_medici_Tigurini_Historiae_animalium_lib._I_1551_(26482136).jpg |
 | 황소 | 콘라트 게스너 『동물지』 · 1551 | `art/ge_bull.webp` | 퍼블릭 도메인 | https://commons.wikimedia.org/wiki/File:103_De_Tauro_(without_doodle),_from_Historiae_animalium.jpg |
-| 거위 | 네덜란드 목판 그림장 · 18세기 | `art/nl_goose.webp` | CC0 | https://commons.wikimedia.org/wiki/File:De_gans,_RP-P-OB-203.361.jpg |
-| 새들 | 네덜란드 목판 그림장 · 18세기 | `art/nl_birds.webp` | CC0 | https://commons.wikimedia.org/wiki/File:Vogels,_RP-P-OB-204.326.jpg |
-| 물고기들 | 네덜란드 목판 그림장 · 18세기 | `art/nl_fish.webp` | CC0 | https://commons.wikimedia.org/wiki/File:Hier_hebt_gy_nu_verscheyde_vis,_Die_wel_smaakt_als_z'_zijn_op_den_dis,_RP-P-OB-204.128.jpg |
-| 뱀장어와 바다짐승 | 네덜란드 목판 그림장 · 18세기 | `art/nl_eel.webp` | CC0 | https://commons.wikimedia.org/wiki/File:Dit_is_een_schoone_paling,_Zeequak_en_een_Noorweegze_korp,_RP-P-OB-202.607.jpg |
-| 먼 나라의 짐승들 | 네덜란드 목판 그림장 · 18세기 | `art/nl_america.webp` | CC0 | https://commons.wikimedia.org/wiki/File:Geen_vreemder_beesten_men_ooit_vand,_Als_in_'t_Amerikaansche_land,_RP-P-OB-202.603.jpg |
-| 새와 짐승 | 네덜란드 목판 그림장 · 18세기 | `art/nl_fowl.webp` | CC0 | https://commons.wikimedia.org/wiki/File:Wilt_o_jonge_jeugd_dees_vogelen_bekyken,_Die_zeer_uistekende_na_levendig_gelyken,_RP-P-OB-202.602.jpg |
+| 거위 | 네덜란드 목판 그림장 | `art/nl_goose.webp` | CC0 | https://commons.wikimedia.org/wiki/File:De_gans,_RP-P-OB-203.361.jpg |
+| 새들 | 네덜란드 목판 그림장 | `art/nl_birds.webp` | CC0 | https://commons.wikimedia.org/wiki/File:Vogels,_RP-P-OB-204.326.jpg |
+| 물고기들 | 네덜란드 목판 그림장 | `art/nl_fish.webp` | CC0 | https://commons.wikimedia.org/wiki/File:Hier_hebt_gy_nu_verscheyde_vis,_Die_wel_smaakt_als_z'_zijn_op_den_dis,_RP-P-OB-204.128.jpg |
+| 뱀장어와 바다짐승 | 네덜란드 목판 그림장 | `art/nl_eel.webp` | CC0 | https://commons.wikimedia.org/wiki/File:Dit_is_een_schoone_paling,_Zeequak_en_een_Noorweegze_korp,_RP-P-OB-202.607.jpg |
+| 먼 나라의 짐승들 | 네덜란드 목판 그림장 | `art/nl_america.webp` | CC0 | https://commons.wikimedia.org/wiki/File:Geen_vreemder_beesten_men_ooit_vand,_Als_in_'t_Amerikaansche_land,_RP-P-OB-202.603.jpg |
+| 새와 짐승 | 네덜란드 목판 그림장 | `art/nl_fowl.webp` | CC0 | https://commons.wikimedia.org/wiki/File:Wilt_o_jonge_jeugd_dees_vogelen_bekyken,_Die_zeer_uistekende_na_levendig_gelyken,_RP-P-OB-202.602.jpg |
 
 ### 4관 · 묵시록
 
@@ -122,8 +122,8 @@
 | 달 보는 곶 | 히로시게 · 명소 에도 백경, 1857 | `art/uk_moon.webp` | CC0 | https://commons.wikimedia.org/wiki/File:%E5%90%8D%E6%89%80%E6%B1%9F%E6%88%B8%E7%99%BE%E6%99%AF_%E6%9C%88%E3%81%AE%E5%B2%AC-Moon_Viewing_Point_MET_DP121535.jpg |
 
 ### 알아둘 점
-- 3관 「동물 우화집」: 중세 필사본 우화집은 깨끗한 낱장 목판 스캔을 CC0·퍼블릭 도메인으로 구하지 못했습니다. 대신 게스너 『동물지』(1551)의 목판 2장(일각수는 책장에서 삽화만 오렸습니다), 레이크스미술관 소장 18세기 네덜란드 동물 목판 그림장 6장, 1485년 『건강의 정원』 장미(B)를 걸었습니다. 엄밀히는 "중세"가 아니라 16~18세기 동물 목판입니다.
-- 1관 「뒤러의 공방」에는 뒤러 작이 아닌 것이 섞여 있습니다: 성 베드로(D, 작가 미상 1552), 둥근 지붕과 황제관(C, 뒤러 공방의 슈프링인클레).
+- 3관 「동물 우화집」: 중세 필사본 우화집은 깨끗한 낱장 목판 스캔을 CC0·퍼블릭 도메인으로 구하지 못했습니다. 대신 게스너 『동물지』(1551)의 목판 2장(일각수는 책장에서 삽화만 오렸습니다), 레이크스미술관 소장 네덜란드 동물 목판 그림장 6장(기록의 인쇄 시기 1724~1856년. 16세기 게스너 책의 판목을 다시 찍은 것), 1485년 『건강의 정원』 장미(B)를 걸었습니다. 엄밀히는 "중세"가 아니라 15~19세기 인쇄물의 동식물 목판입니다. 그림장 두 장의 제목도 기록에 맞춰 고쳤습니다(뱀장어와 바다 물고기, 새 다섯 마리).
+- 1관 「뒤러의 공방」에는 뒤러 작이 아닌 것이 섞여 있습니다: 성 베드로(D, 비르길 솔리스 1552. 처음에는 작가 미상으로 적었으나 레이크스미술관 기록에 판화가 이름이 있어 고쳤습니다), 둥근 지붕과 황제관(C, 슈프링인클레).
 - 2관의 해와 달(A), 4관의 성 미카엘(K)·네 기사(J)는 위 표의 기존 작품입니다.
 
 ## 패 스킨 문양 (v1.0.1)
@@ -138,6 +138,107 @@
 | 4관 묵시록 밤판 `skin_apocalypse.js` | 해 · 초승달 · 어린 양 · 촛대 · 성전 기둥 | 다섯째·여섯째 봉인 · 같은 판화 · 어린 양 경배 · 일곱 촛대의 환시 · 책을 삼키는 요한 |
 
 5관 우키요에 스킨의 문양(산·물결·학·매화·달)은 판화에서 오린 것이 아니라 코드로 그린 SVG입니다.
+
+## 판화 해설의 근거 (판화별)
+
+해설 카드(`notes.js`)의 작가·연도·이야기·재미있는 사실은 아래 기록을 읽고 쉬운 말로 새로 쓴 것입니다. 원문을 그대로 옮기지 않았고, 기록에서 확인하지 못한 내용은 뺐습니다. 작가가 기록에 없으면 "작가 미상"으로 적었습니다. 읽은 날: 2026-11-13.
+
+### 1관 · 뒤러의 공방
+
+관 소개 근거: https://en.wikipedia.org/wiki/Life_of_the_Virgin_(D%C3%BCrer) · https://en.wikipedia.org/wiki/Triumphal_Arch_(woodcut) · https://en.wikipedia.org/wiki/Virgil_Solis
+
+| 판화 | 근거로 삼은 기록 |
+|---|---|
+| 황금문의 요아킴과 안나 | https://commons.wikimedia.org/wiki/File:Joachim_and_Anna_at_the_Golden_Gate,_from_The_Life_of_the_Virgin_MET_DP816139.jpg · https://en.wikipedia.org/wiki/Joachim_and_Anne_Meeting_at_the_Golden_Gate_(D%C3%BCrer) · https://en.wikipedia.org/wiki/Joachim_and_Anne_Meeting_at_the_Golden_Gate |
+| 성 베드로 | https://commons.wikimedia.org/wiki/File:Heilige_Petrus,_RP-P-OB-22.183.jpg · https://id.rijksmuseum.nl/200137731 · https://en.wikipedia.org/wiki/Virgil_Solis |
+| 둥근 지붕과 황제관 | https://commons.wikimedia.org/wiki/File:The_Cupola_and_Imperial_Crown_on_the_Central_Portal,_from_The_Triumphal_Arch_of_Maximilian_I,_1st_edition_(1517-18)_MET_DP-16116-081.jpg · https://collectionapi.metmuseum.org/public/collection/v1/objects/754941 · https://en.wikipedia.org/wiki/Triumphal_Arch_(woodcut) |
+| 성모의 탄생 | https://commons.wikimedia.org/wiki/File:The_Birth_of_the_Virgin,_from_The_Life_of_the_Virgin_MET_DP816142.jpg · https://en.wikipedia.org/wiki/Life_of_the_Virgin_(D%C3%BCrer) · https://en.wikipedia.org/wiki/Nativity_of_Mary |
+| 성 크리스토포로스 | https://commons.wikimedia.org/wiki/File:Saint_Christopher_MET_DP816418.jpg · https://en.wikipedia.org/wiki/Saint_Christopher |
+| 성모의 약혼 | https://commons.wikimedia.org/wiki/File:The_Betrothal_of_the_Virgin,_from_The_Life_of_the_Virgin_MET_DP816143.jpg · https://en.wikipedia.org/wiki/Marriage_of_the_Virgin · https://en.wikipedia.org/wiki/Marcantonio_Raimondi |
+| 수태고지 | https://commons.wikimedia.org/wiki/File:The_Annunciation,_from_The_Life_of_the_Virgin_MET_DP816271.jpg · https://en.wikipedia.org/wiki/Annunciation · https://en.wikipedia.org/wiki/Joachim_and_Anne_Meeting_at_the_Golden_Gate_(D%C3%BCrer) |
+| 코뿔소 | https://commons.wikimedia.org/wiki/File:The_Rhinoceros_MET_MM2134.jpg · https://en.wikipedia.org/wiki/D%C3%BCrer%27s_Rhinoceros |
+| 엘리사벳 방문 | https://commons.wikimedia.org/wiki/File:The_Visitation,_from_The_Life_of_the_Virgin_MET_DP816275.jpg · https://en.wikipedia.org/wiki/Visitation_(Christianity) |
+| 성탄 | https://commons.wikimedia.org/wiki/File:The_Nativity,_from_The_Life_of_the_Virgin_MET_DP816268.jpg · https://collectionapi.metmuseum.org/public/collection/v1/objects/387877 · https://en.wikipedia.org/wiki/Life_of_the_Virgin_(D%C3%BCrer) |
+| 사자를 찢는 삼손 | https://commons.wikimedia.org/wiki/File:Samson_Rending_the_Lion_MET_DP816583.jpg · https://collectionapi.metmuseum.org/public/collection/v1/objects/388799 · https://en.wikipedia.org/wiki/Samson |
+| 토끼 세 마리와 성가족 | https://commons.wikimedia.org/wiki/File:The_Holy_Family_with_Three_Hares_MET_DP816951.jpg · https://en.wikipedia.org/wiki/The_Holy_Family_with_Three_Hares |
+
+### 2관 · 뉘른베르크 연대기
+
+관 소개 근거: https://en.wikipedia.org/wiki/Nuremberg_Chronicle · https://de.wikipedia.org/wiki/Schedelsche_Weltchronik · https://ko.wikipedia.org/wiki/뉘른베르크_연대기
+
+| 판화 | 근거로 삼은 기록 |
+|---|---|
+| 해와 달 | https://commons.wikimedia.org/wiki/File:Nuremberg_chronicles_-_Sun_and_Moon_(LXXVIr).jpg · https://de.wikisource.org/wiki/Die_Schedelsche_Weltchronik_(deutsch):076 · https://en.wikipedia.org/wiki/Nuremberg_Chronicle |
+| 아담의 창조 | https://commons.wikimedia.org/wiki/File:Creation_of_Adam,_Nuremberg_Chronicle,_1493,_Michael_Wolgemut_illustrator_-_Nelson-Atkins_Museum_of_Art_-_DSC08382.JPG · https://en.wikipedia.org/wiki/Nuremberg_Chronicle |
+| 천구의 우주 | https://commons.wikimedia.org/wiki/File:Geocentric_universe_-_Hartmann_Schedel_-_Liber_chronicarum_mundi_-_1493.png · https://de.wikipedia.org/wiki/Geozentrisches_Weltbild · https://en.wikipedia.org/wiki/Nuremberg_Chronicle |
+| 플라톤 | https://commons.wikimedia.org/wiki/File:Plato_in_Nuremberg_Chronicle_LXXIIIv.jpg · https://en.wikipedia.org/wiki/Plato · https://de.wikipedia.org/wiki/Schedelsche_Weltchronik |
+| 뉘른베르크 | https://commons.wikimedia.org/wiki/File:Nuremberg_chronicles_-_Nuremberga.png · https://en.wikipedia.org/wiki/Nuremberg_Chronicle |
+| 스트라스부르 | https://commons.wikimedia.org/wiki/File:Strasbourg,_woodcut_from_Schedel's_Weltchronik_(1493),_compressed.jpg · https://en.wikipedia.org/wiki/Strasbourg_Cathedral |
+| 콘스탄티노폴리스 | https://commons.wikimedia.org/wiki/File:Constantinople,_woodcut_from_Schedel's_Weltchronik_(1493).png · https://en.wikipedia.org/wiki/Fall_of_Constantinople |
+| 쾰른 | https://commons.wikimedia.org/wiki/File:Nuremberg_chronicles_-_colonia.png · https://de.wikipedia.org/wiki/Domkran |
+| 뤼베크 | https://commons.wikimedia.org/wiki/File:Nuremberg_chronicles_-_LUBECA.png · https://en.wikipedia.org/wiki/Lübeck |
+| 마그데부르크 | https://commons.wikimedia.org/wiki/File:Nuremberg_chronicles_-_MEYDEBURGA.png · https://en.wikipedia.org/wiki/Magdeburg · https://de.wikipedia.org/wiki/Schedelsche_Weltchronik |
+| 부다 | https://commons.wikimedia.org/wiki/File:Nuremberg_chronicles_-_BVJA.png · https://en.wikipedia.org/wiki/Buda |
+
+### 3관 · 동물 우화집
+
+관 소개 근거: https://en.wikipedia.org/wiki/Gart_der_Gesundheit · https://en.wikipedia.org/wiki/Historia_animalium_(Gessner) · https://id.rijksmuseum.nl/200580867 · https://nl.wikipedia.org/wiki/Centsprent
+
+| 판화 | 근거로 삼은 기록 |
+|---|---|
+| 장미 | https://commons.wikimedia.org/wiki/File:337_Rosa_rosen.jpg · https://en.wikipedia.org/wiki/Gart_der_Gesundheit |
+| 일각수 | https://commons.wikimedia.org/wiki/File:Conradi_Gesneri_medici_Tigurini_Historiae_animalium_lib._I_1551_(26482136).jpg · https://en.wikipedia.org/wiki/Historia_animalium_(Gessner) · https://en.wikipedia.org/wiki/Conrad_Gessner |
+| 황소 | https://commons.wikimedia.org/wiki/File:103_De_Tauro_(without_doodle),_from_Historiae_animalium.jpg · https://en.wikipedia.org/wiki/Historia_animalium_(Gessner) |
+| 거위 | https://commons.wikimedia.org/wiki/File:De_gans,_RP-P-OB-203.361.jpg · https://id.rijksmuseum.nl/200101634 |
+| 새들 | https://commons.wikimedia.org/wiki/File:Vogels,_RP-P-OB-204.326.jpg · https://id.rijksmuseum.nl/200580867 · https://en.wikipedia.org/wiki/Historia_animalium_(Gessner) |
+| 물고기들 | https://commons.wikimedia.org/wiki/File:Hier_hebt_gy_nu_verscheyde_vis,_Die_wel_smaakt_als_z'_zijn_op_den_dis,_RP-P-OB-204.128.jpg · https://id.rijksmuseum.nl/200579805 |
+| 뱀장어와 바다 물고기 | https://commons.wikimedia.org/wiki/File:Dit_is_een_schoone_paling,_Zeequak_en_een_Noorweegze_korp,_RP-P-OB-202.607.jpg · https://id.rijksmuseum.nl/200573408 |
+| 먼 나라의 짐승들 | https://commons.wikimedia.org/wiki/File:Geen_vreemder_beesten_men_ooit_vand,_Als_in_'t_Amerikaansche_land,_RP-P-OB-202.603.jpg · https://id.rijksmuseum.nl/200573404 |
+| 새 다섯 마리 | https://commons.wikimedia.org/wiki/File:Wilt_o_jonge_jeugd_dees_vogelen_bekyken,_Die_zeer_uistekende_na_levendig_gelyken,_RP-P-OB-202.602.jpg · https://id.rijksmuseum.nl/200573403 · https://nl.wikipedia.org/wiki/Centsprent |
+
+### 4관 · 묵시록
+
+관 소개 근거: https://de.wikipedia.org/wiki/Apokalypse_(Dürer) · https://en.wikipedia.org/wiki/Apocalypse_(Dürer)
+
+| 판화 | 근거로 삼은 기록 |
+|---|---|
+| 성 미카엘과 용 | https://commons.wikimedia.org/wiki/File:Saint_Michael_Fighting_the_Dragon,_from_The_Apocalypse_MET_DP816922.jpg · https://en.wikipedia.org/wiki/St._Michael_Fighting_the_Dragon · https://de.wikipedia.org/wiki/Apokalypse_(Dürer) |
+| 요한의 순교 | https://commons.wikimedia.org/wiki/File:The_Martyrdom_of_Saint_John,_from_The_Apocalypse_MET_DP816728.jpg · https://collectionapi.metmuseum.org/public/collection/v1/objects/397054 · https://de.wikipedia.org/wiki/Apokalypse_(Dürer) |
+| 일곱 촛대의 환시 | https://commons.wikimedia.org/wiki/File:The_Vision_of_the_Seven_Candlesticks,_from_The_Apocalypse_MET_DP816733.jpg · https://collectionapi.metmuseum.org/public/collection/v1/objects/388118 · https://de.wikipedia.org/wiki/Apokalypse_(Dürer) |
+| 장로들 앞의 요한 | https://commons.wikimedia.org/wiki/File:Saint_John_before_God_and_the_Elders,_from_The_Apocalypse_MET_DP816738.jpg · https://collectionapi.metmuseum.org/public/collection/v1/objects/372969 · https://de.wikipedia.org/wiki/Apokalypse_(Dürer) |
+| 다섯째·여섯째 봉인 | https://commons.wikimedia.org/wiki/File:The_Opening_of_the_Fifth_and_Sixth_Seals,_from_the_Apocalypse_MET_DP816737.jpg · https://de.wikipedia.org/wiki/Apokalypse_(Dürer) · https://en.wikipedia.org/wiki/Apocalypse_(Dürer) |
+| 일곱 나팔의 천사 | https://commons.wikimedia.org/wiki/File:Seven_Angels_with_Trumpets,_from_the_Apocalypse_series_MET_DP816955.jpg · https://collectionapi.metmuseum.org/public/collection/v1/objects/397139 · https://de.wikipedia.org/wiki/Apokalypse_(Dürer) |
+| 네 복수의 천사 | https://commons.wikimedia.org/wiki/File:The_Four_Avenging_Angels,_from_The_Apocalypse_MET_DP816073.jpg · https://collectionapi.metmuseum.org/public/collection/v1/objects/387455 · https://de.wikipedia.org/wiki/Apokalypse_(Dürer) |
+| 책을 삼키는 요한 | https://commons.wikimedia.org/wiki/File:Saint_John_Devouring_the_Book,_from_The_Apocalypse_MET_DP816918.jpg · https://collectionapi.metmuseum.org/public/collection/v1/objects/388823 · https://de.wikipedia.org/wiki/Apokalypse_(Dürer) |
+| 태양을 입은 여인 | https://commons.wikimedia.org/wiki/File:The_Apocalyptic_Woman,_from_The_Apocalypse_MET_DP816914.jpg · https://collectionapi.metmuseum.org/public/collection/v1/objects/336575 · https://de.wikipedia.org/wiki/Apokalypse_(Dürer) |
+| 어린 양의 뿔을 가진 짐승 | https://commons.wikimedia.org/wiki/File:The_Beast_with_Two_Horns_Like_a_Lamb,_from_The_Apocalypse_MET_DP816931.jpg · https://collectionapi.metmuseum.org/public/collection/v1/objects/388124 · https://de.wikipedia.org/wiki/Apokalypse_(Dürer) |
+| 어린 양 경배 | https://commons.wikimedia.org/wiki/File:The_Adoration_of_the_Lamb,_from_the_Apocalypse_series_MET_DP816940.jpg · https://collectionapi.metmuseum.org/public/collection/v1/objects/397144 · https://de.wikipedia.org/wiki/Apokalypse_(Dürer) |
+| 바빌론의 여인 | https://commons.wikimedia.org/wiki/File:The_Whore_of_Babylon,_from_The_Apocalypse_MET_DP816928.jpg · https://collectionapi.metmuseum.org/public/collection/v1/objects/336214 · https://de.wikipedia.org/wiki/Apokalypse_(Dürer) |
+| 묵시록의 네 기사 | https://commons.wikimedia.org/wiki/File:The_Four_Horsemen,_from_The_Apocalypse_MET_DP816773.jpg · https://en.wikipedia.org/wiki/Apocalypse_(Dürer) · https://de.wikipedia.org/wiki/Apokalypse_(Dürer) |
+
+### 5관 · 우키요에
+
+관 소개 근거: https://en.wikipedia.org/wiki/Thirty-six_Views_of_Mount_Fuji · https://en.wikipedia.org/wiki/One_Hundred_Famous_Views_of_Edo
+
+| 판화 | 근거로 삼은 기록 |
+|---|---|
+| 가나가와 앞바다의 큰 파도 | https://commons.wikimedia.org/wiki/File:Tsunami_by_hokusai_19th_century.jpg · https://en.wikipedia.org/wiki/The_Great_Wave_off_Kanagawa |
+| 산 아래의 소나기 | https://commons.wikimedia.org/wiki/File:%E5%86%A8%E5%B6%BD%E4%B8%89%E5%8D%81%E5%85%AD%E6%99%AF_%E5%B1%B1%E4%B8%8B%E7%99%BD%E9%9B%A8-Storm_below_Mount_Fuji_(Sanka_no_haku_u),_from_the_series_Thirty-six_Views_of_Mount_Fuji_(Fugaku_sanj%C5%ABrokkei)_MET_DP141040.jpg · https://en.wikipedia.org/wiki/Thunderstorm_Beneath_the_Summit |
+| 도토미 산속 | https://commons.wikimedia.org/wiki/File:%E5%86%A8%E5%B6%BD%E4%B8%89%E5%8D%81%E5%85%AD%E6%99%AF_%E9%81%A0%E6%B1%9F%E5%B1%B1%E4%B8%AD-In_the_Mountains_of_T%C5%8Dtomi_Province_(T%C5%8Dtomi_sanch%C5%AB),_from_the_series_Thirty-six_Views_of_Mount_Fuji_(Fugaku_sanj%C5%ABrokkei)_MET_DP140988.jpg · https://ja.wikipedia.org/wiki/遠江山中 |
+| 가지카자와 | https://commons.wikimedia.org/wiki/File:%E5%86%A8%E5%B6%BD%E4%B8%89%E5%8D%81%E5%85%AD%E6%99%AF_%E7%94%B2%E5%B7%9E%E7%9F%B3%E7%8F%AD%E6%B2%A2-Kajikazawa_in_Kai_Province_(K%C5%8Dsh%C5%AB_Kajikazawa),_from_the_series_Thirty-six_Views_of_Mount_Fuji_(Fugaku_sanj%C5%ABrokkei)_MET_DP140973.jpg · https://en.wikipedia.org/wiki/Kajikazawa_in_Kai_Province |
+| 스루가의 에지리 | https://commons.wikimedia.org/wiki/File:%E5%86%A8%E5%B6%BD%E4%B8%89%E5%8D%81%E5%85%AD%E6%99%AF_%E9%A7%BF%E5%B7%9E%E6%B1%9F%E5%B0%BB-Ejiri_in_Suruga_Province_(Sunsh%C5%AB_Ejiri),_from_the_series_Thirty-six_Views_of_Mount_Fuji_(Fugaku_sanj%C5%ABrokkei)_MET_DP140977.jpg · https://ja.wikipedia.org/wiki/駿州江尻 |
+| 에도 니혼바시 | https://commons.wikimedia.org/wiki/File:%E5%86%A8%E5%B6%BD%E4%B8%89%E5%8D%81%E5%85%AD%E6%99%AF_%E6%B1%9F%E6%88%B8%E6%97%A5%E6%9C%AC%E6%A9%8B-Nihonbashi_in_Edo_(Edo_Nihonbashi),_from_the_series_Thirty-six_Views_of_Mount_Fuji_(Fugaku_sanj%C5%ABrokkei)_MET_DP141003.jpg · https://ja.wikipedia.org/wiki/江戸日本橋 |
+| 오하시 다리의 소나기 | https://commons.wikimedia.org/wiki/File:%E5%90%8D%E6%89%80%E6%B1%9F%E6%88%B6%E7%99%BE%E6%99%AF_%E5%A4%A7%E3%81%AF%E3%81%97%E3%81%82%E3%81%9F%E3%81%91%E3%81%AE%E5%A4%95%E7%AB%8B-Sudden_Shower_over_Shin-%C5%8Chashi_Bridge_and_Atake_(%C5%8Chashi_Atake_no_y%C5%ABdachi),_from_the_series_One_Hundred_Famous_Views_of_Edo_(Meisho_Edo_hyakkei)_MET_DP121526.jpg · https://en.wikipedia.org/wiki/Sudden_Shower_over_Shin-%C5%8Chashi_bridge_and_Atake |
+| 료고쿠의 불꽃놀이 | https://commons.wikimedia.org/wiki/File:%E5%90%8D%E6%89%80%E6%B1%9F%E6%88%B6%E7%99%BE%E6%99%AF_%E4%B8%A1%E5%9B%BD%E8%8A%B1%E7%81%AB-Fireworks_at_Ry%C5%8Dgoku_Bridge,_from_the_series_One_Hundred_Famous_Views_of_Edo_MET_DP121524.jpg · https://es.wikipedia.org/wiki/Cien_famosas_vistas_de_Edo · https://en.wikipedia.org/wiki/Sumidagawa_Fireworks_Festival |
+| 마마의 단풍 | https://commons.wikimedia.org/wiki/File:%E5%90%8D%E6%89%80%E6%B1%9F%E6%88%B8%E7%99%BE%E6%99%AF_%E7%9C%9F%E9%96%93%E3%81%AE%E7%B4%85%E8%91%89%E6%89%8B%E5%8F%A4%E9%82%A3%E3%81%AE%E7%A4%BE%E7%B6%99%E3%81%AF%E3%81%97-Maples_at_Mama,_from_the_series_One_Hundred_Famous_Views_of_Edo_MET_DP121529.jpg · https://en.wikipedia.org/wiki/One_Hundred_Famous_Views_of_Edo · https://ja.wikipedia.org/wiki/真間の継橋 |
+| 아사쿠사 긴류잔 | https://commons.wikimedia.org/wiki/File:%E5%90%8D%E6%89%80%E6%B1%9F%E6%88%B8%E7%99%BE%E6%99%AF_%E6%B5%85%E8%8D%89%E9%87%91%E9%BE%8D%E5%B1%B1-Kinry%C5%ABsan_Temple_at_Asakusa,_from_the_series_%22One_Hundred_Famous_Views_of_Edo%22_MET_DP121552.jpg · https://en.wikipedia.org/wiki/One_Hundred_Famous_Views_of_Edo · https://es.wikipedia.org/wiki/Cien_famosas_vistas_de_Edo |
+| 후카가와 스사키의 십만 평 | https://commons.wikimedia.org/wiki/File:%E3%80%8C%E5%90%8D%E6%89%80%E6%B1%9F%E6%88%B8%E7%99%BE%E6%99%AF_%E6%B7%B1%E5%B7%9D%E6%B4%B2%E5%B4%8E%E5%8D%81%E4%B8%87%E5%9D%AA%E3%80%8D-%E2%80%9CJ%C5%ABmantsubo_Plain_at_Fukagawa_Susaki,%E2%80%9D_from_the_series_One_Hundred_Famous_Views_of_Edo_(Meisho_Edo_hyakkei,_Fukagawa_Susaki_J%C5%ABmantsubo)_MET_DP121668.jpg · https://es.wikipedia.org/wiki/Cien_famosas_vistas_de_Edo · https://en.wikipedia.org/wiki/One_Hundred_Famous_Views_of_Edo |
+| 달 보는 곶 | https://commons.wikimedia.org/wiki/File:%E5%90%8D%E6%89%80%E6%B1%9F%E6%88%B8%E7%99%BE%E6%99%AF_%E6%9C%88%E3%81%AE%E5%B2%AC-Moon_Viewing_Point_MET_DP121535.jpg · https://es.wikipedia.org/wiki/Cien_famosas_vistas_de_Edo · https://ja.wikipedia.org/wiki/月の岬 |
+
+해설을 쓰며 알아둔 점
+- 메트로폴리탄미술관 작품 페이지는 접속이 막혀(429) 읽지 못했고, 메트 기록은 Wikimedia Commons에 옮겨진 메타데이터와 메트 공개 API로 확인했습니다.
+- 연도는 소장 기록을 따랐습니다. 기록과 위키백과가 다르면 기록을 따르고, 인쇄본의 판 연도가 다르면 함께 적었습니다(예: "1498 (1511년 판 인쇄본)").
+- 『뉘른베르크 연대기』 목판은 낱장마다 누가 새겼는지 합의가 없어 공방 이름으로만 적었습니다.
 
 ## 살펴봤지만 쓰지 않은 것
 - 니콜라 콩베르 마르세유 타로 "La Lune"(1760) 복원본: CC BY-SA 4.0이라 제외했습니다.
