@@ -1,6 +1,6 @@
 // 사천성 머지 서비스 워커: 한 번 받은 그림은 저장해 두고, 화면과 코드는 새 것을 먼저 받는다
-const V = 'scm-v1.0.0';
-const CORE = ['./', 'art.js?v=34', 'paints.js?v=34', 'art/title.webp', 'art/pediment.png', 'art/sprig.png', 'manifest.webmanifest', 'icon-192.png'];
+const V = 'scm-v1.0.1';
+const CORE = ['./', 'art.js?v=35', 'paints.js?v=35', 'art/title.webp', 'art/pediment.png', 'art/sprig.png', 'manifest.webmanifest', 'icon-192.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(V).then(c => Promise.all(CORE.map(u => c.add(u).catch(() => {})))).then(() => self.skipWaiting()));
 });

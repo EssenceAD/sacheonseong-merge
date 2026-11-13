@@ -9,7 +9,22 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="apple-touch-startup-image" href="splash.png">
+<!-- iOS 스플래시(임시 그림): 주요 아이폰·아이패드 세로 크기 -->
+<link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="splash/splash-750x1334.png">
+<link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash/splash-1242x2208.png">
+<link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash/splash-1125x2436.png">
+<link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="splash/splash-828x1792.png">
+<link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash/splash-1242x2688.png">
+<link rel="apple-touch-startup-image" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash/splash-1170x2532.png">
+<link rel="apple-touch-startup-image" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash/splash-1284x2778.png">
+<link rel="apple-touch-startup-image" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash/splash-1179x2556.png">
+<link rel="apple-touch-startup-image" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash/splash-1290x2796.png">
+<link rel="apple-touch-startup-image" media="(device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash/splash-1206x2622.png">
+<link rel="apple-touch-startup-image" media="(device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash/splash-1320x2868.png">
+<link rel="apple-touch-startup-image" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="splash/splash-1536x2048.png">
+<link rel="apple-touch-startup-image" media="(device-width: 820px) and (device-height: 1180px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="splash/splash-1640x2360.png">
+<link rel="apple-touch-startup-image" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="splash/splash-1668x2388.png">
+<link rel="apple-touch-startup-image" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="splash/splash-2048x2732.png">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -275,6 +290,8 @@ button.chip.can{background:var(--ink); color:var(--face); animation:cardcall 1.6
 #finger[hidden]{display:none}
 @keyframes tapbob{0%,100%{translate:0 12px}50%{translate:0 0}}
 #tools .boost{position:relative; flex:1; max-width:112px; min-height:66px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; font-size:15px; padding:6px 4px}
+.boost svg .hl{stroke:var(--face)}
+.boost.armed svg .hl{stroke:var(--ink)}
 .boost svg{width:28px; height:28px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round}
 .boost em{position:absolute; top:-10px; right:-8px; min-width:26px; height:26px; box-sizing:border-box; padding:0 4px; border-radius:13px; background:var(--ink); color:var(--face); font-family:var(--num); font-variant-numeric:lining-nums; font-style:normal; font-weight:700; font-size:17px; line-height:26px; text-align:center}
 #tools{gap:14px!important; padding-top:8px}
@@ -455,8 +472,8 @@ button.chip.can{background:var(--ink); color:var(--face); animation:cardcall 1.6
   </div></div>
 </div>
 
-<script src="art.js?v=34"></script>
-<script src="paints.js?v=34"></script>
+<script src="art.js?v=35"></script>
+<script src="paints.js?v=35"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 (()=>{
@@ -475,13 +492,16 @@ const EAST=[
 ];
 const SKINS={
  classic:{name:'손 채색 목판',P:'#F3ECD8',K:'#1B1714',KC:['#DB3A1C','#2443B0','#A31F70','#178F84','#BF7F17']},
- durer:{name:'뒤러 먹판',P:'#F3ECD8',K:'#1B1714',KC:['#6F4E2A','#6F4E2A','#6F4E2A','#6F4E2A','#6F4E2A']},
- chronicle:{name:'연대기 채색',P:'#F5ECCF',K:'#221B15',KC:['#D9A92B','#2F68A8','#C4442B','#4F8A4B','#C9788C']},
- bestiary:{name:'우화집 양피지',P:'#EADDBE',K:'#33241A',KC:['#A8432B','#44589A','#7C3B63','#3D6E5B','#B98524']},
- apocalypse:{name:'묵시록 밤판',P:'#2A2420',K:'#EFE6D0',KC:['#E0553A','#5B7FD6','#C254A0','#3FB3A6','#D9A440'],dark:true},
+ durer:{name:'뒤러 먹판',art:1,P:'#F3ECD8',K:'#1B1714',KC:['#6F4E2A','#6F4E2A','#6F4E2A','#6F4E2A','#6F4E2A']},
+ chronicle:{name:'연대기 채색',art:1,P:'#F5ECCF',K:'#221B15',KC:['#D9A92B','#2F68A8','#C4442B','#4F8A4B','#C9788C']},
+ bestiary:{name:'우화집 양피지',art:1,P:'#EADDBE',K:'#33241A',KC:['#A8432B','#44589A','#7C3B63','#3D6E5B','#B98524']},
+ apocalypse:{name:'묵시록 밤판',art:1,P:'#2A2420',K:'#EFE6D0',KC:['#E0553A','#5B7FD6','#C254A0','#3FB3A6','#D9A440'],dark:true},
  ukiyoe:{name:'우키요에(동양 목판)',P:'#EDE4CF',K:'#1E1A17',KC:['#2B4C7E','#2B4C7E','#2B4C7E','#2B4C7E','#2B4C7E'],vector:true}
 };
+Object.keys(SKINS).forEach(k=>{ SKINS[k].id=k; });
 let SK=SKINS.classic;
+// 1~4관 스킨의 문양은 그 관 판화에서 오린 그림(art/skin_*.js). 고를 때 받아 온다
+function loadSkinArt(id){ const k=SKINS[id]; if(!k||!k.art||(window.SKIN_ART&&window.SKIN_ART[id])) return Promise.resolve(); return new Promise(res=>{ const sc=document.createElement('script'); sc.src='art/skin_'+id+'.js?v=35'; sc.onload=sc.onerror=()=>res(); document.head.appendChild(sc); }); }
 function skinVars(id){ SK=SKINS[id]||SKINS.classic; P=SK.P; K=SK.K; KC=SK.KC; }
 
 const $=s=>document.querySelector(s);
@@ -554,9 +574,9 @@ const MT='transform="translate(38 48) scale(.86) translate(-40 -50)"';
 function tileSVG(k,l){
   const m=(SK.vector?EAST:MOTIF)[k], c=KC[k], seed=3+k*13+l*5;
   // 실제 목판화에서 오려 낸 문양(art.js). 없으면 예전 선화로 그린다
-  const A=!SK.vector&&window.ART&&(k===2&&l>=5&&window.ART[5]?window.ART[5]:window.ART[k]); let ax=0, ay=0, aw=0, ah=0, spikes='';
-  if(A){ const r=A.w/A.h, z=(l>=5?.78:1)*(k===0?.76:1); if(r>54/61){ aw=54*z; ah=54*z/r; } else { ah=61*z; aw=61*z*r; } ax=38-aw/2; ay=43-ah/2;
-    if(k===0){ // 해: 원판 둘레에 뾰족한 광선
+  const SA=SK.art&&window.SKIN_ART&&window.SKIN_ART[SK.id], A=SA?SA[k]:!SK.vector&&window.ART&&(k===2&&l>=5&&window.ART[5]?window.ART[5]:window.ART[k]); let ax=0, ay=0, aw=0, ah=0, spikes='';
+  if(A){ const r=A.w/A.h, z=(l>=5?(SA?.64:.78):1)*(k===0&&!SA?.76:1); if(r>54/61){ aw=54*z; ah=54*z/r; } else { ah=61*z; aw=61*z*r; } ax=38-aw/2; ay=43-ah/2;
+    if(k===0&&!SA){ // 해: 원판 둘레에 뾰족한 광선
       const rx=aw/2*.97, ry=ah/2*.97, L=aw*.27; let d='';
       for(let i=0;i<14;i++){ const a=i/14*6.2832, q=(t,e)=>(38+Math.cos(t)*(rx+e)).toFixed(1)+' '+(43+Math.sin(t)*(ry+e)).toFixed(1); d+='M'+q(a-.14,0)+'L'+q(a,L)+'L'+q(a+.14,0)+'Z'; }
       spikes='<path d="'+d+'" fill="'+K+'"/>'; } } // 5단계는 먹 바탕이 보이도록 조금 작게
@@ -757,7 +777,7 @@ if(!S.rec){ // 모드별 기록 (예전 통합 기록은 여정으로 옮김)
 if(!S.v3){ if(S.jour>0){ const ns={}; for(const k in S.stars) ns[+k+15]=S.stars[k]; for(let i=1;i<=15;i++) ns[i]=3; S.stars=ns; S.jour+=15; } S.v3=1; }
 if(!S.v31){ if(S.jour>=5&&!S.ink) S.ink=5; S.v31=1; } // 예전부터 하던 사람도 바로 한 칸 칠할 수 있게
 if(!S.skins.includes(S.skin)) S.skin='classic';
-if(S.skin!=='classic'){ skinVars(S.skin); buildTileCSS(); }
+if(S.skin!=='classic'){ skinVars(S.skin); buildTileCSS(); if(SK.art) loadSkinArt(S.skin).then(()=>setSkin(S.skin)); }
 const save=()=>{ try{ localStorage.setItem(SAVE,JSON.stringify(S)); }catch(e){} };
 const fmtT=ms=>{ const s=Math.max(0,Math.round(ms/1000)); return (s/60|0)+':'+String(s%60).padStart(2,'0'); };
 const fmtN=n=>n.toLocaleString('en-US');
@@ -1302,7 +1322,7 @@ function useBoost(t){
 const ICON={
   hint:'<path d="M9 21h6M10 18h4M12 3a6 6 0 0 0-4 10.4c1 1 1.4 2 1.4 3.1h5.2c0-1.1.4-2.1 1.4-3.1A6 6 0 0 0 12 3z"/>',
   shuffle:'<path d="M3 7h4l8 10h5M3 17h4l2.4-3M13.6 9 15 7h5M17.5 4.5 20 7l-2.5 2.5M17.5 14.5 20 17l-2.5 2.5"/>',
-  bomb:'<circle cx="10.5" cy="14" r="6.5"/><path d="M15 9l2.5-2.5M17.5 6.5c.5-2.5 3.5-2.5 3.5 0"/>'
+  bomb:'<circle cx="10" cy="14.6" r="6.9" fill="currentColor"/><path d="M12.6 7.6l3 3-1.9 1.9-3-3z" fill="currentColor"/><path d="M15.2 8.2c.9-2.6 2.6-3.6 4.3-2.7"/><path d="M20.9 1.9v1.5M23 4.6h-1.5M22.5 2.5l-1 1M19.1 2.3l.6 1.2" stroke-width="1.3"/><path class="hl" d="M5.5 13.4a4.7 4.7 0 0 1 3.1-3.3M6.4 16.6l1-.9M7.8 18.2l1.1-1" stroke-width="1.25"/>'
 };
 function tools(){
   const el=$('#tools'); el.textContent='';
@@ -1620,10 +1640,12 @@ const paintIdx=()=>{ const i=PAINTS.findIndex(p=>!S.paint.album.includes(p.id));
 const DROP='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.500c4 5 6 8 6 11a6 6 0 0 1-12 0c0-3 2-6 6-11z"/></svg>'.replace('.500','.5');
 const curPaint=()=>PAINTS[Math.min(paintIdx(),PAINTS.length-1)];
 const paintDone=p=>S.paint.done[p.id]||(S.paint.done[p.id]=[]);
+// 칸을 다시 나눈 판화가 있어도 저장이 어긋나지 않게: 없는 칸 번호와 겹친 번호를 지운다
+PAINTS.forEach(p=>{ const d=S.paint.done[p.id]; if(d) S.paint.done[p.id]=[...new Set(d)].filter(i=>i>=0&&i<p.regions.length); });
 function ptBuild(p,done){
   const el=document.createElement('div'); el.className='pt'; el.style.aspectRatio=p.w+' / '+p.h;
-  const PC=SKINS.classic.KC, W=p.auto; let g=''; p.regions.forEach((r,i)=>{ g+=`<g class="rg" data-i="${i}" fill="${PC[r.c]}" stroke="${PC[r.c]}" stroke-width="7" stroke-linejoin="round" stroke-linecap="round" filter="url(#${p.id}r)"${done.includes(i)?'':' style="display:none"'}>${r.s}</g>`; });
-  el.innerHTML=`<svg viewBox="0 0 ${p.w} ${p.h}" preserveAspectRatio="none" aria-hidden="true"><defs><filter id="${p.id}r" x="-${W?25:8}%" y="-${W?25:8}%" width="${W?150:116}%" height="${W?150:116}%">${W?`<feGaussianBlur in="SourceGraphic" stdDeviation="${(p.w*.008).toFixed(1)}" result="b"/>`:''}<feTurbulence type="fractalNoise" baseFrequency="${W?0.009:0.018}" numOctaves="${W?3:2}" seed="7" result="n"/><feDisplacementMap in="${W?'b':'SourceGraphic'}" in2="n" xChannelSelector="R" yChannelSelector="G" scale="${(p.w*(W?.11:.022)).toFixed(1)}"/></filter>${p.defs||''}</defs><g opacity="${W?.62:.84}">${g}</g></svg><img src="${p.src}" alt="" draggable="false" loading="lazy" decoding="async">`;
+  const PC=SKINS.classic.KC, W=p.auto===1; let g=''; p.regions.forEach((r,i)=>{ g+=`<g class="rg" data-i="${i}" fill="${PC[r.c]}" stroke="${PC[r.c]}" stroke-width="7" stroke-linejoin="round" stroke-linecap="round" filter="url(#${p.id}r)"${done.includes(i)?'':' style="display:none"'}>${r.s}</g>`; });
+  el.innerHTML=`<svg viewBox="0 0 ${p.w} ${p.h}" preserveAspectRatio="none" aria-hidden="true"><defs><filter id="${p.id}r" x="-${W?25:8}%" y="-${W?25:8}%" width="${W?150:116}%" height="${W?150:116}%">${W?`<feGaussianBlur in="SourceGraphic" stdDeviation="${(p.w*.008).toFixed(1)}" result="b"/>`:''}<feTurbulence type="fractalNoise" baseFrequency="${W?0.009:0.018}" numOctaves="${W?3:2}" seed="7" result="n"/><feDisplacementMap in="${W?'b':'SourceGraphic'}" in2="n" xChannelSelector="R" yChannelSelector="G" scale="${(p.w*(W?.11:.022)).toFixed(1)}"/></filter>${p.defs||''}</defs><g opacity="${W?.62:p.auto===2?.68:.84}">${g}</g></svg><img src="${p.src}" alt="" draggable="false" loading="lazy" decoding="async">`;
   return el;
 }
 // 손 채색: 물방울 자리에서 색이 번져 나간다
@@ -1698,6 +1720,8 @@ const COOP_INK=2, COOP_PRIZE=6;
 let coState=null, coBusy=false, coAt=0;
 const coPrint=id=>PAINTS.find(x=>x.id===COOP[(Math.max(1,id||1)-1)%COOP.length])||PAINTS[0];
 const coGrid=p=>p.w>=p.h?[6,4]:[4,6];
+// 한 사람이 한 판화에 cap 칸, 하루에 day 칸까지(서버가 지킨다). 지금 더 칠할 수 있는 칸 수
+const coLeft=st=>{ const cap=st.cap||4, day=st.day||2, mine=st.cells.filter(c=>c.me).length; return {cap,day,mine,left:Math.max(0,Math.min(cap-mine,day-(st.today||0)))}; };
 async function coFetch(){ const r=await sb('rpc/scm_coop_state',{method:'POST',body:JSON.stringify({p_player:pid()})}); if(!r.ok) throw {code:r.status}; coAt=Date.now(); return r.json(); }
 // 내가 참여한 판화가 완성됐으면 한 번만 보상
 function coClaim(st){
@@ -1714,32 +1738,35 @@ function coMenu(){
 function coDraw(){
   const st=coState, stage=$('#coStage'); stage.textContent=''; $('#coInk').textContent=S.ink;
   if(!st||!st.id){ $('#coTitle').textContent=''; $('#coWho').textContent=''; return; }
-  const p=coPrint(st.id), [gx,gy]=coGrid(p), cw=p.w/gx, ch=p.h/gy, PC=SKINS.classic.KC, by={}; st.cells.forEach(c=>{ by[c.c]=c; });
+  const L=coLeft(st), p=coPrint(st.id), [gx,gy]=coGrid(p), cw=p.w/gx, ch=p.h/gy, PC=SKINS.classic.KC, by={}; st.cells.forEach(c=>{ by[c.c]=c; });
   $('#coTitle').textContent=st.id+'번째 큰 판화 · '+p.title+' · '+p.by;
   const el=document.createElement('div'); el.className='pt co'; el.style.aspectRatio=p.w+' / '+p.h; el.style.width=`min(100%, ${(52*p.w/p.h).toFixed(1)}vh)`;
   let g=''; for(let i=0;i<gx*gy;i++){ const x=i%gx, y=(i-x)/gx; if(by[i]) g+=`<rect x="${(x*cw).toFixed(1)}" y="${(y*ch).toFixed(1)}" width="${(cw+.6).toFixed(1)}" height="${(ch+.6).toFixed(1)}" fill="${PC[(x+2*y)%5]}"/>`; }
   el.innerHTML=`<svg viewBox="0 0 ${p.w} ${p.h}" preserveAspectRatio="none" aria-hidden="true"><g opacity=".6">${g}</g></svg><img src="${p.src}" alt="" draggable="false" decoding="async">`;
   for(let i=0;i<gx*gy;i++){ const x=i%gx, y=(i-x)/gx, c=by[i], d=document.createElement(c?'span':'button');
-    d.className='cc'+(c?(c.me?' me':''):' free'+(S.ink>=COOP_INK?' can':'')); d.style.left=(x/gx*100)+'%'; d.style.top=(y/gy*100)+'%'; d.style.width=(100/gx)+'%'; d.style.height=(100/gy)+'%';
+    d.className='cc'+(c?(c.me?' me':''):' free'+(S.ink>=COOP_INK&&L.left>0?' can':'')); d.style.left=(x/gx*100)+'%'; d.style.top=(y/gy*100)+'%'; d.style.width=(100/gx)+'%'; d.style.height=(100/gy)+'%';
     if(c){ const n=document.createElement('i'); n.textContent=c.n; d.appendChild(n); }
     else { d.type='button'; d.setAttribute('aria-label','이 칸 칠하기, 잉크 '+COOP_INK); d.innerHTML=DROP; d.onclick=()=>coGive(i); }
     el.appendChild(d); }
   stage.appendChild(el);
   const n=st.cells.length, mine=st.cells.filter(c=>c.me).length, who={}; st.cells.forEach(c=>{ who[c.n]=(who[c.n]||0)+1; });
   const top=Object.keys(who).sort((a,b)=>who[b]-who[a]).slice(0,4).map(k=>k+' '+who[k]).join(' · ');
-  $('#coNote').textContent=S.ink>=COOP_INK?'빈 칸을 누르면 잉크 '+COOP_INK+'로 칠합니다. 다 칠해지면 참여한 모두가 잉크 +'+COOP_PRIZE:'잉크가 모자랍니다(한 칸 = 잉크 '+COOP_INK+'). 여정을 깨면 잉크를 얻습니다';
-  $('#coWho').textContent=n+'/'+st.total+'칸 · 내가 칠한 칸 '+mine+(mine?'(검은 이름표)':'')+(top?' · 함께한 사람: '+top:'');
+  $('#coNote').textContent=L.mine>=L.cap?'이 판화에는 '+L.cap+'칸을 다 칠했습니다. 다른 분들이 마저 칠하면 모두 잉크 +'+COOP_PRIZE:L.left<=0?'오늘은 '+L.day+'칸을 다 칠했습니다. 내일 다시 칠할 수 있습니다':S.ink>=COOP_INK?'빈 칸을 누르면 잉크 '+COOP_INK+'로 칠합니다. 다 칠해지면 참여한 모두가 잉크 +'+COOP_PRIZE:'잉크가 모자랍니다(한 칸 = 잉크 '+COOP_INK+'). 여정을 깨면 잉크를 얻습니다';
+  $('#coWho').textContent=n+'/'+st.total+'칸 · 내가 칠한 칸 '+mine+'/'+L.cap+(mine?'(검은 이름표)':'')+' · 오늘 '+Math.min(L.day,st.today||0)+'/'+L.day+(top?' · 함께한 사람: '+top:'');
 }
 async function coOpen(){
   coDraw(); $('#coNote').textContent=coState?$('#coNote').textContent:'공방 문을 여는 중…';
   try{ coState=await coFetch(); coClaim(coState); coDraw(); }catch(e){ if(!coState) $('#coNote').textContent='공방에 연결하지 못했습니다. 잠시 뒤 다시 열어 주세요'; }
 }
 async function coGive(i){
-  if(coBusy) return; if(S.ink<COOP_INK){ toast('잉크가 모자랍니다. 여정을 깨면 잉크를 얻습니다',2000); return; }
+  if(coBusy) return; if(coState){ const L=coLeft(coState); if(L.mine>=L.cap){ toast('한 판화에는 '+L.cap+'칸까지 칠할 수 있습니다',2000); return; } if(L.left<=0){ toast('하루에 '+L.day+'칸까지 칠할 수 있습니다. 내일 또 만나요',2200); return; } }
+  if(S.ink<COOP_INK){ toast('잉크가 모자랍니다. 여정을 깨면 잉크를 얻습니다',2000); return; }
   coBusy=true;
   try{ const r=await sb('rpc/scm_coop_give',{method:'POST',body:JSON.stringify({p_player:pid(),p_nick:S.nick||'익명',p_cell:i})}); if(!r.ok) throw {code:r.status}; const j=await r.json();
     if(j.ok){ S.ink-=COOP_INK; save(); hiss(0,.6,.08,1400); buzz(20); coState=j.state; coAt=Date.now(); if(j.done) coClaim(j.state); }
     else if(j.why==='taken'){ toast('방금 다른 분이 칠한 칸입니다',1800); if(j.state) coState=j.state; }
+    else if(j.why==='cap'){ toast('한 판화에는 4칸까지 칠할 수 있습니다',2000); if(j.state) coState=j.state; }
+    else if(j.why==='day'){ toast('하루에 2칸까지 칠할 수 있습니다. 내일 또 만나요',2200); if(j.state) coState=j.state; }
     else if(j.why==='fast') toast('조금 천천히 칠해 주세요',1500);
     else toast('칠하지 못했습니다',1500);
   }catch(e){ toast('공방에 연결하지 못했습니다',1800); }
@@ -1750,8 +1777,9 @@ const hallList=h=>PAINTS.filter(p=>(p.hall||1)===h);
 const hallDone=h=>{ const l=hallList(h); return l.length>0&&l.every(p=>S.paint.album.includes(p.id)); };
 function unlockSkins(){ let got=null; HALLS.forEach(h=>{ if(h.skin&&hallDone(h.id)&&!S.skins.includes(h.skin)){ S.skins.push(h.skin); got=h; } }); if(got) save(); return got; }
 function setSkin(id){
-  if(!SKINS[id]||!S.skins.includes(id)) return; S.skin=id; save(); skinVars(id); buildTileCSS();
-  if(R.is3d) buildAtlas().then(cv=>{ R.setAtlas(cv); R.colors(); if(grid.length&&!over) paintAll(); }).catch(()=>{});
+  if(!SKINS[id]||!S.skins.includes(id)) return; S.skin=id; save(); skinVars(id);
+  const fin=()=>{ if(S.skin!==id) return; buildTileCSS(); if(R.is3d) buildAtlas().then(cv=>{ if(S.skin!==id) return; R.setAtlas(cv); R.colors(); if(grid.length&&!over) paintAll(); }).catch(()=>{}); };
+  if(SKINS[id].art&&!(window.SKIN_ART&&window.SKIN_ART[id])) loadSkinArt(id).then(fin); else fin();
 }
 function drawSkins(){
   const el=$('#skinRow'); if(!el) return; el.textContent='';
