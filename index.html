@@ -165,6 +165,36 @@ button.primary{background:var(--ink); color:var(--face)}
 #albumGrid figcaption b{font-size:15px}
 .pt.lock{border:2px dashed var(--ink); box-sizing:border-box; display:flex; align-items:center; justify-content:center; font-size:40px; opacity:.75; background:none}
 @media (prefers-reduced-motion: reduce){ .paintCard.can,.drop.can,.pt.framed.in{animation:none} }
+.tile.seal{filter:saturate(.45)}
+.tile.seal::after{content:""; position:absolute; inset:5%; background:linear-gradient(51deg,transparent 43%,var(--ink) 43% 57%,transparent 57%),linear-gradient(-51deg,transparent 43%,var(--ink) 43% 57%,transparent 57%)}
+#hud.boss .hc:nth-of-type(1){background:var(--ink); color:var(--face)}
+#mapGrid button.boss{border-width:3.5px}
+#gallery{width:100%; flex:none}
+#galWall{display:flex; gap:10px; align-items:flex-end; overflow-x:auto; padding:22px 26px 12px; scroll-snap-type:x proximity; scrollbar-width:none;
+  background:linear-gradient(var(--ink),var(--ink)) 0 9px/100% 2px no-repeat, linear-gradient(rgba(27,23,20,.09),rgba(27,23,20,.09)); border-bottom:6px double var(--ink)}
+#galWall::-webkit-scrollbar{display:none}
+.hang{flex:none; margin:0; display:flex; flex-direction:column; align-items:center; scroll-snap-align:center; cursor:pointer}
+.hang .wire{width:74px; height:16px; display:block; margin-bottom:-2px}
+.hang .pt{height:112px; margin:18px 20px 22px}
+.hang .pt.lock{margin:8px 10px 12px; font-size:30px}
+.hang figcaption{font-size:12px; line-height:1.3; background:var(--face); border:1px solid var(--ink); padding:1px 8px; max-width:150px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.hang.now figcaption{background:var(--ink); color:var(--face)}
+.galInfo{display:flex; justify-content:space-between; align-items:center; padding:8px 2px 0}
+.galInfo b{font-size:18px}
+button.chip{font-size:14px; padding:5px 12px; box-shadow:none}
+button.chip.can{background:var(--ink); color:var(--face); animation:cardcall 1.6s ease-in-out infinite}
+.rankBox{width:min(100%,330px); box-sizing:border-box; display:flex; flex-direction:column; align-items:center; gap:6px; background:var(--face); border:2px solid var(--ink); box-shadow:2px 2px 0 var(--ink); padding:9px 10px 10px}
+.rankBox .boardBox{width:100%}
+.rankBox .note{font-size:13.5px; color:var(--ink)}
+.rankBox .board{font-size:15px}
+.rankBox .board tr.me td{font-size:17px}
+#menu .pager button.plain{font-size:15px; color:var(--ink)}
+#mapGrid button:disabled{opacity:.62}
+#mapGrid button:disabled .st{font-weight:700; font-size:11px}
+.pager button.plain{font-size:20px}
+.rankBox .tabs button{font-size:13px; padding:4px 12px}
+.board tr.me td{font-weight:700}
+#album .pedi{width:min(60%,190px); margin-bottom:0}
 #recList{width:min(100%,320px); margin:0; display:grid; grid-template-columns:1fr auto; row-gap:12px; font-size:16px}
 #recList dd{margin:0; text-align:right; font-size:22px}
 .tabs{display:flex; gap:8px}
@@ -272,11 +302,10 @@ button.primary{background:var(--ink); color:var(--face)}
   </section>
 
   <section id="menu" class="screen" hidden>
-    <div class="pedi" aria-hidden="true"><i class="w1"></i><i class="w2"></i><img src="art/pediment.png" alt=""></div>
-    <button id="menuPaint" class="paintCard" type="button" data-go="paint">
-      <span id="menuPaintPic"></span>
-      <span class="cap"><b id="menuInk"></b><em id="menuPaintHint"></em></span>
-    </button>
+    <div id="gallery">
+      <div id="galWall" aria-label="판화 전시실"></div>
+      <div class="galInfo"><b id="menuInk"></b><button id="menuPaint" class="chip" type="button"><span id="menuPaintHint"></span></button></div>
+    </div>
     <nav>
       <button type="button" class="primary big" data-go="map">여정 <small id="mJour"></small></button>
       <div class="grid2">
@@ -286,7 +315,7 @@ button.primary{background:var(--ink); color:var(--face)}
         <button type="button" data-go="codex">도감 <small id="mCodex"></small></button>
       </div>
     </nav>
-    <div id="menuBoard" class="boardBox"></div>
+    <div class="rankBox"><div class="tabs" id="rankTabs"><button type="button" data-r="league">주간 리그</button><button type="button" data-r="daily">오늘의 판</button></div><div id="menuBoard" class="boardBox"></div></div>
     <div class="pager"><button id="btnNick" class="plain" type="button"></button><button id="btnSound" class="plain" type="button">소리 켬</button></div>
   </section>
 
@@ -319,6 +348,7 @@ button.primary{background:var(--ink); color:var(--face)}
 
   <section id="album" class="screen" hidden>
     <div class="bar"><button class="plain" type="button" data-go="paint">← 판화</button><h2>판화 앨범</h2><span style="width:56px"></span></div>
+    <div class="pedi" aria-hidden="true"><i class="w1"></i><i class="w2"></i><img src="art/pediment.png" alt=""></div>
     <div id="albumGrid"></div>
   </section>
 
@@ -353,8 +383,8 @@ button.primary{background:var(--ink); color:var(--face)}
   </div></div>
 </div>
 
-<script src="art.js?v=31"></script>
-<script src="paints.js?v=32"></script>
+<script src="art.js?v=33"></script>
+<script src="paints.js?v=33"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 (()=>{
@@ -500,8 +530,13 @@ ${crack?`<path d="M40 22 46 42 36 56 47 68 42 84M46 42 58 46M36 56 22 62" fill="
 <g filter="url(#ink)" fill="none" stroke="${K}" stroke-linecap="round" stroke-linejoin="round"><path stroke-width="4" d="M8 90C22 62 8 40 30 26 52 12 72 32 62 52 53 70 30 66 35 48M72 94C60 78 76 62 60 46M12 12C26 22 22 40 40 44"/>
 <path stroke-width="2.6" d="M17 68l-9-3M21 46l-10-5M36 23l-3-10M56 21l6-9M67 40l9-3M57 63l8 7M40 63l-2 10M67 78l8-4M24 26l-8 4M47 30l2-9M30 56l-8 6"/></g></svg>`;
   OBS.stone=stone(false); OBS.stone2=stone(true); OBS.bramble=bramble;
+  { let lat=''; for(let i=-100;i<90;i+=9) lat+=`M${i} 100 ${i+100} 0M${i} 0 ${i+100} 100`;
+    OBS.back=`<svg xmlns="${NS}" viewBox="0 0 80 100" preserveAspectRatio="none"><defs>${inkFilter('ink',67)}${grainFilter}<clipPath id="face"><rect x="2" y="2" width="72" height="92" rx="7"/></clipPath><clipPath id="in"><rect x="10" y="10" width="56" height="76" rx="2"/></clipPath></defs>
+<g filter="url(#ink)"><rect x="5.5" y="5.5" width="72" height="92" rx="7" fill="${K}"/></g><rect x="2" y="2" width="72" height="92" rx="7" fill="${P}"/><g clip-path="url(#face)"><rect x="0" y="0" width="80" height="100" fill="${K}" filter="url(#grain)"/></g>
+<g filter="url(#ink)" fill="none" stroke="${K}"><rect x="2" y="2" width="72" height="92" rx="7" stroke-width="2.8"/><rect x="9" y="9" width="58" height="78" rx="3" stroke-width="2.4"/><g clip-path="url(#in)"><path stroke-width="1.7" d="${lat}"/></g><circle cx="38" cy="48" r="12" fill="${P}" stroke-width="2.6"/><path stroke-width="2.4" d="M38 39v18M29 48h18"/></g></svg>`;
+    OBS.blot=`<svg xmlns="${NS}" viewBox="0 0 80 100" preserveAspectRatio="none"><defs>${inkFilter('ink',83,4,-7.7)}</defs><g filter="url(#ink)" fill="${K}"><path d="M40 20c14-4 26 8 24 20 10 6 8 24-4 28 0 12-16 18-26 10-12 6-24-6-20-18-10-8-6-24 6-26 2-10 12-16 20-14z"/><circle cx="14" cy="24" r="4"/><circle cx="68" cy="84" r="5"/><circle cx="10" cy="78" r="2.6"/><circle cx="70" cy="16" r="3"/></g><path d="M29 40c6-7 15-7 20 0" fill="none" stroke="${P}" stroke-width="2.6" stroke-linecap="round"/></svg>`; }
   const st=document.createElement('style');
-  st.textContent=`.stone{background-image:${uri(stone(false))}}.stone2{background-image:${uri(stone(true))}}.bramble{background-image:${uri(bramble)}}`;
+  st.textContent=`.stone{background-image:${uri(stone(false))}}.stone2{background-image:${uri(stone(true))}}.bramble{background-image:${uri(bramble)}}.back{background-image:${uri(OBS.back)}}.blot{background-image:${uri(OBS.blot)}}`;
   document.head.appendChild(st);
 }
 
@@ -527,7 +562,7 @@ const sfx={
 
 /* ───────── 저장 ───────── */
 const SAVE='scm-save-v1';
-const S=Object.assign({nick:'',stars:{},pending:0,jour:0,ink:0,paint:{cur:0,done:{},album:[]},boost:{hint:1,shuffle:0,bomb:0},daily:{},seen:{}},(()=>{try{return JSON.parse(localStorage.getItem(SAVE))||{};}catch(e){return {};}})());
+const S=Object.assign({nick:'',stars:{},tries:{},pending:0,jour:0,ink:0,paint:{cur:0,done:{},album:[]},boost:{hint:1,shuffle:0,bomb:0},daily:{},seen:{}},(()=>{try{return JSON.parse(localStorage.getItem(SAVE))||{};}catch(e){return {};}})());
 if(!S.rec){ // 모드별 기록 (예전 통합 기록은 여정으로 옮김)
   const z=()=>({score:0,time:0,streak:0,combo:0,games:0,gold:0,cur:0});
   S.rec={journey:z(),daily:z(),basket:z()};
@@ -562,10 +597,10 @@ for(let y=0;y<ROWS;y++){ tiles[y]=[]; for(let x=0;x<COLS;x++){
 }} board.style.gridTemplateColumns=`repeat(${COLS},var(--cw))`; }
 board.appendChild(pathLayer); board.appendChild(fx); buildCells();
 
-const rockCls=g=>g.type==='stone'?(g.hp>1?'stone':'stone2'):g.type==='bramble'?'bramble':'rock';
+const rockCls=g=>g.type==='stone'?(g.hp>1?'stone':'stone2'):g.type==='bramble'?'bramble':g.type==='blot'?'blot':'rock';
 function paint(x,y){
   const g=grid[y][x], t=tiles[y][x];
-  if(g&&!g.rock) S.seen[''+g.k+g.l]=1;
+  if(g&&!g.rock&&!g.down) S.seen[''+g.k+g.l]=1;
   R.paint(x,y,g,!!(sel&&sel.x===x&&sel.y===y),mode==='basket'&&!!g&&!isFree(x,y));
 }
 function paintAll(){ for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++)paint(x,y); }
@@ -575,7 +610,7 @@ function toast(msg,ms=1500){ const t=$('#toast'); t.textContent=msg; t.classList
 const kf=(t,a)=>{ const n=a.length-1, p=Math.min(n-1e-6,Math.max(0,t)*n), i=p|0; return a[i]+(a[i+1]-a[i])*(p-i); };
 const R2D={
   is3d:false,
-  paint(x,y,g,s,d){ tiles[y][x].className='tile '+(g?(g.rock?rockCls(g):'t'+g.k+g.l):'empty')+(s?' sel':'')+(d?' dim':''); },
+  paint(x,y,g,s,d){ tiles[y][x].className='tile '+(g?(g.rock?rockCls(g):g.down?'back':'t'+g.k+g.l):'empty')+(s?' sel':'')+(d?' dim':'')+(g&&g.seal?' seal':''); },
   shake(x,y){ const t=tiles[y][x]; t.classList.add('no'); setTimeout(()=>t.classList.remove('no'),260); },
   pulse(x,y){ tiles[y][x].animate({scale:['1.15','1']},{duration:200}); },
   press(x,y){ tiles[y][x].animate({scale:['1','.9 .84','1.1']},{duration:170,easing:'ease-out'}); },
@@ -661,6 +696,16 @@ void main(){
     if(vTex.w>4.5){ float gm=1.-smoothstep(.1,.24,min(distance(t.rgb,uGold),distance(t.rgb,uGoldL)));
       col=mix(col,mix(uGold,uGoldL,.5+.5*sin(sp.x*.06+sp.y*.045+uTime*2.4)),gm); }
 #endif
+    if(vFx.w>.5){ // 봉인: 쇠사슬과 자물쇠
+      vec2 q=(vF-.5)*vec2(1.,1.26);
+      float d1=abs(q.x-q.y*.8), d2=abs(q.x+q.y*.8);
+      float along=(d1<d2?q.x+q.y:q.x-q.y)*9.;
+      float link=step(min(d1,d2),.075)*(.55+.45*step(.5,fract(along)));
+      col=mix(col,vec3(.93,.87,.72),.4);
+      col=mix(col,uInk,link);
+      float lk=1.-smoothstep(.16,.18,length(q));
+      col=mix(col,uInk,lk); col=mix(col,uPaper,(1.-smoothstep(.045,.06,length(q)))*lk);
+    }
   } else {
     if(kind>1.5) discard;
     // 옆면: 나무 + 해칭 음영
@@ -775,9 +820,9 @@ function make3D(simple){
   const api={
     is3d:true, simple, canvas,
     paint(x,y,g,s,d){ const i=idx(x,y), o=st[i]; o.vis=!!g; o.sel=!!s;
-      if(g){ const n=g.rock?(g.type==='stone'?(g.hp>1?26:27):g.type==='bramble'?28:25):g.k*5+g.l-1;
+      if(g){ const n=g.rock?(g.type==='stone'?(g.hp>1?26:27):g.type==='bramble'?28:g.type==='blot'?30:25):g.down?29:g.k*5+g.l-1;
         const kind=g.rock?(g.type==='wall'||!g.type?1:2):0; o.decal=kind===2;
-        aTex.setXYZW(i,n%8,n/8|0,kind,g.rock?0:g.l); aFx.setXYZW(i,d?1:0,(i*.618)%1,s?1:0,0); aTex.needsUpdate=aFx.needsUpdate=true; }
+        aTex.setXYZW(i,n%8,n/8|0,kind,g.rock||g.down?0:g.l); aFx.setXYZW(i,d?1:0,(i*.618)%1,s?1:0,g.seal?1:0); aTex.needsUpdate=aFx.needsUpdate=true; }
       kick(); },
     shake(x,y){ add(idx(x,y),260,(t,s)=>{ s.ox=Math.sin(t*12.566)*4.5*(1-t); }); },
     pulse(x,y){ add(idx(x,y),200,(t,s)=>{ s.sx=s.sy=1.15-.15*t; }); },
@@ -815,7 +860,7 @@ function use2D(){ R=R2D; board.classList.remove('gl'); if(grid.length) paintAll(
 // 패 그림 26+3장을 한 장의 판(아틀라스)으로 찍어 3D 블록 윗면에 쓴다
 function buildAtlas(){
   const list=[]; for(let k=0;k<5;k++)for(let l=1;l<=MAXL;l++) list.push(tileSVG(k,l));
-  list.push(rockSVG(),OBS.stone,OBS.stone2,OBS.bramble);
+  list.push(rockSVG(),OBS.stone,OBS.stone2,OBS.bramble,OBS.back,OBS.blot);
   const cv=document.createElement('canvas'); cv.width=cv.height=2048; const cx=cv.getContext('2d');
   return Promise.all(list.map((svg,i)=>new Promise((res,rej)=>{ const im=new Image();
     im.onload=()=>{ try{ cx.drawImage(im,(i%8)*256,(i/8|0)*320,256,320); res(); }catch(e){ rej(e); } }; im.onerror=rej;
@@ -858,7 +903,7 @@ function findPath(a,b){
 }
 function findMove(){
   const by={};
-  for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){ const g=grid[y][x]; if(g&&!g.rock)(by[g.k*10+g.l]||(by[g.k*10+g.l]=[])).push({x,y}); }
+  for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){ const g=grid[y][x]; if(g&&!g.rock&&!g.down&&!g.seal)(by[g.k*10+g.l]||(by[g.k*10+g.l]=[])).push({x,y}); }
   for(const key of shuffle(Object.keys(by))){ const a=by[key];
     for(let i=0;i<a.length;i++)for(let j=i+1;j<a.length;j++) if(findPath(a[i],a[j])) return [a[i],a[j]]; }
   return null;
@@ -873,10 +918,14 @@ function deal(cfg,rng){
   const pos=[]; for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++)pos.push({x,y}); shuffle(pos,rng);
   grid=Array.from({length:ROWS},()=>Array(COLS).fill(null));
   let n=0; const put=(c,o)=>{ for(let j=0;j<c;j++){ const p=pos[n++]; grid[p.y][p.x]=Object.assign({rock:true},o); } };
-  put(cfg.wall,{type:'wall'}); put(cfg.stone,{type:'stone',hp:2}); put(cfg.bramble,{type:'bramble'});
-  const bag=genBag(COLS*ROWS-n,rng);
-  const spots=pos.slice(n);
-  do{ shuffle(bag,rng); spots.forEach((p,i)=>grid[p.y][p.x]=bag[i]); }while(!findMove());
+  put(cfg.wall,{type:'wall'}); put(cfg.stone,{type:'stone',hp:2}); put(cfg.bramble,{type:'bramble'}); put(cfg.blot||0,{type:'blot'});
+  const bag=genBag(COLS*ROWS-n,rng,cfg.seal?3:-1);
+  const spots=pos.slice(n); let tries=0;
+  do{ shuffle(bag,rng); bag.forEach(t=>{ t.down=false; t.seal=false; });
+    let d=cfg.down||0, sl=cfg.seal||0; // 뒤집힌 패, 봉인된 패(열쇠는 봉인하지 않는다)
+    for(const t of bag){ if(!d&&!sl) break; if(d>0){ t.down=true; d--; } else if(t.k!==3){ t.seal=true; sl--; } }
+    shuffle(bag,rng); spots.forEach((p,i)=>grid[p.y][p.x]=bag[i]);
+  }while((!findMove()||(cfg.intro&&!teachMove()))&&++tries<400);
 }
 function dealBasket(){
   const pos=[]; for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++)pos.push({x,y}); shuffle(pos);
@@ -893,21 +942,10 @@ function reshuffle(){
   return false;
 }
 // 30단계까지는 고정 곡선, 그 뒤로는 10단계마다 한 단계씩 어려워지고 50단계마다 쉬어가는 판
-const isRest=s=>s-GROW_END>STAGES&&(s-GROW_END)%50===0;
+const isRest=()=>false; // 쉬어가는 판은 3.2에서 쉬움·쉬움·보통·어려움 주기로 바뀌었다
 const starsOf=s=>s<=S.jour?(S.stars[s]||1):0;
 const starTotal=()=>{ let n=0; for(let i=1;i<=S.jour;i++) n+=starsOf(i); return n; };
 const starStr=n=>'★'.repeat(n)+'☆'.repeat(3-n);
-function oldCfg(s){
-  if(s>STAGES&&s%50===0) return {wall:0,stone:0,bramble:6,limit:180000};
-  if(s>STAGES){
-    const t=Math.floor((s-1)/10)-2, n=Math.min(25,16+t), wall=Math.min(10,6+t), stone=Math.min(8,6+Math.floor(t/2));
-    return {wall,stone,bramble:n-wall-stone,limit:Math.max(100,122-4*t)*1000};
-  }
-  const n=6+Math.floor((s-1)*10/(STAGES-1));
-  const wall=s>=16?Math.min(6,2+Math.floor((s-16)/3)):0, stone=s>=6?Math.min(6,1+Math.floor((s-6)/3)):0;
-  return {wall,stone,bramble:n-wall-stone,limit:(180-2*(s-1))*1000};
-}
-
 /* ───────── 배치 ───────── */
 function layout(){
   const sheet=$('#sheet'), cs=getComputedStyle(sheet);
@@ -967,13 +1005,14 @@ const buzz=p=>{ try{ if(navigator.vibrate&&(!navigator.userActivation||navigator
 
 
 /* ───────── 한 수 ───────── */
-function select(p){ const old=sel; sel=p; if(old) paint(old.x,old.y); if(p){ paint(p.x,p.y); R.press(p.x,p.y); } if(tutOn) guide(); }
+function select(p){ const old=sel; sel=p; if(old) paint(old.x,old.y); if(p){ paint(p.x,p.y); R.press(p.x,p.y); } if(tutOn||coachOn) guide(); }
 function tap(x,y){
   if(lock||over||x<0||y<0||x>=COLS||y>=ROWS) return;
   touch();
   if(bombArmed){ bombAt(x,y); return; }
   if(mode==='basket'){ basketTap(x,y); return; }
   const g=grid[y][x]; if(!g||g.rock) return;
+  if(g.down||g.seal){ sfx.bad(); R.shake(x,y); toast(g.down?'뒤집힌 패는 옆에서 합치면 열립니다':'봉인된 패는 근처에서 열쇠 패를 합치면 풀립니다',1500); return; }
   clearHint();
   if(!sel){ select({x,y}); sfx.tap(); return; }
   if(sel.x===x&&sel.y===y){ select(null); return; }
@@ -1004,25 +1043,29 @@ function doMatch(a,b,path,g){
   const leave=R.leave(a,b,path); // 첫 패가 길을 따라 날아가 둘째 패와 맞눌린다
   setTimeout(()=>{
     leave.cancel(); if(over) return;
-    const cx=(b.x+.5)*cw, cy=(b.y+.5)*ch; let pts;
+    const cx=(b.x+.5)*cw, cy=(b.y+.5)*ch; let pts, fxN=0;
     if(lvl<MAXL){
       grid[a.y][a.x]=null; grid[b.y][b.x]={k:g.k,l:lvl+1}; paint(a.x,a.y); paint(b.x,b.y);
       if(lvl+1===MAXL) S.rec[mode].gold++;
       // 눌렸다 튕김
       R.bounce(b.x,b.y);
-      burst(cx,cy,false); pts=(10*Math.pow(2,lvl-1)+20*crumble(b))*mult; sfx.match(lvl,mult); buzz(30);
+      const cr=crumble(b); fxN=cr+freeNear(b,g.k,false);
+      burst(cx,cy,false); pts=(10*Math.pow(2,lvl-1)+20*cr)*mult; sfx.match(lvl,mult); buzz(30);
     } else {
       grid[a.y][a.x]=null; grid[b.y][b.x]=null; let rocks=0;
       for(const c of [a,b]) for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){
         const x=c.x+dx, y=c.y+dy; if(x<0||y<0||x>=COLS||y>=ROWS) continue;
         if(grid[y][x]&&grid[y][x].rock){ grid[y][x]=null; rocks++; burst((x+.5)*cw,(y+.5)*ch,false); paint(x,y); }
       }
-      paint(a.x,a.y); paint(b.x,b.y);
+      paint(a.x,a.y); paint(b.x,b.y); fxN=rocks+freeNear(a,g.k,true)+freeNear(b,g.k,true);
       burst((a.x+.5)*cw,(a.y+.5)*ch,true); burst(cx,cy,true);
       R.boardShake();
       pts=(300+50*rocks)*mult; sfx.boom(); buzz([30,40,30]);
     }
-    merges++; if(lvl<MAXL) madeMax=Math.max(madeMax,lvl+1); else booms++;
+    merges++; kindMerge[g.k]++; if(lvl<MAXL) madeMax=Math.max(madeMax,lvl+1); else booms++;
+    if(lvl+1===MAXL) goldMade++;
+    if(merges%3===0) spreadBlot();
+    if(coachOn&&fxN>0){ coachOn=false; finger.hidden=true; }
     score+=pts; hud(); setCombo(combo); pop(cx,cy-ch*.3,'+'+pts+(mult>1?' ×'+mult:''));
     lock=false; afterMove();
   },200);
@@ -1030,7 +1073,7 @@ function doMatch(a,b,path,g){
 function shuffleAnim(){
   lock=true; sfx.shuffle();
   R.flipOut();
-  setTimeout(()=>{ reshuffle(); sel=null; paintAll();
+  setTimeout(()=>{ if(!reshuffle()){ freeAll(); reshuffle(); toast('막힌 패를 모두 풀었습니다',1600); } sel=null; paintAll();
     R.flipIn();
     setTimeout(()=>{ if(!over){ lock=false; guide(); } },170);
   },170);
@@ -1038,6 +1081,8 @@ function shuffleAnim(){
 function afterMove(){
   if(over) return; hud();
   if(goalMet()){ endGame(true); return; }
+  if(goal.type==='moves'&&merges>=goal.limit){ endGame(false,'이동을 다 썼습니다'); return; }
+  if(tileCount()===0){ endGame(false,'목표를 이루지 못했습니다'); return; }
   if(findMove()){ guide(); return; }
   if(tutOn&&!pairExists()){ lock=true; finger.hidden=true; toast('합쳐진 패는 둘째로 누른 자리에 생깁니다. 다시 해 봅시다',2200); setTimeout(()=>{ if(!over) startGame('journey',jStage); },1600); return; }
   lock=true; toast('막혔습니다. 패를 섞습니다');
@@ -1119,16 +1164,7 @@ let goal={type:'clear'}, merges=0, madeMax=0, booms=0, hintsLeft=3, tutOn=false,
 const touch=()=>{ lastAct=performance.now(); };
 const rockCount=()=>{ let n=0; for(const r of grid) for(const g of r) if(g&&g.rock) n++; return n; };
 function pairExists(){ const c={}; for(const r of grid) for(const g of r) if(g&&!g.rock){ const k=g.k*10+g.l; if(c[k]) return true; c[k]=1; } return false; }
-function goalMet(){ return goal.type==='clear'?tileCount()===0:goal.type==='merge'?merges>=goal.n:goal.type==='make'?madeMax>=goal.level:goal.type==='rocks'?rockCount()===0:booms>=goal.n; }
 function setSize(c,r){ if(c!==COLS||r!==ROWS){ COLS=c; ROWS=r; buildCells(); } R.reset(); }
-function hud(){
-  const L=$('#goalL'), V=$('#goalV');
-  if(goal.type==='clear'){ L.textContent='남은 패'; V.textContent=tileCount(); }
-  else if(goal.type==='merge'){ L.textContent='같은 패 잇기'; V.textContent=Math.min(merges,goal.n)+'/'+goal.n; }
-  else if(goal.type==='make'){ L.textContent=goal.level+'단계 패 만들기'; V.textContent=(madeMax>=goal.level?1:0)+'/1'; }
-  else if(goal.type==='rocks'){ L.textContent='남은 덤불'; V.textContent=rockCount(); }
-  else { L.textContent='황금 폭발'; V.textContent=Math.min(booms,goal.n)+'/'+goal.n; }
-}
 // 튜토리얼 5판: 글자=종류(S 해·M 달·R 장미·K 열쇠·C 왕관)+단계, B 덤불, W 벽
 const TUT=[
  {cols:4,rows:4,grid:['. . . .','S1 S1 M1 M1','. R1 . R1','. . . .'],goal:{type:'merge',n:3},text:'같은 그림 두 개를 차례로 누르세요'},
@@ -1142,12 +1178,6 @@ function dealFixed(rows){
 }
 // 6~15단계: 판이 조금씩 커진다 [칸, 줄, 덤불, 바위]
 const GROW=[[5,6,0,0],[5,6,2,0],[6,6,2,0],[6,7,2,1],[6,8,3,0],[7,8,3,1],[7,8,2,2],[7,9,4,1],[8,9,4,1],[8,10,4,2]];
-function stageCfg(s){
-  if(s<=TUT_N) return Object.assign({tut:s},TUT[s-1]);
-  if(s<=GROW_END){ const i=s-TUT_N-1, g=GROW[i], tiles=g[0]*g[1]-g[2]-g[3];
-    return {cols:g[0],rows:g[1],wall:0,stone:g[3],bramble:g[2],limit:Math.round(tiles*(6-i/3))*1000}; }
-  return oldCfg(s-GROW_END);
-}
 // 판 크기에 맞춰 패 묶음을 만든다: 종류마다 끝까지 합치면 5단계 두 장이 남도록(합 32)
 function splitKind(c){
   if(SETS[c]) return SETS[c].concat(0);
@@ -1156,9 +1186,9 @@ function splitKind(c){
     const sc=d*100+Math.abs(a-4)*3+c3; if(!best||sc<best.sc) best={sc,v:[a,b,c3,d]}; }
   return best?best.v:[0,0,0,4];
 }
-function genBag(T,rng){
-  let nk=Math.max(1,Math.min(5,Math.round(T/14)));
-  const kinds=shuffle([0,1,2,3,4],rng).slice(0,nk), bag=[];
+function genBag(T,rng,must=-1){
+  let nk=T>=55?5:Math.max(1,Math.min(5,Math.round(T/14)));
+  const kinds=shuffle([0,1,2,3,4],rng).slice(0,nk), bag=[]; if(must>=0&&!kinds.includes(must)) kinds[0]=must;
   kinds.forEach((k,i)=>{ const c=Math.floor(T/nk)+(i<T%nk?1:0); splitKind(c).forEach((cnt,l)=>{ for(let j=0;j<cnt;j++) bag.push({k,l:l+1}); }); });
   return bag;
 }
@@ -1169,20 +1199,133 @@ fx.appendChild(finger);
 const nearRock=p=>{ for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){ const x=p.x+dx,y=p.y+dy; if(x<0||y<0||x>=COLS||y>=ROWS) continue; const g=grid[y][x]; if(g&&g.rock&&g.type!=='wall') return true; } return false; };
 function movesAll(){
   const by={}, out=[];
-  for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){ const g=grid[y][x]; if(g&&!g.rock)(by[g.k*10+g.l]||(by[g.k*10+g.l]=[])).push({x,y}); }
+  for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){ const g=grid[y][x]; if(g&&!g.rock&&!g.down&&!g.seal)(by[g.k*10+g.l]||(by[g.k*10+g.l]=[])).push({x,y}); }
   for(const k in by){ const a=by[k]; for(let i=0;i<a.length;i++)for(let j=i+1;j<a.length;j++) if(findPath(a[i],a[j])) out.push([a[i],a[j]]); }
   return out;
 }
-function guide(){
-  if(!tutOn||over||!grid.length){ finger.hidden=true; return; }
-  const ms=movesAll(); if(!ms.length){ finger.hidden=true; return; }
-  let best=null; // 덤불 옆 패가 '둘째'가 되는 순서를 먼저 권한다
-  ms.forEach(([a,b])=>[[a,b],[b,a]].forEach(([p,q])=>{ const sc=(nearRock(q)?2:0)-(nearRock(p)?1:0); if(!best||sc>best.sc) best={sc,p,q}; }));
-  let t=best.p;
-  if(sel){ const same=(a,b)=>a.x===b.x&&a.y===b.y, mine=ms.filter(m=>same(m[0],sel)||same(m[1],sel)).map(m=>same(m[0],sel)?m[1]:m[0]);
-    if(mine.length){ t=mine.find(nearRock)||mine[0]; if(goal.type==='rocks'&&nearRock(sel)&&!nearRock(t)) t=sel; } }
-  finger.hidden=false; finger.style.left=((t.x+.5)*cw)+'px'; finger.style.top=((t.y+.5)*ch)+'px';
+/* ───────── 3.2: 장치(뒤집힌 패·봉인·잉크 얼룩), 목표, 난이도 곡선 ───────── */
+const KN=['해','달','장미','열쇠','왕관'];
+const INTRO={30:'down',60:'seal',90:'blot'}; // 새 장치가 처음 나오는 단계
+const INTRO_TEXT={down:'뒤집힌 패 옆에서 합치면 앞면이 열립니다',seal:'봉인된 패 근처에서 열쇠 패를 합치면 풀립니다',blot:'잉크 얼룩은 세 번 합칠 때마다 번집니다. 옆에서 합쳐 지우세요'};
+const isBoss=s=>s>GROW_END&&s%10===0&&!INTRO[s]; // 10단계마다 어려운 판
+let coachOn=false, goldMade=0, kindMerge=[0,0,0,0,0];
+const wallCount=()=>{ let n=0; for(const r of grid) for(const g of r) if(g&&g.rock&&g.type==='wall') n++; return n; };
+const inB=(x,y)=>x>=0&&y>=0&&x<COLS&&y<ROWS;
+// 합친 자리 둘레: 뒤집힌 패는 열리고, 열쇠를 합쳤다면(또는 폭발이면) 봉인이 풀린다
+function freeNear(c,k,boom){
+  let n=0; const R2=k===3?2:boom?1:0;
+  for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++){
+    const x=c.x+dx, y=c.y+dy; if(!inB(x,y)) continue; const g=grid[y][x]; if(!g||g.rock) continue;
+    const d=Math.max(Math.abs(dx),Math.abs(dy));
+    if(g.down&&d<=1){ g.down=false; n++; paint(x,y); R.bounce(x,y); }
+    if(g.seal&&d<=R2){ g.seal=false; n++; paint(x,y); R.pulse(x,y); }
+  }
+  return n;
 }
+function freeAll(){ for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){ const g=grid[y][x]; if(g&&!g.rock&&(g.down||g.seal)){ g.down=false; g.seal=false; } } }
+// 잉크 얼룩: 세 번 합칠 때마다 빈 옆 칸 하나로 번진다
+function spreadBlot(){
+  const c=[];
+  for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){ const g=grid[y][x]; if(g&&g.rock&&g.type==='blot') for(let d=0;d<4;d++){ const X=x+DX[d], Y=y+DY[d]; if(inB(X,Y)&&grid[Y][X]===null) c.push({x:X,y:Y}); } }
+  if(!c.length) return; const p=c[rnd()*c.length|0]; grid[p.y][p.x]={rock:true,type:'blot'}; paint(p.x,p.y); R.pulse(p.x,p.y);
+}
+// 안내가 권할 만한 수: 그 자리에서 합치면 장치 하나가 풀리는가
+function gainAt(p,k){
+  for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++){ const x=p.x+dx, y=p.y+dy; if(!inB(x,y)) continue; const g=grid[y][x]; if(!g) continue; const d=Math.max(Math.abs(dx),Math.abs(dy));
+    if(d<=1&&((g.rock&&g.type!=='wall')||g.down)) return true; if(g.seal&&k===3) return true; }
+  return false;
+}
+function teachMove(){ return movesAll().some(m=>{ const k=grid[m[0].y][m[0].x].k; return gainAt(m[0],k)||gainAt(m[1],k); }); }
+function guide(){
+  if((!tutOn&&!coachOn)||over||!grid.length){ finger.hidden=true; return; }
+  const ms=movesAll(); if(!ms.length){ finger.hidden=true; return; }
+  const kOf=p=>grid[p.y][p.x].k, same=(a,b)=>a.x===b.x&&a.y===b.y;
+  let best=null; // 장치 옆 패가 '둘째'가 되는 순서를 먼저 권한다
+  ms.forEach(([a,b])=>[[a,b],[b,a]].forEach(([p,q])=>{ const k=kOf(p), sc=(gainAt(q,k)?2:0)-(gainAt(p,k)?1:0); if(!best||sc>best.sc) best={sc,p,q}; }));
+  if(coachOn&&best.sc<=0){ finger.hidden=true; return; }
+  let t=best.p;
+  if(sel){ const mine=ms.filter(m=>same(m[0],sel)||same(m[1],sel)).map(m=>same(m[0],sel)?m[1]:m[0]);
+    if(mine.length){ const k=kOf(sel); t=mine.find(q=>gainAt(q,k))||mine[0]; if((goal.type==='rocks'||coachOn)&&gainAt(sel,k)&&!gainAt(t,k)) t=sel; } }
+  finger.hidden=false; finger.style.left=((t.x+.5)*cw)+'px'; finger.style.top=((t.y+.62)*ch)+'px';
+}
+function goalMet(){
+  const t=goal.type;
+  return t==='clear'?tileCount()===0:t==='merge'?merges>=goal.n:t==='make'?madeMax>=goal.level:t==='rocks'?rockCount()===0:t==='boom'?booms>=goal.n
+    :t==='gold'||t==='moves'?goldMade>=goal.n:t==='kind'?kindMerge[goal.k]>=goal.n:t==='walls'?wallCount()===0:false;
+}
+function hud(){
+  const L=$('#goalL'), V=$('#goalV'), t=goal.type;
+  if(t==='clear'){ L.textContent='남은 패'; V.textContent=tileCount(); }
+  else if(t==='merge'){ L.textContent='같은 패 잇기'; V.textContent=Math.min(merges,goal.n)+'/'+goal.n; }
+  else if(t==='make'){ L.textContent=goal.level+'단계 패 만들기'; V.textContent=(madeMax>=goal.level?1:0)+'/1'; }
+  else if(t==='rocks'){ L.textContent='남은 덤불'; V.textContent=rockCount(); }
+  else if(t==='boom'){ L.textContent='황금 폭발'; V.textContent=Math.min(booms,goal.n)+'/'+goal.n; }
+  else if(t==='gold'){ L.textContent='황금 패(5단계) 만들기'; V.textContent=Math.min(goldMade,goal.n)+'/'+goal.n; }
+  else if(t==='kind'){ L.textContent=KN[goal.k]+' 패 합치기'; V.textContent=Math.min(kindMerge[goal.k],goal.n)+'/'+goal.n; }
+  else if(t==='walls'){ L.textContent='벽돌 다 깨기'; V.textContent=wallCount(); }
+  else { L.textContent='황금 '+Math.min(goldMade,goal.n)+'/'+goal.n+' · 남은 이동'; V.textContent=Math.max(0,goal.limit-merges); }
+}
+// 16단계부터: 쉬움·쉬움·보통·어려움 반복, 10단계마다 어려운 판. 한 판에 장치는 두 종류까지
+function stageCfg(s){
+  if(s<=TUT_N) return Object.assign({tut:s},TUT[s-1]);
+  if(s<=GROW_END){ const i=s-TUT_N-1, g=GROW[i], tiles=g[0]*g[1]-g[2]-g[3];
+    return {cols:g[0],rows:g[1],wall:0,stone:g[3],bramble:g[2],limit:Math.round(tiles*(6-i/3))*1000}; }
+  const c={wall:0,stone:0,bramble:0,down:0,seal:0,blot:0,goal:{type:'clear'}};
+  if(INTRO[s]){ const d=INTRO[s]; c[d]=d==='blot'?2:3; c.limit=300000; c.intro=d; c.text=INTRO_TEXT[d]; return c; } // 첫 등장: 그 장치만 2~3개, 시간 넉넉
+  const r=seeded(s*7919+13), T=Math.floor((s-16)/10), boss=isBoss(s), diff=boss?3:[0,0,1,2][(s-16)%4];
+  const avail=['bramble']; if(s>=21) avail.push('stone'); if(s>=26) avail.push('wall'); if(s>30) avail.push('down'); if(s>60) avail.push('seal'); if(s>90) avail.push('blot');
+  const picks=shuffle(avail,r).slice(0,2), total=Math.min(18,[4,7,10,13][diff]+Math.floor(T/2)), cap={bramble:10,stone:8,wall:6,down:10,seal:5,blot:3};
+  picks.forEach(t=>{ c[t]=Math.max(1,Math.min(cap[t],Math.round(total/picks.length))); });
+  c.limit=Math.max(110,[200,200,180,160][diff]-(boss?10:0)-T*3)*1000; c.diff=diff; c.boss=boss;
+  const gr=r();
+  if(diff>=2&&c.wall>0&&gr<.5){ c.wall=Math.min(c.wall,3); c.goal={type:'walls'}; }
+  else if(gr<.45) c.goal={type:'clear'};
+  else if(gr<.63) c.goal={type:'gold',n:2+Math.min(2,diff)};
+  else if(gr<.85) c.goal={type:'kind',k:Math.floor(r()*5),n:6+diff};
+  else c.goal={type:'moves',n:2,limit:[14,14,12,10][diff]};
+  return c;
+}
+
+/* ───────── 주간 리그 · 단계 기록 (Supabase) ───────── */
+const pid=()=>{ if(!S.pid){ S.pid=crypto.randomUUID?crypto.randomUUID():'10000000-1000-4000-8000-100000000000'.replace(/[018]/g,c=>(c^crypto.getRandomValues(new Uint8Array(1))[0]&15>>c/4).toString(16)); save(); } return S.pid; };
+// 월요일 0시(한국 시간)에 새 주가 시작된다
+function leagueLeft(){ const k=new Date(Date.now()+9*3600e3), dow=(k.getUTCDay()+6)%7, ms=(7-dow)*86400e3-(k.getUTCHours()*3600e3+k.getUTCMinutes()*60e3+k.getUTCSeconds()*1e3);
+  const d=Math.floor(ms/86400e3), h=Math.floor(ms%86400e3/3600e3); return d>0?d+'일 '+h+'시간':h>0?h+'시간':Math.max(1,Math.floor(ms/60e3))+'분'; }
+function leagueBump(){ try{ return sb('rpc/scm_league_bump',{method:'POST',body:JSON.stringify({p_player:pid(),p_nick:S.nick||'이름 없음'})}).catch(()=>{}); }catch(e){} }
+async function fetchLeague(){ const r=await sb('rpc/scm_league_top',{method:'POST',body:JSON.stringify({p_player:S.pid||null})}); if(!r.ok) throw {code:r.status}; return r.json(); }
+// 난이도 조정용 익명 기록: 단계·성공 여부·걸린 시간·몇 번째 시도인지만 보낸다(기기나 사람을 알 수 있는 값은 없음)
+function logStage(stage,win,ms,attempt,goalType){ try{ sb('scm_stage_log',{method:'POST',headers:{Prefer:'return=minimal'},body:JSON.stringify({stage,win,time_ms:Math.max(0,Math.min(3600000,Math.round(ms))),attempt:Math.max(1,Math.min(10000,attempt)),goal:String(goalType).slice(0,16)})}).catch(()=>{}); }catch(e){} }
+let rankTab='league';
+async function drawRank(){
+  const el=$('#menuBoard'); document.querySelectorAll('#rankTabs button').forEach(x=>{ const on=x.dataset.r===rankTab; x.classList.toggle('armed',on); x.setAttribute('aria-pressed',on); });
+  if(rankTab==='daily'){ drawBoard(el,3); return; }
+  el.textContent=''; const say=t=>{ const p=document.createElement('p'); p.className='note'; p.textContent=t; el.appendChild(p); };
+  say('이번 주 순위를 불러오는 중');
+  let rows; try{ rows=await fetchLeague(); }catch(e){ rows=undefined; }
+  if(rankTab!=='league') return; el.textContent='';
+  say('이번 주 깬 단계 수 · '+leagueLeft()+' 남음');
+  if(rows===undefined){ say('순위를 불러오지 못했습니다'); return; }
+  if(!rows.length){ say('아직 기록이 없습니다. 여정을 깨면 올라갑니다'); return; }
+  const tb=document.createElement('table'); tb.className='board';
+  rows.filter(r=>r.pos<=3||r.me).forEach(r=>{ const tr=tb.insertRow(); if(r.me) tr.className='me'; [r.pos+'위',String(r.nick||'이름 없음').slice(0,12)+(r.me?' (나)':''),r.clears+'단계'].forEach(v=>{ tr.insertCell().textContent=v; }); });
+  el.appendChild(tb);
+}
+
+/* ───────── 메뉴 상단 전시실: 판화가 액자로 벽에 걸린다 ───────── */
+function drawGallery(){
+  const wall=$('#galWall'), cur=paintIdx(), fin=cur>=PAINTS.length; wall.textContent=''; let nowEl=null;
+  PAINTS.forEach((p,i)=>{ const f=document.createElement('figure'), has=S.paint.album.includes(p.id), now=i===cur;
+    f.className='hang'+(now?' now':has?'':' lock'); f.innerHTML='<svg class="wire" viewBox="0 0 100 22" aria-hidden="true"><path d="M8 22 50 3 92 22" fill="none" stroke="'+K+'" stroke-width="1.6"/><circle cx="50" cy="3.500" r="3" fill="'+K+'"/></svg>'.replace('.500','.5');
+    let pic; if(has||now){ pic=ptBuild(p,has?p.regions.map((r,j)=>j):paintDone(p)); pic.classList.add('framed'); } else { pic=document.createElement('div'); pic.className='pt lock'; pic.style.aspectRatio=p.w+' / '+p.h; pic.textContent='?'; }
+    f.appendChild(pic); const c=document.createElement('figcaption'); c.textContent=has?p.title:now?p.title+' · 칠하는 중':'다음 판화'; f.appendChild(c);
+    f.onclick=()=>{ if(now) go('paint'); else if(has) go('album'); else toast('앞의 판화를 먼저 완성하세요',1500); };
+    wall.appendChild(f); if(now) nowEl=f; });
+  $('#menuInk').textContent='잉크 '+S.ink;
+  $('#menuPaintHint').textContent=fin?'전시실 둘러보기 ›':S.ink>=INK_COST?'판화 칠하기 ›':'판화 칠하기 › 잉크 '+INK_COST+' 필요';
+  $('#menuPaint').classList.toggle('can',!fin&&S.ink>=INK_COST); $('#menuPaint').onclick=()=>go(fin?'album':'paint');
+  requestAnimationFrame(()=>{ const t=nowEl||wall.lastChild; if(t) wall.scrollLeft=Math.max(0,t.offsetLeft-(wall.clientWidth-t.offsetWidth)/2); });
+}
+
 // 첫 시간 초과에는 30초를 한 번 더 준다
 function offerContinue(){
   paused=true; lock=true; const t0=performance.now(); select(null); clearHint();
@@ -1201,13 +1344,15 @@ function offerContinue(){
 function startGame(m,stage){
   mode=m; jStage=stage||1; over=false; lock=false; paused=false; bombArmed=false; basket=[]; sel=null;
   score=0; combo=0; maxCombo=0; hints=0; gotStars=0; gotInk=0; subP=null; merges=madeMax=booms=0; hintsLeft=3; usedCont=false; clearWarn();
-  lastMatch=-1e9; limit=0; setCombo(0); clearHint(); goal={type:'clear'}; tutOn=false;
+  lastMatch=-1e9; limit=0; setCombo(0); clearHint(); goal={type:'clear'}; tutOn=false; coachOn=false; goldMade=0; kindMerge=[0,0,0,0,0]; $('#hud').classList.remove('boss');
   $('#result').hidden=true; $('#resTable').hidden=false; $('#basket').hidden=m!=='basket'; show('game');
+  fx.querySelectorAll('i').forEach(e=>e.remove()); pathLayer.textContent=''; // 지난 판의 이펙트가 남지 않게
   const coach=$('#coach'); coach.hidden=true;
   if(m==='journey'){
-    const c=stageCfg(jStage); setSize(c.cols||8,c.rows||10); limit=c.limit||0; $('#hudStageL').textContent='단계'; $('#hudStage').textContent=jStage;
+    const c=stageCfg(jStage); setSize(c.cols||8,c.rows||10); limit=c.limit||0; $('#hudStageL').textContent=c.boss?'어려운 판':'단계'; $('#hudStage').textContent=jStage;
+    S.tries[jStage]=(S.tries[jStage]||0)+1; $('#hud').classList.toggle('boss',!!c.boss);
     if(c.tut){ tutOn=true; goal=c.goal; dealFixed(c.grid); coach.textContent=c.text; coach.hidden=false; }
-    else { deal(c,rnd);
+    else { deal(c,rnd); goal=c.goal||{type:'clear'}; if(c.intro){ coachOn=true; coach.textContent=c.text; coach.hidden=false; }
       if(S.pending){ S.pending=0; if(boostTotal()<3){ const t=['shuffle','bomb'][rnd()*2|0]; S.boost[t]++; setTimeout(()=>toast('연승 보상: '+BN[t]+' +1',2200),300); } save(); } }
   } else if(m==='daily'){
     setSize(8,10); deal({wall:3,stone:3,bramble:4},seeded(+today().replace(/-/g,''))); $('#hudStageL').textContent='오늘의'; $('#hudStage').textContent='판';
@@ -1216,6 +1361,7 @@ function startGame(m,stage){
   }
   $('#timeCell').hidden=tutOn;
   tools(); layout(); paintAll(); hud(); startT=performance.now(); touch(); tick(); guide();
+  if(m==='journey'&&!tutOn&&goal.type!=='clear') setTimeout(()=>toast('목표 · '+(goal.type==='moves'?goal.limit+'번 안에 황금 패 '+goal.n+'개':$('#goalL').textContent+(goal.n?' '+goal.n+(goal.type==='kind'?'번':'개'):'')),2400),350);
 }
 // 남은 시간 알림 (여정): 30초 예고, 10초부터 초읽기, 5초부터 판 테두리까지 붉게
 let warnSec=1e9;
@@ -1237,7 +1383,7 @@ function tick(){
   if(limit){ const sec=Math.ceil((limit-el)/1000); if(sec!==warnSec){ warnSec=sec; timeWarn(sec); } }
   if(limit&&el>=limit&&!lock){ if(mode==='journey'&&!usedCont) offerContinue(); else endGame(false,'시간이 다 되었습니다'); return; }
   // 5초 넘게 손이 멈추면 이어지는 쌍 하나가 살짝 반짝인다
-  if(mode==='journey'&&!tutOn&&!lock&&performance.now()-lastAct>5000){ const m=findMove(); if(m) R.glint(m); touch(); }
+  if(mode==='journey'&&!tutOn&&!coachOn&&!lock&&performance.now()-lastAct>5000){ const m=findMove(); if(m) R.glint(m); touch(); }
 }
 setInterval(tick,250);
 function endGame(win,why){
@@ -1249,11 +1395,12 @@ function endGame(win,why){
     if(score>b.score){ b.score=score; neu.score=1; }
     if(!b.time||t<b.time){ b.time=t; neu.time=1; }
     if(b.cur>b.streak){ b.streak=b.cur; neu.streak=1; }
-    if(mode==='journey'){ if(jStage>S.jour){ S.ink++; gotInk=1; } S.jour=Math.max(S.jour,jStage); const fr=limit?(limit-t)/limit:1; gotStars=fr>=.6?3:fr>=.4?2:1; S.stars[jStage]=Math.max(S.stars[jStage]||0,gotStars); }
+    if(mode==='journey'){ if(jStage>S.jour){ gotInk=isBoss(jStage)?2:1; S.ink+=gotInk; if(jStage>TUT_N) leagueBump(); } S.jour=Math.max(S.jour,jStage); const fr=limit?(limit-t)/limit:1; gotStars=fr>=.6?3:fr>=.4?2:1; S.stars[jStage]=Math.max(S.stars[jStage]||0,gotStars); }
   } else b.cur=0;
   if(maxCombo>b.combo){ b.combo=maxCombo; neu.combo=1; }
   let dailyNote='';
   if(mode==='daily'&&win){ const d=today(); if(S.daily[d]) dailyNote='오늘 기록은 이미 남겼습니다'; else { S.daily[d]={score,time:t,combo:maxCombo,hints}; subP=sendDaily(); S.ink+=2; gotInk=2; } } // 하루 한 번 잉크 2
+  if(mode==='journey') logStage(jStage,win,t,S.tries[jStage]||1,goal.type);
   save();
   setTimeout(()=>showResult(win,why||dailyNote,t,was,tut?{}:neu),win?550:350);
 }
@@ -1301,7 +1448,7 @@ const paintDone=p=>S.paint.done[p.id]||(S.paint.done[p.id]=[]);
 function ptBuild(p,done){
   const el=document.createElement('div'); el.className='pt'; el.style.aspectRatio=p.w+' / '+p.h;
   let g=''; p.regions.forEach((r,i)=>{ g+=`<g class="rg" data-i="${i}" fill="${KC[r.c]}" stroke="${KC[r.c]}" stroke-width="7" stroke-linejoin="round" stroke-linecap="round" filter="url(#${p.id}r)"${done.includes(i)?'':' style="display:none"'}>${r.s}</g>`; });
-  el.innerHTML=`<svg viewBox="0 0 ${p.w} ${p.h}" preserveAspectRatio="none" aria-hidden="true"><defs><filter id="${p.id}r" x="-8%" y="-8%" width="116%" height="116%"><feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="2" seed="7" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="${(p.w*.022).toFixed(1)}"/></filter>${p.defs||''}</defs><g opacity=".84">${g}</g></svg><img src="${p.src}" alt="" draggable="false">`;
+  el.innerHTML=`<svg viewBox="0 0 ${p.w} ${p.h}" preserveAspectRatio="none" aria-hidden="true"><defs><filter id="${p.id}r" x="-8%" y="-8%" width="116%" height="116%"><feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="2" seed="7" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="${(p.w*.022).toFixed(1)}"/></filter>${p.defs||''}</defs><g opacity=".84">${g}</g></svg><img src="${p.src}" alt="" draggable="false" loading="lazy" decoding="async">`;
   return el;
 }
 // 손 채색: 물방울 자리에서 색이 번져 나간다
@@ -1354,13 +1501,6 @@ function drawAlbum(){
     pic.style.width=(p.w>=p.h?76:76*p.w/p.h).toFixed(1)+'%'; slot.appendChild(pic); f.appendChild(slot);
     const c=document.createElement('figcaption'), b=document.createElement('b'), d=document.createElement('span'); b.textContent=has?p.title:'아직 칠하지 않은 판화'; d.textContent=has?p.by:''; c.appendChild(b); c.appendChild(d); f.appendChild(c); el.appendChild(f); });
 }
-function drawMenuPaint(){
-  const p=curPaint(), fin=paintIdx()>=PAINTS.length, done=fin?p.regions.map((r,i)=>i):paintDone(p), box=$('#menuPaintPic');
-  box.textContent=''; box.appendChild(ptBuild(p,done));
-  $('#menuInk').textContent='잉크 '+S.ink;
-  $('#menuPaintHint').textContent=fin?'앨범 보기 ›':S.ink>=INK_COST?'판화 칠하기 ›':'판화 칠하기 › 잉크 '+INK_COST+' 필요';
-  $('#menuPaint').classList.toggle('can',!fin&&S.ink>=INK_COST);
-}
 
 /* ───────── 화면 ───────── */
 const CX=[[0,'점선'],[10,'겹선'],[30,'모서리 장식'],[60,'채색 테']]; // 별 합계로 열리는 도감 테두리
@@ -1370,10 +1510,10 @@ function drawMap(){
   const el=$('#mapGrid'), from=mapPage*STAGES+1; el.textContent='';
   for(let s=from;s<from+STAGES;s++){ const b=document.createElement('button'); b.type='button';
     const n=document.createElement('span'); n.textContent=s; b.appendChild(n);
-    const sub=s<=S.jour?starStr(starsOf(s)):s<=TUT_N?'배움':isRest(s)?'쉼':'';
+    const sub=s<=S.jour?starStr(starsOf(s)):s<=TUT_N?'배움':INTRO[s]?'새 장치':isBoss(s)?'어려움':'';
     if(sub){ const t=document.createElement('span'); t.className='st'; t.textContent=sub; b.appendChild(t); }
     if(s<=S.jour) b.className='done'; else if(s===S.jour+1) b.className='now'; else b.disabled=true;
-    if(isRest(s)) b.classList.add('rest');
+    if(isBoss(s)) b.classList.add('boss');
     b.onclick=()=>startGame('journey',s); el.appendChild(b); }
   $('#mapPage').textContent=from+' ~ '+(from+STAGES-1); $('#mapPrev').disabled=mapPage<=0; $('#mapNext').disabled=mapPage>=maxPage;
   $('#mapNote').textContent=`★ ${starTotal()}  ·  셔플 ${S.boost.shuffle} · 폭탄 ${S.boost.bomb}`+(S.rec.journey.cur>=2?`  ·  ${S.rec.journey.cur}연승`:'');
@@ -1420,6 +1560,7 @@ function drawRec(){
   document.querySelectorAll('#recTabs button').forEach(x=>{ const on=x.dataset.tab===recTab; x.classList.toggle('armed',on); x.setAttribute('aria-pressed',on); });
 }
 document.querySelectorAll('#recTabs button').forEach(x=>{ x.onclick=()=>{ recTab=x.dataset.tab; drawRec(); }; });
+document.querySelectorAll('#rankTabs button').forEach(x=>{ x.onclick=()=>{ rankTab=x.dataset.r; drawRank(); }; });
 const SCREENS=['title','menu','map','records','codex','game','paint','album'];
 function show(id){ SCREENS.forEach(s=>{ $('#'+s).hidden=s!==id; }); }
 function go(id){
@@ -1428,7 +1569,7 @@ function go(id){
   if(id==='basket'){ startGame('basket'); return; }
   over=true; save();
   if(id==='menu'){
-    drawMenuPaint(); $('#mJour').textContent=S.jour?S.jour+'단계':''; $('#btnNick').textContent='닉네임 · '+(S.nick||'없음'); drawBoard($('#menuBoard'),3); retrySubmit(); $('#mDaily').textContent=S.daily[today()]?'완료':'잉크 +2';
+    drawGallery(); $('#mJour').textContent=S.jour?S.jour+'단계':''; $('#btnNick').textContent='닉네임 · '+(S.nick||'없음'); drawRank(); retrySubmit(); $('#mDaily').textContent=S.daily[today()]?'완료':'잉크 +2';
     $('#mCodex').textContent=Object.keys(S.seen).length+'/25';
   }
   if(id==='map'){
@@ -1514,7 +1655,7 @@ function runTitle(){
 $('#title').addEventListener('pointerdown',e=>{ if(!titleDone){ finishTitle(); titleSkipAt=performance.now(); e.preventDefault(); } },true);
 runTitle();
 
-window.scm={ PAINTS, paintAt:i=>{ const b=[...document.querySelectorAll('#ptStage .drop')][i]; if(b) b.click(); }, gfx:()=>R.is3d?R.stats():{is3d:false}, stageCfg, fetchBoard, tap, findMove, findPath, startGame, go, endGame, S, grid:()=>grid, set:g=>{grid=g;paintAll();}, state:()=>({mode,score,combo,lock,over,tiles:tileCount(),basket:basket.length}) };
+window.scm={ logStage, fetchLeague, leagueBump, PAINTS, paintAt:i=>{ const b=[...document.querySelectorAll('#ptStage .drop')][i]; if(b) b.click(); }, gfx:()=>R.is3d?R.stats():{is3d:false}, stageCfg, fetchBoard, tap, findMove, findPath, startGame, go, endGame, S, grid:()=>grid, set:g=>{grid=g;paintAll();}, state:()=>({mode,score,combo,lock,over,tiles:tileCount(),basket:basket.length}) };
 })();
 </script>
 </body>
