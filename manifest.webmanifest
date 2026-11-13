@@ -1,0 +1,17 @@
+{
+  "name": "사천성 머지",
+  "short_name": "사천성 머지",
+  "description": "같은 패 둘을 이어 한 단계씩 올리는 손 채색 목판화풍 퍼즐",
+  "lang": "ko",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#DAD2BE",
+  "theme_color": "#DAD2BE",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

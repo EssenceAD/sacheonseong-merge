@@ -5,7 +5,24 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="description" content="같은 패 둘을 이어 한 단계씩 올리는 손 채색 목판화풍 사천성 머지 퍼즐">
 <meta name="theme-color" content="#DAD2BE">
+<!-- 제목과 아이콘은 임시(placeholder)다. 바꿀 때: 아래 title·apple-mobile-web-app-title, manifest.webmanifest 의 name·short_name, icon-*.png·apple-touch-icon.png·splash.png -->
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="apple-touch-startup-image" href="splash.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="사천성 머지">
 <style>
+#loading{position:fixed; inset:0; z-index:99; background:#DAD2BE; color:#1B1714; display:flex; align-items:center; justify-content:center; transition:opacity .3s; font-family:serif}
+#loading.off{opacity:0; pointer-events:none}
+#loading div{display:flex; flex-direction:column; align-items:center; gap:14px}
+#loading b{font-size:26px; letter-spacing:.12em}
+#loading span{font-size:14px}
+#loading i{display:block; width:132px; height:8px; border:2px solid #1B1714; position:relative; overflow:hidden}
+#loading i::after{content:""; position:absolute; inset:0; background:#1B1714; transform-origin:left; animation:ldbar 1s ease-in-out infinite alternate}
+@keyframes ldbar{from{transform:scaleX(.06)}to{transform:scaleX(1)}}
 html{color-scheme:light; box-sizing:border-box; padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
 body{margin:0; font-size:14px}
 [hidden]{display:none!important}
@@ -327,6 +344,8 @@ button.chip.can{background:var(--ink); color:var(--face); animation:cardcall 1.6
 </style>
 </head>
 <body>
+<div id="loading" role="status"><div><b>사천성 머지</b><i></i><span>판을 준비하는 중…</span></div></div>
+<script>setTimeout(function(){ var l=document.getElementById('loading'); if(l) l.remove(); },9000);</script>
 <div id="grain"></div>
 <div id="sheet">
   <section id="title" class="screen">
@@ -1667,7 +1686,11 @@ function drawSettings(){
   row('배경음','류트와 하프시코드 음악',!muteAll&&bgmOn,()=>setSound('bgm'));
   row('진동','패를 맞출 때 짧게 떨림',vibOn,()=>{ vibOn=!vibOn; LS('scm-vib',vibOn?'1':'0'); if(vibOn) buzz(30); });
   row('단순 그래픽','느리거나 뜨거워지는 기기용',simple,()=>{ LS('scm-gfx',simple?'':'simple'); save(); location.reload(); });
-  $('#setNote').textContent='지금 그래픽: '+(R.is3d?(R.stats().simple?'입체 패(단순)':'입체 패'):'평면 패')+' · 단순 그래픽을 바꾸면 화면을 다시 불러옵니다';
+  if(installEvt){ const r=document.createElement('div'), d=document.createElement('div'), b=document.createElement('b'), sm=document.createElement('small'), x=document.createElement('button');
+    r.className='row'; b.textContent='홈 화면에 추가'; sm.textContent='앱처럼 바로 열기'; d.appendChild(b); d.appendChild(sm); x.type='button'; x.className='primary'; x.textContent='설치';
+    x.onclick=()=>{ const e=installEvt; installEvt=null; try{ e.prompt(); }catch(err){} drawSettings(); }; r.appendChild(d); r.appendChild(x); el.appendChild(r); }
+  const standalone=(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone;
+  $('#setNote').textContent=(standalone?'':'홈 화면에 두려면 브라우저 메뉴에서 「홈 화면에 추가」를 누르세요 · ')+'지금 그래픽: '+(R.is3d?(R.stats().simple?'입체 패(단순)':'입체 패'):'평면 패')+' · 단순 그래픽을 바꾸면 화면을 다시 불러옵니다';
 }
 /* ───────── 공방 협동: 모두가 큰 판화 한 장을 함께 칠한다(Supabase) ───────── */
 const COOP=['horsemen','uk_wave','rhino','ap_woman','nc_nuremberg','christopher','uk_fireworks','samson'];
@@ -1925,7 +1948,13 @@ function runTitle(){
   at(4050,finishTitle);
 }
 $('#title').addEventListener('pointerdown',e=>{ if(!titleDone){ finishTitle(); titleSkipAt=performance.now(); e.preventDefault(); } },true);
-runTitle();
+// 첫 로딩 화면: 글꼴과 제목 판화가 준비되면 걷고 인쇄 연출을 시작한다(길어도 4초)
+Promise.race([Promise.all([document.fonts&&document.fonts.ready, new Promise(r=>{ const i=new Image(); i.onload=i.onerror=r; i.src='art/title.webp'; })]), new Promise(r=>setTimeout(r,4000))])
+  .catch(()=>{}).then(()=>{ const l=$('#loading'); if(l){ l.classList.add('off'); setTimeout(()=>l.remove(),350); } runTitle(); });
+// 홈 화면 설치(PWA)
+let installEvt=null;
+addEventListener('beforeinstallprompt',e=>{ e.preventDefault(); installEvt=e; if(!$('#settings').hidden) drawSettings(); });
+if('serviceWorker' in navigator&&location.protocol==='https:') addEventListener('load',()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); });
 
 unlockSkins();
 window.scm={ sfx, music, audioTest(){ const a=AC(); if(!a) return null; try{ sfxBus.disconnect(); bgmBus.disconnect(); }catch(e){} const an=a.createAnalyser(); an.fftSize=2048; sfxBus.connect(an); bgmBus.connect(an); muteAll=false; sfxOn=bgmOn=true; gest=true; return {an,ac:a,bgm}; }, coFetch, coGive, get coState(){ return coState; }, setSkin, SKINS, HALLS, logStage, fetchLeague, leagueBump, PAINTS, paintAt:i=>{ const b=[...document.querySelectorAll('#ptStage .drop')][i]; if(b) b.click(); }, gfx:()=>R.is3d?R.stats():{is3d:false}, stageCfg, fetchBoard, tap, findMove, findPath, startGame, go, endGame, S, grid:()=>grid, set:g=>{grid=g;paintAll();}, state:()=>({mode,score,combo,lock,over,tiles:tileCount(),basket:basket.length}) };
