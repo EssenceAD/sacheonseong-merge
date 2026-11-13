@@ -144,6 +144,14 @@ button.primary{background:var(--ink); color:var(--face)}
 .pt > svg,.pt > img{position:absolute; inset:0; width:100%; height:100%; display:block; max-width:none}
 .pt img{pointer-events:none}
 #ptStage{width:100%; display:flex; justify-content:center; padding:18px 0}
+#setList{width:min(100%,330px); display:flex; flex-direction:column; gap:0; padding:6px 14px}
+#setList .row{display:flex; align-items:center; gap:10px; padding:11px 0; border-bottom:1px solid rgba(27,23,20,.25)}
+#setList .row:last-child{border-bottom:0}
+#setList .row div{flex:1; text-align:left}
+#setList .row b{display:block; font-size:17px}
+#setList .row small{display:block; font-size:12.5px; opacity:.85}
+#setList .row button{min-width:64px; font-size:15px; padding:7px 10px}
+#setNote{font-size:13px; text-wrap:balance}
 #ptHud,#coHud{width:100%; display:flex; align-items:center; gap:12px}
 #coHud #coNote{margin:0; flex:1; font-size:14.5px; font-weight:700; line-height:1.35; text-wrap:balance}
 #coop{justify-content:flex-start; gap:10px; padding-top:6px}
@@ -344,7 +352,7 @@ button.chip.can{background:var(--ink); color:var(--face); animation:cardcall 1.6
       <button type="button" data-go="coop">공방 · 함께 칠하기 <small id="mCoop"></small></button>
     </nav>
     <div class="rankBox"><div class="tabs" id="rankTabs"><button type="button" data-r="league">주간 리그</button><button type="button" data-r="daily">오늘의 판</button></div><div id="menuBoard" class="boardBox"></div></div>
-    <div class="pager"><button id="btnNick" class="plain" type="button"></button><button id="btnSound" class="plain" type="button">소리 켬</button></div>
+    <div class="pager"><button id="btnNick" class="plain" type="button"></button><button class="plain" type="button" data-go="settings">설정</button></div>
   </section>
 
   <section id="map" class="screen" hidden>
@@ -373,6 +381,12 @@ button.chip.can{background:var(--ink); color:var(--face); animation:cardcall 1.6
     <div id="ptHud"><div class="hc"><small>잉크</small><b id="ptInkV"></b></div><p id="ptNote"></p></div>
     <div id="ptStage"></div>
     <div id="ptBtns"></div>
+  </section>
+
+  <section id="settings" class="screen" hidden>
+    <div class="bar"><button class="plain" type="button" data-go="menu">← 메뉴</button><h2>설정</h2><span style="width:56px"></span></div>
+    <div id="setList" class="frame"></div>
+    <p class="note" id="setNote"></p>
   </section>
 
   <section id="coop" class="screen" hidden>
@@ -601,25 +615,116 @@ ${crack?`<path d="M40 22 46 42 36 56 47 68 42 84M46 42 58 46M36 56 22 62" fill="
   document.head.appendChild(st);
 }
 
-/* ───────── 소리 ───────── */
-let soundOn=true, ac=null;
-try{ if(localStorage.getItem('scm-sound')==='0') soundOn=false; }catch(e){}
-function A(){ if(!soundOn) return null; try{ ac=ac||new (window.AudioContext||window.webkitAudioContext)(); if(ac.state==='suspended') ac.resume(); return ac; }catch(e){ return null; } }
+/* ───────── 소리: 효과음(나무·프레스·금빛·인장·종)과 배경음(류트·하프시코드) ───────── */
+const LS=(k,v)=>{ try{ if(v===undefined) return localStorage.getItem(k); localStorage.setItem(k,v); }catch(e){} return null; };
+// scm-sound=0 은 전체 끔(예전 설정·시험용). 효과음·배경음·진동은 따로 끌 수 있다
+let muteAll=LS('scm-sound')==='0', sfxOn=LS('scm-sfx')!=='0', bgmOn=LS('scm-bgm')!=='0', vibOn=LS('scm-vib')!=='0';
+let ac=null, sfxBus=null, bgmBus=null, bgmIn=null, gest=false;
+function AC(){
+  try{
+    if(!ac){ ac=new (window.AudioContext||window.webkitAudioContext)();
+      sfxBus=ac.createGain(); sfxBus.gain.value=.9; sfxBus.connect(ac.destination);
+      bgmBus=ac.createGain(); bgmBus.gain.value=.5; bgmBus.connect(ac.destination);
+      // 작은 방 울림(되먹임 지연 하나)
+      bgmIn=ac.createGain(); const dl=ac.createDelay(.5), fb=ac.createGain(), lp=ac.createBiquadFilter(), wet=ac.createGain();
+      dl.delayTime.value=.21; fb.gain.value=.3; lp.type='lowpass'; lp.frequency.value=2200; wet.gain.value=.34;
+      bgmIn.connect(bgmBus); bgmIn.connect(dl); dl.connect(lp); lp.connect(fb); fb.connect(dl); lp.connect(wet); wet.connect(bgmBus); }
+    if(ac.state==='suspended'&&!document.hidden) ac.resume(); return ac;
+  }catch(e){ return null; }
+}
+function A(){ return (muteAll||!sfxOn)?null:AC(); }
 function knock(f,t=0,v=.22,d=.1){ const a=A(); if(!a) return; const o=a.createOscillator(), g=a.createGain(), s=a.currentTime+t;
   o.type='sine'; o.frequency.setValueAtTime(f*1.7,s); o.frequency.exponentialRampToValueAtTime(f,s+.025);
-  g.gain.setValueAtTime(v,s); g.gain.exponentialRampToValueAtTime(.001,s+d); o.connect(g); g.connect(a.destination); o.start(s); o.stop(s+d+.03); }
-function hiss(t,d,v,fc){ const a=A(); if(!a) return; const n=Math.ceil(a.sampleRate*d), buf=a.createBuffer(1,n,a.sampleRate), ch=buf.getChannelData(0);
-  for(let i=0;i<n;i++) ch[i]=(rnd()*2-1)*(1-i/n); const src=a.createBufferSource(), f=a.createBiquadFilter(), g=a.createGain();
-  src.buffer=buf; f.type='lowpass'; f.frequency.value=fc; g.gain.value=v; src.connect(f); f.connect(g); g.connect(a.destination); src.start(a.currentTime+t); }
+  g.gain.setValueAtTime(v,s); g.gain.exponentialRampToValueAtTime(.001,s+d); o.connect(g); g.connect(sfxBus); o.start(s); o.stop(s+d+.03); }
+function noise(t,d,v,fc,type='lowpass',q=.8){ const a=A(); if(!a) return; const n=Math.ceil(a.sampleRate*d), buf=a.createBuffer(1,n,a.sampleRate), ch=buf.getChannelData(0);
+  for(let i=0;i<n;i++) ch[i]=(Math.random()*2-1)*(1-i/n); const src=a.createBufferSource(), f=a.createBiquadFilter(), g=a.createGain();
+  src.buffer=buf; f.type=type; f.frequency.value=fc; f.Q.value=q; g.gain.value=v; src.connect(f); f.connect(g); g.connect(sfxBus); src.start(a.currentTime+t); }
+const hiss=(t,d,v,fc)=>noise(t,d,v,fc);
+// 나무 블록: 짧은 배음 셋 + 딱 하는 잡음
+function wood(f=900,t=0,v=.3){ const a=A(); if(!a) return; const s=a.currentTime+t;
+  [[1,1,.075],[2.41,.42,.045],[3.9,.18,.03]].forEach(([m,g0,d])=>{ const o=a.createOscillator(), g=a.createGain(); o.type='sine';
+    o.frequency.setValueAtTime(f*m*1.08,s); o.frequency.exponentialRampToValueAtTime(f*m,s+.012);
+    g.gain.setValueAtTime(v*g0,s); g.gain.exponentialRampToValueAtTime(.0008,s+d); o.connect(g); g.connect(sfxBus); o.start(s); o.stop(s+d+.02); });
+  noise(t,.016,v*.55,Math.min(9000,f*2.4),'bandpass',1.4); }
+// 프레스: 낮게 눌리는 소리 + 종이 쓸림
+function press(t=0,v=.4){ knock(96,t,v,.17); noise(t,.11,v*.4,650); noise(t+.03,.2,v*.1,3800,'highpass'); }
+// 금빛 반짝임: 높은 배음이 차례로 켜졌다 사라진다
+function shimmer(t=0,v=.1){ const a=A(); if(!a) return; const s=a.currentTime+t;
+  [2093,2637,3136,3951,4699,5274].forEach((f,i)=>{ const o=a.createOscillator(), g=a.createGain(), st=s+i*.045; o.type='sine'; o.frequency.value=f*(1+(Math.random()-.5)*.004);
+    g.gain.setValueAtTime(0,st); g.gain.linearRampToValueAtTime(v/(1+i*.25),st+.01); g.gain.exponentialRampToValueAtTime(.0006,st+.65+i*.08); o.connect(g); g.connect(sfxBus); o.start(st); o.stop(st+1.3); }); }
+// 인장: 묵직하게 찍고 떼는 소리
+function stamp(t=0,v=.5){ knock(140,t,v,.11); knock(62,t+.005,v*.8,.2); noise(t,.03,v*.5,1800,'bandpass'); noise(t+.1,.09,v*.08,5200,'highpass'); }
+// 종: 어긋난 배음이 길게 남는다
+function bell(f=660,t=0,v=.14,d=1.5){ const a=A(); if(!a) return; const s=a.currentTime+t;
+  [[1,1],[2,.5],[2.76,.34],[4.07,.18],[5.4,.1]].forEach(([m,g0],i)=>{ const o=a.createOscillator(), g=a.createGain(); o.type='sine'; o.frequency.value=f*m;
+    g.gain.setValueAtTime(0,s); g.gain.linearRampToValueAtTime(v*g0,s+.004); g.gain.exponentialRampToValueAtTime(.0006,s+d/(1+i*.55)); o.connect(g); g.connect(sfxBus); o.start(s); o.stop(s+d+.05); }); }
 const sfx={
-  tap:()=>knock(820,0,.12,.05),
-  bad:()=>knock(170,0,.14,.12),
-  match:(l,c)=>{ const f=520*Math.pow(1.122,l*2+c); knock(f,0,.2,.1); knock(f*1.5,.07,.2,.14); },
-  boom:()=>{ knock(70,0,.5,.5); hiss(0,.45,.4,900); knock(990,.05,.15,.2); },
-  shuffle:()=>{ for(let i=0;i<6;i++) hiss(i*.05,.05,.12,3000); },
-  win:()=>{ [660,880,990,1320].forEach((f,i)=>knock(f,i*.11,.2,.25)); }
+  tap:()=>wood(1150,0,.17),
+  bad:()=>{ wood(230,0,.24); noise(0,.06,.08,400); },
+  match:(l,c)=>{ const f=520*Math.pow(1.122,l*2+c); wood(f*1.5,0,.3); press(.05,.26); knock(f*1.5,.09,.1,.14); },
+  gold:()=>shimmer(.08,.1),
+  boom:()=>{ stamp(0,.55); noise(0,.4,.3,900); shimmer(.06,.12); },
+  shuffle:()=>{ for(let i=0;i<6;i++) wood(700+i*90,i*.05,.12); },
+  tick:(v=.14)=>wood(1700,0,v),
+  bell:(f=660,v=.14)=>bell(f,0,v,1.4),
+  stamp:()=>stamp(0,.5),
+  win:()=>{ stamp(0,.45); [523,659,784].forEach((f,i)=>bell(f,.18+i*.14,.11,1.5)); }
 };
 
+/* 배경음: 줄을 뜯는 소리(카플러스-스트롱)를 음마다 한 번 만들어 두고 박자에 맞춰 튼다 */
+const ksCache={};
+function ksBuf(a,m,ins){
+  const key=ins+m; if(ksCache[key]) return ksCache[key];
+  const sr=a.sampleRate, f=440*Math.pow(2,(m-69)/12), hp=ins==='h', b=hp?.2:.5, N=Math.max(2,Math.round(sr/f-b)), n=Math.ceil(sr*(hp?1.3:2.2)), buf=a.createBuffer(1,n,sr), ch=buf.getChannelData(0), d=new Float32Array(N), e=new Float32Array(N);
+  let prev=0; for(let i=0;i<N;i++){ const w=Math.random()*2-1; if(hp) d[i]=w; else { prev+=.42*(w-prev); d[i]=prev*1.7; } }
+  const pk=Math.max(1,Math.round(N*(hp?.11:.23))); for(let i=0;i<N;i++) e[i]=d[i]-d[(i+N-pk)%N]*.9; // 뜯는 자리에 따른 배음
+  const damp=hp?.9976:.9968; let p=0, peak=0;
+  for(let i=0;i<n;i++){ const k=(p+1)%N, v=e[p]; ch[i]=v; if(Math.abs(v)>peak) peak=Math.abs(v); e[p]=damp*((1-b)*e[p]+b*e[k]); p=k; }
+  const g=.9/(peak||1), fo=Math.floor(sr*.05); for(let i=0;i<n;i++) ch[i]*=g*(i>n-fo?(n-i)/fo:1)*(i<24?i/24:1);
+  return ksCache[key]=buf;
+}
+// 코드: [베이스, [화음 셋]] · arp: [박, 화음 번호] · mel: 마디마다 [박, 음]
+const TRACKS={
+ menu:{bpm:66,beats:3,ins:'l',melEvery:1,
+  ch:[[45,[57,60,64]],[41,[57,60,65]],[48,[55,60,64]],[43,[55,59,62]],[45,[57,60,64]],[41,[57,60,65]],[48,[55,60,64]],[40,[56,59,64]]],
+  bass:[[0,0]], arp:[[.5,0],[1,1],[1.5,2],[2,1],[2.5,0]],
+  mel:[[[0,76],[2,72]],[[0,69],[2,72]],[[0,76],[1.5,74],[2,72]],[[0,74]],[[0,72],[2,76]],[[0,77],[2,76]],[[0,72],[1,74],[2,76]],[[0,71],[2,68]]]},
+ board:{bpm:100,beats:4,ins:'h',melEvery:2,
+  ch:[[38,[62,65,69]],[36,[60,64,67]],[41,[60,65,69]],[36,[60,64,67]],[34,[62,65,70]],[41,[60,65,69]],[43,[62,67,70]],[45,[61,64,69]]],
+  bass:[[0,0],[2,1]], arp:[[0,0],[.5,2],[1,1],[1.5,2],[2,0],[2.5,2],[3,1],[3.5,2]],
+  mel:[[[0,81],[2,77],[3,74]],[[0,76],[2,72]],[[0,77],[1,79],[2,81]],[[0,79],[2,76]],[[0,77],[2,74]],[[0,72],[2,77]],[[0,79],[1,77],[2,74]],[[0,73],[2,76]]]},
+ paint:{bpm:56,beats:4,ins:'l',melEvery:1,
+  ch:[[43,[59,62,67]],[40,[59,64,67]],[48,[60,64,67]],[50,[57,62,66]],[43,[59,62,67]],[47,[59,62,66]],[48,[60,64,67]],[50,[57,62,67]]],
+  bass:[[0,0]], arp:[[1,0],[1.5,1],[2,2],[3,1]],
+  mel:[[[0,74],[2.5,71]],[[0,76],[2,79]],[[0,76],[2.5,72]],[[0,74],[2,69]],[[0,71],[2,74]],[[0,78],[2.5,74]],[[0,76],[2,72]],[[0,74],[2.5,66]]]}
+};
+const bgm={name:null,want:null,bar:0,pass:0,next:0,timer:0,sw:0,out:null};
+function bgmNote(m,t,v,ins){ const s=ac.createBufferSource(), g=ac.createGain(); s.buffer=ksBuf(ac,m,ins); g.gain.value=v; s.connect(g); g.connect(bgm.out); s.start(t);
+  if(ins==='h'){ const s2=ac.createBufferSource(), g2=ac.createGain(); s2.buffer=ksBuf(ac,m+12,'h'); g2.gain.value=v*.32; s2.connect(g2); g2.connect(bgm.out); s2.start(t+.004); } }
+function bgmBar(T,bar,t0,pass){
+  const spb=60/T.bpm, c=T.ch[bar%T.ch.length], h=()=>(Math.random()-.5)*.014;
+  T.bass.forEach(([bt,k])=>bgmNote(c[0]+(k?7:0),t0+bt*spb+h(),.5,'l'));
+  T.arp.forEach(([bt,i])=>bgmNote(c[1][i],t0+bt*spb+h(),(T.ins==='h'?.16:.26)+Math.random()*.05,T.ins));
+  if(pass%T.melEvery===T.melEvery-1) (T.mel[bar%T.mel.length]||[]).forEach(([bt,m])=>bgmNote(m,t0+bt*spb+h(),T.ins==='h'?.3:.42,T.ins));
+}
+function bgmTick(){
+  if(!ac||!bgm.name||ac.state!=='running') return; const T=TRACKS[bgm.name], len=T.beats*60/T.bpm;
+  while(bgm.next<ac.currentTime+.4){ if(bgm.next<ac.currentTime+.03) bgm.next=ac.currentTime+.06; bgmBar(T,bgm.bar,bgm.next,bgm.pass); bgm.next+=len; bgm.bar++; if(bgm.bar%T.ch.length===0) bgm.pass++; }
+}
+function bgmStop(){ clearInterval(bgm.timer); clearTimeout(bgm.sw); bgm.name=null; const o=bgm.out; bgm.out=null;
+  if(o&&ac){ o.gain.setTargetAtTime(0,ac.currentTime,.12); setTimeout(()=>{ try{ o.disconnect(); }catch(e){} },900); } }
+function music(name){
+  bgm.want=name; if(!gest) return;
+  if(muteAll||!bgmOn||!name){ bgmStop(); return; }
+  const a=AC(); if(!a||bgm.name===name) return;
+  const was=!!bgm.name; bgmStop();
+  bgm.sw=setTimeout(()=>{ if(bgm.want!==name||muteAll||!bgmOn) return;
+    bgm.out=a.createGain(); bgm.out.gain.value=0; bgm.out.connect(bgmIn); bgm.out.gain.setTargetAtTime(1,a.currentTime,.35);
+    bgm.name=name; bgm.bar=0; bgm.pass=0; bgm.next=a.currentTime+.15; bgm.timer=setInterval(bgmTick,150); bgmTick(); },was?450:30);
+}
+const musicFor=id=>id==='game'?'board':(id==='paint'||id==='album'||id==='coop')?'paint':'menu';
+addEventListener('pointerdown',()=>{ if(gest) return; gest=true; if(bgm.want) music(bgm.want); },{capture:true,passive:true});
+document.addEventListener('visibilitychange',()=>{ if(!ac) return; try{ if(document.hidden) ac.suspend(); else if(gest) ac.resume(); }catch(e){} });
 
 /* ───────── 저장 ───────── */
 const SAVE='scm-save-v1';
@@ -934,7 +1039,7 @@ function buildAtlas(){
 const GFX=(()=>{ try{ return new URLSearchParams(location.search).get('gfx'); }catch(e){ return null; } })();
 (function init3D(){
   if(GFX==='2d') return;
-  const low=GFX==='simple'||(navigator.deviceMemory&&navigator.deviceMemory<=3)||(navigator.hardwareConcurrency&&navigator.hardwareConcurrency<=3);
+  const low=GFX==='simple'||LS('scm-gfx')==='simple'||(navigator.deviceMemory&&navigator.deviceMemory<=3)||(navigator.hardwareConcurrency&&navigator.hardwareConcurrency<=3);
   const r3=make3D(!!low); if(!r3) return;
   buildAtlas().then(cv=>{ r3.setAtlas(cv); r3.colors(); board.insertBefore(r3.canvas,pathLayer); board.classList.add('gl'); R=r3; r3.resize(); if(grid.length) paintAll(); })
     .catch(()=>{});
@@ -1065,7 +1170,7 @@ function setCombo(c){
   if(comboAnim) comboAnim.cancel(); clearTimeout(comboTO);
   if(c>0){ comboAnim=bar.animate({width:['100%','0%']},{duration:COMBO_MS,easing:'linear'}); comboTO=setTimeout(()=>{$('#comboLabel').textContent='연속 ×1'; $('#comboRow').style.visibility='hidden';},COMBO_MS); }
 }
-const buzz=p=>{ try{ if(navigator.vibrate&&(!navigator.userActivation||navigator.userActivation.hasBeenActive)) navigator.vibrate(p); }catch(e){} };
+const buzz=p=>{ try{ if(vibOn&&navigator.vibrate&&(!navigator.userActivation||navigator.userActivation.hasBeenActive)) navigator.vibrate(p); }catch(e){} };
 
 
 /* ───────── 한 수 ───────── */
@@ -1110,7 +1215,7 @@ function doMatch(a,b,path,g){
     const cx=(b.x+.5)*cw, cy=(b.y+.5)*ch; let pts, fxN=0;
     if(lvl<MAXL){
       grid[a.y][a.x]=null; grid[b.y][b.x]={k:g.k,l:lvl+1}; paint(a.x,a.y); paint(b.x,b.y);
-      if(lvl+1===MAXL) S.rec[mode].gold++;
+      if(lvl+1===MAXL){ S.rec[mode].gold++; sfx.gold(); }
       // 눌렸다 튕김
       R.bounce(b.x,b.y);
       const cr=crumble(b); fxN=cr+freeNear(b,g.k,false);
@@ -1419,10 +1524,10 @@ function timeWarn(sec){
   const t=$('#time'), w=$('#boardWrap');
   t.classList.toggle('low',sec<=30); t.classList.toggle('crit',sec<=10); w.classList.toggle('danger',sec<=5&&sec>0);
   const pulse=k=>t.animate({scale:[String(k),'1']},{duration:420,easing:'ease-out'});
-  if(sec===30){ toast('30초 남았습니다',1300); pulse(1.5); knock(660,0,.18,.14); buzz(30); }
-  else if(sec===10){ toast('10초 남았습니다',1100); pulse(1.7); knock(880,0,.2,.1); knock(880,.15,.2,.1); buzz([30,60,30]); }
-  else if(sec<10&&sec>5){ pulse(1.3); knock(880,0,.12,.06); }
-  else if(sec<=5&&sec>0){ if(sec===5) toast('5초 남았습니다',800); pulse(1.9); knock(1180,0,.24,.09); buzz(45);
+  if(sec===30){ toast('30초 남았습니다',1300); pulse(1.5); sfx.bell(660,.13); buzz(30); }
+  else if(sec===10){ toast('10초 남았습니다',1100); pulse(1.7); sfx.bell(880,.15); buzz([30,60,30]); }
+  else if(sec<10&&sec>5){ pulse(1.3); sfx.tick(.12); }
+  else if(sec<=5&&sec>0){ if(sec===5) toast('5초 남았습니다',800); pulse(1.9); sfx.tick(.24); buzz(45);
     w.animate({outlineWidth:['6px','3px']},{duration:500,easing:'ease-out'}); }
 }
 function clearWarn(){ warnSec=1e9; $('#time').classList.remove('low','crit'); $('#boardWrap').classList.remove('danger'); }
@@ -1484,7 +1589,7 @@ function showResult(win,msg,t,was,neu){
   if(mode==='daily') Promise.resolve(subP).then(r=>drawBoard(rb,5,r==='fail'?'내 기록을 보내지 못했습니다':''));
   const st=$('#stamp'); st.hidden=!(win&&Object.keys(neu).length); st.classList.remove('hit');
   $('#result').hidden=false;
-  if(!st.hidden){ void st.offsetWidth; st.classList.add('hit'); setTimeout(()=>{ knock(140,0,.4,.18); buzz(40); },150); }
+  if(!st.hidden){ void st.offsetWidth; st.classList.add('hit'); setTimeout(()=>{ sfx.stamp(); buzz(40); },150); }
 }
 
 /* ───────── 판화 채색 메타: 잉크로 명작 판화를 한 칸씩 칠한다 ───────── */
@@ -1538,7 +1643,7 @@ function paintAt(i,btn){
 // 한 장 완성: 액자에 넣어 앨범으로
 function framePaint(p){
   if(!S.paint.album.includes(p.id)) S.paint.album.push(p.id); save();
-  ptEl.classList.add('framed','in'); knock(120,0,.3,.22); knock(660,.25,.18,.3); buzz([30,50,30]);
+  ptEl.classList.add('framed','in'); sfx.stamp(); sfx.bell(784,.1); buzz([30,50,30]);
   $('#ptNote').textContent='완성! 전시관에 걸었습니다'; $('#ptInkV').textContent=S.ink;
   const bt=$('#ptBtns'); bt.textContent='';
   const add=(label,fn,cls)=>{ const x=document.createElement('button'); x.type='button'; x.textContent=label; if(cls) x.className=cls; x.onclick=fn; bt.appendChild(x); };
@@ -1546,6 +1651,23 @@ function framePaint(p){
   if(hall&&hallDone(hall.id)) $('#ptNote').textContent=hall.id+'관 「'+hall.name+'」 완성!'+(newSkin?' 패 스킨 「'+SKINS[newSkin.skin].name+'」이 열렸습니다':'');
   if(newSkin) add('패 스킨 보기',()=>go('codex'),'primary');
   if(paintIdx()<PAINTS.length) add('다음 판화',drawPaint,newSkin?'':'primary'); add('전시관 보기',()=>{ albNext=p.hall||1; go('album'); });
+}
+/* ───────── 설정 ───────── */
+function setSound(which){
+  const cur=!muteAll&&(which==='sfx'?sfxOn:bgmOn);
+  if(muteAll){ muteAll=false; sfxOn=which==='sfx'; bgmOn=which==='bgm'; } else if(which==='sfx') sfxOn=!cur; else bgmOn=!cur;
+  LS('scm-sound','1'); LS('scm-sfx',sfxOn?'1':'0'); LS('scm-bgm',bgmOn?'1':'0'); if(which==='sfx'&&sfxOn) sfx.tap(); music(bgm.want||'menu');
+}
+function drawSettings(){
+  const el=$('#setList'), simple=LS('scm-gfx')==='simple'; el.textContent='';
+  const row=(name,sub,on,fn)=>{ const r=document.createElement('div'), d=document.createElement('div'), b=document.createElement('b'), sm=document.createElement('small'), x=document.createElement('button');
+    r.className='row'; b.textContent=name; sm.textContent=sub; d.appendChild(b); d.appendChild(sm); x.type='button'; x.textContent=on?'켬':'끔'; if(on) x.className='armed'; x.setAttribute('aria-pressed',on); x.setAttribute('aria-label',name+' '+(on?'켬':'끔'));
+    x.onclick=()=>{ fn(); drawSettings(); }; r.appendChild(d); r.appendChild(x); el.appendChild(r); };
+  row('효과음','패 맞추는 소리, 인장, 종',!muteAll&&sfxOn,()=>setSound('sfx'));
+  row('배경음','류트와 하프시코드 음악',!muteAll&&bgmOn,()=>setSound('bgm'));
+  row('진동','패를 맞출 때 짧게 떨림',vibOn,()=>{ vibOn=!vibOn; LS('scm-vib',vibOn?'1':'0'); if(vibOn) buzz(30); });
+  row('단순 그래픽','느리거나 뜨거워지는 기기용',simple,()=>{ LS('scm-gfx',simple?'':'simple'); save(); location.reload(); });
+  $('#setNote').textContent='지금 그래픽: '+(R.is3d?(R.stats().simple?'입체 패(단순)':'입체 패'):'평면 패')+' · 단순 그래픽을 바꾸면 화면을 다시 불러옵니다';
 }
 /* ───────── 공방 협동: 모두가 큰 판화 한 장을 함께 칠한다(Supabase) ───────── */
 const COOP=['horsemen','uk_wave','rhino','ap_woman','nc_nuremberg','christopher','uk_fireworks','samson'];
@@ -1557,7 +1679,7 @@ async function coFetch(){ const r=await sb('rpc/scm_coop_state',{method:'POST',b
 // 내가 참여한 판화가 완성됐으면 한 번만 보상
 function coClaim(st){
   const got=S.coop||(S.coop=[]); let n=0; (st&&st.won||[]).forEach(id=>{ if(!got.includes(id)){ got.push(id); n++; } });
-  if(n){ S.ink+=COOP_PRIZE*n; save(); toast('함께 칠한 판화가 완성됐습니다! 잉크 +'+COOP_PRIZE*n,2800); knock(120,0,.3,.22); knock(660,.25,.18,.3); }
+  if(n){ S.ink+=COOP_PRIZE*n; save(); toast('함께 칠한 판화가 완성됐습니다! 잉크 +'+COOP_PRIZE*n,2800); sfx.stamp(); sfx.bell(784,.1); }
   return n;
 }
 function coMenu(){
@@ -1709,8 +1831,8 @@ function drawRec(){
 }
 document.querySelectorAll('#recTabs button').forEach(x=>{ x.onclick=()=>{ recTab=x.dataset.tab; drawRec(); }; });
 document.querySelectorAll('#rankTabs button').forEach(x=>{ x.onclick=()=>{ rankTab=x.dataset.r; drawRank(); }; });
-const SCREENS=['coop','title','menu','map','records','codex','game','paint','album'];
-function show(id){ SCREENS.forEach(s=>{ $('#'+s).hidden=s!==id; }); }
+const SCREENS=['settings','coop','title','menu','map','records','codex','game','paint','album'];
+function show(id){ SCREENS.forEach(s=>{ $('#'+s).hidden=s!==id; }); music(musicFor(id)); }
 function go(id){
   $('#result').hidden=true;
   if(id==='daily'){ if(!S.nick){ askNick('daily'); return; } startGame('daily'); return; }
@@ -1728,6 +1850,7 @@ function go(id){
   }
   if(id==='codex') drawSkins();
   if(id==='coop'){ if(!S.nick){ askNick('coop'); return; } coOpen(); }
+  if(id==='settings') drawSettings();
   if(id==='paint') drawPaint();
   if(id==='album') drawAlbum();
   if(id==='codex'){
@@ -1748,10 +1871,9 @@ $('#btnStart').onclick=()=>{ if(!titleDone||performance.now()-titleSkipAt<350) r
 $('#btnNick').onclick=askNick;
 $('#nickForm').addEventListener('submit',e=>{ e.preventDefault(); const v=$('#nickInput').value.trim().slice(0,12); if(!v) return; S.nick=v; save(); $('#nickDlg').hidden=true; go(nickNext); });
 $('#btnBack').onclick=()=>go(mode==='journey'?'map':'menu');
-const soundLabel=()=>{ $('#btnSound').textContent=soundOn?'소리 켬':'소리 끔'; };
-$('#btnSound').onclick=()=>{ soundOn=!soundOn; soundLabel(); try{ localStorage.setItem('scm-sound',soundOn?'1':'0'); }catch(e){} if(soundOn) sfx.tap(); };
+
+
 let rz=0; window.addEventListener('resize',()=>{ clearTimeout(rz); rz=setTimeout(()=>{ if(!$('#game').hidden) layout(); },80); });
-soundLabel();
 /* ───────── 타이틀: 인쇄 연출 (롤러 → 종이 압착 → 색판 4번) ───────── */
 let titleDone=false, titleSkipAt=0; const titleTimers=[], titleAnims=[];
 function buildTitle(){
@@ -1806,7 +1928,7 @@ $('#title').addEventListener('pointerdown',e=>{ if(!titleDone){ finishTitle(); t
 runTitle();
 
 unlockSkins();
-window.scm={ coFetch, coGive, get coState(){ return coState; }, setSkin, SKINS, HALLS, logStage, fetchLeague, leagueBump, PAINTS, paintAt:i=>{ const b=[...document.querySelectorAll('#ptStage .drop')][i]; if(b) b.click(); }, gfx:()=>R.is3d?R.stats():{is3d:false}, stageCfg, fetchBoard, tap, findMove, findPath, startGame, go, endGame, S, grid:()=>grid, set:g=>{grid=g;paintAll();}, state:()=>({mode,score,combo,lock,over,tiles:tileCount(),basket:basket.length}) };
+window.scm={ sfx, music, audioTest(){ const a=AC(); if(!a) return null; try{ sfxBus.disconnect(); bgmBus.disconnect(); }catch(e){} const an=a.createAnalyser(); an.fftSize=2048; sfxBus.connect(an); bgmBus.connect(an); muteAll=false; sfxOn=bgmOn=true; gest=true; return {an,ac:a,bgm}; }, coFetch, coGive, get coState(){ return coState; }, setSkin, SKINS, HALLS, logStage, fetchLeague, leagueBump, PAINTS, paintAt:i=>{ const b=[...document.querySelectorAll('#ptStage .drop')][i]; if(b) b.click(); }, gfx:()=>R.is3d?R.stats():{is3d:false}, stageCfg, fetchBoard, tap, findMove, findPath, startGame, go, endGame, S, grid:()=>grid, set:g=>{grid=g;paintAll();}, state:()=>({mode,score,combo,lock,over,tiles:tileCount(),basket:basket.length}) };
 })();
 </script>
 </body>
