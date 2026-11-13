@@ -17,6 +17,7 @@
 | G | 코뿔소 The Rhinoceros (MM2134) | 알브레히트 뒤러 · 1515 | The Metropolitan Museum of Art | CC0 | https://commons.wikimedia.org/wiki/File:The_Rhinoceros_MET_MM2134.jpg |
 | H | 사자를 찢는 삼손 Samson Rending the Lion (DP816583) | 알브레히트 뒤러 · 1497년경 | The Metropolitan Museum of Art | CC0 | https://commons.wikimedia.org/wiki/File:Samson_Rending_the_Lion_MET_DP816583.jpg |
 | I | 토끼 세 마리와 성가족 The Holy Family with Three Hares (DP816951) | 알브레히트 뒤러 · 1497년경 | The Metropolitan Museum of Art | CC0 | https://commons.wikimedia.org/wiki/File:The_Holy_Family_with_Three_Hares_MET_DP816951.jpg |
+| K | 성 미카엘과 용 Saint Michael Fighting the Dragon, from The Apocalypse (DP816922) | 알브레히트 뒤러 · 1498년경(이 인쇄본은 1511년 판) | The Metropolitan Museum of Art | CC0 | https://commons.wikimedia.org/wiki/File:Saint_Michael_Fighting_the_Dragon,_from_The_Apocalypse_MET_DP816922.jpg |
 | J | 묵시록의 네 기사 The Four Horsemen, from The Apocalypse (DP816773) | 알브레히트 뒤러 · 1498 | The Metropolitan Museum of Art | CC0 | https://commons.wikimedia.org/wiki/File:The_Four_Horsemen,_from_The_Apocalypse_MET_DP816773.jpg |
 
 ## 어디에 쓰였나
@@ -34,7 +35,7 @@
 | 채색 판화 2 장미 | `art/rosa.webp` | B |
 | 채색 판화 3 둥근 지붕과 황제관 | `art/p_crown.webp` | C |
 | 채색 판화 4 성 베드로 | `art/p_petrus1552.webp` | D |
-| 채색 판화 5 열쇠를 든 베드로 | `art/p_petrus1503.webp` | E |
+| 채색 판화 5 성 미카엘과 용 | `art/p_michael.webp` | K |
 | 채색 판화 6 성 크리스토포로스 | `art/p_christopher.webp` | F |
 | 채색 판화 7 코뿔소 | `art/rhino.webp` | G |
 | 채색 판화 8 사자를 찢는 삼손 | `art/p_samson.webp` | H |
