@@ -354,6 +354,7 @@ button.primary{background:var(--ink); color:var(--face)}
 </div>
 
 <script src="art.js"></script>
+<script src="paints.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 (()=>{
@@ -431,8 +432,12 @@ const MT='transform="translate(38 48) scale(.86) translate(-40 -50)"';
 function tileSVG(k,l){
   const m=MOTIF[k], c=KC[k], seed=3+k*13+l*5;
   // 실제 목판화에서 오려 낸 문양(art.js). 없으면 예전 선화로 그린다
-  const A=window.ART&&window.ART[k]; let ax=0, ay=0, aw=0, ah=0;
-  if(A){ const r=A.w/A.h, z=l>=5?.78:1; if(r>54/61){ aw=54*z; ah=54*z/r; } else { ah=61*z; aw=61*z*r; } ax=38-aw/2; ay=43-ah/2; } // 5단계는 먹 바탕이 보이도록 조금 작게
+  const A=window.ART&&(k===2&&l>=5&&window.ART[5]?window.ART[5]:window.ART[k]); let ax=0, ay=0, aw=0, ah=0, spikes='';
+  if(A){ const r=A.w/A.h, z=(l>=5?.78:1)*(k===0?.76:1); if(r>54/61){ aw=54*z; ah=54*z/r; } else { ah=61*z; aw=61*z*r; } ax=38-aw/2; ay=43-ah/2;
+    if(k===0){ // 해: 원판 둘레에 뾰족한 광선
+      const rx=aw/2*.97, ry=ah/2*.97, L=aw*.27; let d='';
+      for(let i=0;i<14;i++){ const a=i/14*6.2832, q=(t,e)=>(38+Math.cos(t)*(rx+e)).toFixed(1)+' '+(43+Math.sin(t)*(ry+e)).toFixed(1); d+='M'+q(a-.14,0)+'L'+q(a,L)+'L'+q(a+.14,0)+'Z'; }
+      spikes='<path d="'+d+'" fill="'+K+'"/>'; } } // 5단계는 먹 바탕이 보이도록 조금 작게
   const box=`x="${ax.toFixed(1)}" y="${ay.toFixed(1)}" width="${aw.toFixed(1)}" height="${ah.toFixed(1)}"`;
   let s=`<svg xmlns="${NS}" viewBox="0 0 80 100" preserveAspectRatio="none"><defs>${inkFilter('ink',seed)}${inkFilter('ink2',seed+31,1.6,-7.9)}${grainFilter}<clipPath id="in"><rect x="9.5" y="9.5" width="57" height="67" rx="2"/></clipPath><clipPath id="face"><rect x="2" y="2" width="72" height="92" rx="7"/></clipPath><clipPath id="sh"><path d="${m.shade}"/></clipPath>${A?`<mask id="pm" maskUnits="userSpaceOnUse" ${box}><image href="${A.plate}" ${box} preserveAspectRatio="none"/></mask><filter id="hal" x="-15%" y="-15%" width="130%" height="130%"><feMorphology operator="dilate" radius="${l>=5?1.4:2.6}"/></filter>`:''}</defs>`;
   // 패 두께(먹) + 종이 면 + 종이 결
@@ -456,7 +461,7 @@ function tileSVG(k,l){
     s+=`<rect x="8.5" y="8.5" width="59" height="69" rx="2" fill="none" stroke="${K}" stroke-width="2.5"/>`;
     s+=`<path fill="${K}" d="M8.5 8.5h13a13 13 0 0 1-13 13zM67.5 8.5h-13a13 13 0 0 0 13 13zM8.5 77.5h13a13 13 0 0 0-13-13zM67.5 77.5h-13a13 13 0 0 1 13-13zM38 5.2l4 3.3-4 3.3-4-3.3zM5.4 43l3.1-4 3.1 4-3.1 4zM64.4 43l3.1-4 3.1 4-3.1 4z"/>`;
   }
-  s+=A?`</g><image href="${A.ink}" ${box} preserveAspectRatio="none"/>`:`<g ${MT} fill="none" stroke="${K}" stroke-linejoin="round" stroke-linecap="round"><g stroke-width="4.2">${m.line}</g><g clip-path="url(#sh)"><path d="${HATCH}" stroke-width="1.15"/></g></g></g>`;
+  s+=A?`</g>${spikes}<image href="${A.ink}" ${box} preserveAspectRatio="none"/>`:`<g ${MT} fill="none" stroke="${K}" stroke-linejoin="round" stroke-linecap="round"><g stroke-width="4.2">${m.line}</g><g clip-path="url(#sh)"><path d="${HATCH}" stroke-width="1.15"/></g></g></g>`;
   // 단계 점: 흑백에서도 단계를 셀 수 있게
   if(l>=5) s+=`<rect x="8.5" y="79.4" width="59" height="12.2" rx="2" fill="${K}"/>`; // 5단계는 먹 띠 위에 금빛 점
   for(let i=0;i<l;i++) s+=`<circle cx="${(38+(i-(l-1)/2)*10.4).toFixed(1)}" cy="85.4" r="4.3" fill="${l>=5?GL:K}" stroke="${l>=5?K:P}" stroke-width="1.3"/>`;
@@ -1248,7 +1253,7 @@ function endGame(win,why){
   } else b.cur=0;
   if(maxCombo>b.combo){ b.combo=maxCombo; neu.combo=1; }
   let dailyNote='';
-  if(mode==='daily'&&win){ const d=today(); if(S.daily[d]) dailyNote='오늘 기록은 이미 남겼습니다'; else S.daily[d]={score,time:t,combo:maxCombo,hints}; subP=sendDaily(); }
+  if(mode==='daily'&&win){ const d=today(); if(S.daily[d]) dailyNote='오늘 기록은 이미 남겼습니다'; else { S.daily[d]={score,time:t,combo:maxCombo,hints}; subP=sendDaily(); S.ink+=2; gotInk=2; } } // 하루 한 번 잉크 2
   save();
   setTimeout(()=>showResult(win,why||dailyNote,t,was,tut?{}:neu),win?550:350);
 }
@@ -1258,7 +1263,7 @@ function showResult(win,msg,t,was,neu){
   const notes=[]; if(msg) notes.push(msg);
   if(mode==='daily') notes.push('힌트 '+hints+'회'+(hints?' (+'+hints*10+'초)':'')); else if(win&&b.cur>=2) notes.push(b.cur+'연승');
   if(mode==='journey'&&win) notes.unshift(starStr(gotStars));
-  if(gotInk) notes.push('\n잉크 +1 → 모은 잉크 '+S.ink+'\n판화 한 칸 = 잉크 '+INK_COST);
+  if(gotInk) notes.push('\n잉크 +'+gotInk+' → 모은 잉크 '+S.ink+'\n판화 한 칸 = 잉크 '+INK_COST);
   $('#resMsg').textContent=notes.join(' · ').replace(' · \n','\n'); $('#resMsg').hidden=!notes.length;
   const row=(name,now,best,isNew)=>`<tr><td>${name}</td><td class="${isNew?'new':''}">${now}</td><td>${best}</td></tr>`;
   $('#resTable').innerHTML='<tr><th></th><th>이번</th><th>최고</th></tr>'
@@ -1269,7 +1274,7 @@ function showResult(win,msg,t,was,neu){
   const btns=$('#resBtns'), sb=$('#shareBox'); btns.textContent=''; sb.hidden=true;
   const add=(label,fn)=>{ const x=document.createElement('button'); x.type='button'; x.textContent=label; x.onclick=()=>fn(x); btns.appendChild(x); };
   if(mode==='journey'){ if(win) add('다음 단계',()=>startGame('journey',jStage+1)); else if(!win) add('다시 도전',()=>startGame('journey',jStage)); }
-  if(mode==='journey'&&win&&S.ink>=INK_COST&&S.paint.cur<PAINTS.length){ add('판화 칠하기',()=>go('paint')); if(jStage===TUT_N) btns.insertBefore(btns.lastChild,btns.firstChild); }
+  if((mode==='journey'||mode==='daily')&&win&&S.ink>=INK_COST&&paintIdx()<PAINTS.length){ add('판화 칠하기',()=>go('paint')); if(jStage===TUT_N) btns.insertBefore(btns.lastChild,btns.firstChild); }
   if(mode==='basket') add('다시 하기',()=>startGame('basket'));
   if(mode==='daily'&&S.daily[today()]) add('공유 문구 복사',x=>{
     const d=today(), r=S.daily[d], text=`사천성 머지 · 오늘의 판 ${d}\n점수 ${fmtN(r.score)} · ${fmtT(r.time)} · 연속 ×${Math.max(1,r.combo)} · 힌트 ${r.hints||0}회`;
@@ -1287,36 +1292,11 @@ function showResult(win,msg,t,was,neu){
 
 /* ───────── 판화 채색 메타: 잉크로 명작 판화를 한 칸씩 칠한다 ───────── */
 const INK_COST=3;
-// c = 물감(0 주홍·1 군청·2 자주·3 청록·4 황토), at = 물방울 자리, s = 칠해질 모양(먹선 아래에 깔려 조금 삐져나온다)
-const PAINTS=[
- {id:'rhino',title:'코뿔소',by:'알브레히트 뒤러 · 1515',src:'art/rhino.webp',w:960,h:702,regions:[
-   {c:3,at:[800,640],s:'<polygon points="10,548 300,535 480,540 640,560 780,585 945,590 945,690 10,690"/>'},
-   {c:1,at:[230,565],s:'<polygon points="60,520 120,540 150,470 190,430 290,445 300,560 330,600 320,640 250,650 150,690 50,690 40,600"/><polygon points="480,440 580,450 600,560 650,600 640,640 520,690 470,680 470,560"/>'},
-   {c:2,at:[95,380],s:'<polygon points="22,290 60,250 165,235 185,330 190,430 150,470 120,540 60,520 22,440 15,360"/>'},
-   {c:4,at:[310,270],s:'<polygon points="165,150 200,110 280,95 480,100 500,170 470,235 440,300 450,420 380,440 290,445 200,420 170,330 160,230"/><polygon points="75,110 250,38 285,95 200,110 165,150 60,250 30,190"/>'},
-   {c:0,at:[550,290],s:'<polygon points="440,300 470,235 500,170 520,60 600,90 640,180 650,300 640,400 580,450 480,440 450,420"/>'},
-   {c:2,at:[760,340],s:'<polygon points="640,180 700,170 770,200 790,250 860,250 880,330 935,395 945,470 905,550 850,555 800,470 720,440 680,480 640,400 650,300"/>'},
-   {c:4,at:[815,205],s:'<polygon points="925,310 945,320 945,400 905,400"/><polygon points="775,170 840,165 875,180 850,250 790,250"/>'}
- ]},
- {id:'sunmoon',title:'해와 달',by:'뉘른베르크 연대기 · 1493',src:'art/title.webp',w:640,h:627,
-  defs:'<mask id="smc" maskUnits="userSpaceOnUse" x="0" y="0" width="640" height="627"><circle cx="455" cy="345" r="188" fill="#fff"/><circle cx="402" cy="336" r="168" fill="#000"/></mask>',regions:[
-   {c:0,at:[110,200],s:'<circle cx="225" cy="330" r="212"/>'},
-   {c:4,at:[235,340],s:'<circle cx="235" cy="336" r="88"/>'},
-   {c:1,at:[600,400],s:'<g mask="url(#smc)"><circle cx="455" cy="345" r="188"/></g>'},
-   {c:2,at:[490,385],s:'<ellipse cx="482" cy="352" rx="58" ry="112"/>'},
-   {c:3,at:[500,200],s:'<polygon points="445,150 540,170 560,250 470,272 440,210"/>'}
- ]},
- {id:'rosa',title:'장미',by:'건강의 정원 · 1485',src:'art/rosa.webp',w:640,h:864,regions:[
-   {c:4,at:[318,560],s:'<path fill="none" stroke-width="24" d="M270 195 300 430 325 610 395 770M300 330 380 210M250 420 205 300M330 600 392 440"/>'},
-   {c:3,at:[130,480],s:'<polygon points="40,370 120,345 200,400 250,470 215,600 60,615 35,500"/><ellipse cx="380" cy="262" rx="62" ry="36"/>'},
-   {c:0,at:[268,150],s:'<ellipse cx="268" cy="150" rx="28" ry="48"/>'},
-   {c:2,at:[425,130],s:'<circle cx="425" cy="130" r="82"/>'},
-   {c:0,at:[170,235],s:'<circle cx="170" cy="235" r="78"/>'},
-   {c:2,at:[460,395],s:'<circle cx="460" cy="395" r="82"/>'}
- ]}
-];
+const PAINTS=window.PAINTS||[]; // 판화 목록과 채색 영역은 paints.js 에 있다
+// 지금 칠할 판화 = 목록에서 아직 앨범에 없는 첫 장
+const paintIdx=()=>{ const i=PAINTS.findIndex(p=>!S.paint.album.includes(p.id)); return i<0?PAINTS.length:i; };
 const DROP='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.500c4 5 6 8 6 11a6 6 0 0 1-12 0c0-3 2-6 6-11z"/></svg>'.replace('.500','.5');
-const curPaint=()=>PAINTS[Math.min(S.paint.cur,PAINTS.length-1)];
+const curPaint=()=>PAINTS[Math.min(paintIdx(),PAINTS.length-1)];
 const paintDone=p=>S.paint.done[p.id]||(S.paint.done[p.id]=[]);
 function ptBuild(p,done){
   const el=document.createElement('div'); el.className='pt'; el.style.aspectRatio=p.w+' / '+p.h;
@@ -1337,13 +1317,13 @@ function seep(el,p,i,x,y){
 }
 let ptEl=null;
 function ptNote(){
-  const fin=S.paint.cur>=PAINTS.length, p=curPaint(), left=fin?0:p.regions.length-paintDone(p).length, n=$('#ptNote'), bt=$('#ptBtns');
+  const fin=paintIdx()>=PAINTS.length, p=curPaint(), left=fin?0:p.regions.length-paintDone(p).length, n=$('#ptNote'), bt=$('#ptBtns');
   $('#ptInkV').textContent=S.ink; bt.textContent='';
   n.textContent=fin?'준비된 판화를 모두 완성했습니다':left===0?'':S.ink>=INK_COST?'물방울을 누르면 그 부분이 칠해집니다 (한 칸 = 잉크 '+INK_COST+')':'잉크가 '+(INK_COST-S.ink)+' 더 필요합니다. 여정 한 단계를 깨면 잉크 1';
   if(!fin&&left>0&&S.ink<INK_COST){ const x=document.createElement('button'); x.type='button'; x.className='primary'; x.textContent='여정 계속하기 (잉크 +1)'; x.onclick=()=>startGame('journey',S.jour+1); bt.appendChild(x); }
 }
 function drawPaint(){
-  const fin=S.paint.cur>=PAINTS.length, p=curPaint(), done=fin?p.regions.map((r,i)=>i):paintDone(p);
+  const fin=paintIdx()>=PAINTS.length, p=curPaint(), done=fin?p.regions.map((r,i)=>i):paintDone(p);
   $('#ptTitle').textContent=p.title; $('#ptBy').textContent=p.by; $('#ptBtns').textContent='';
   const st=$('#ptStage'); st.textContent=''; ptEl=ptBuild(p,done); ptEl.style.width=`min(100%, ${(54*p.w/p.h).toFixed(1)}vh)`; if(fin) ptEl.classList.add('framed'); st.appendChild(ptEl);
   p.regions.forEach((r,i)=>{ if(done.includes(i)) return; const b=document.createElement('button'); b.type='button'; b.className='drop'+(S.ink>=INK_COST?' can':'');
@@ -1359,12 +1339,12 @@ function paintAt(i,btn){
 }
 // 한 장 완성: 액자에 넣어 앨범으로
 function framePaint(p){
-  if(!S.paint.album.includes(p.id)) S.paint.album.push(p.id); S.paint.cur++; save();
+  if(!S.paint.album.includes(p.id)) S.paint.album.push(p.id); save();
   ptEl.classList.add('framed','in'); knock(120,0,.3,.22); knock(660,.25,.18,.3); buzz([30,50,30]);
   $('#ptNote').textContent='완성! 판화 앨범에 넣었습니다'; $('#ptInkV').textContent=S.ink;
   const bt=$('#ptBtns'); bt.textContent='';
   const add=(label,fn,cls)=>{ const x=document.createElement('button'); x.type='button'; x.textContent=label; if(cls) x.className=cls; x.onclick=fn; bt.appendChild(x); };
-  if(S.paint.cur<PAINTS.length) add('다음 판화',drawPaint,'primary'); add('앨범 보기',()=>go('album'));
+  if(paintIdx()<PAINTS.length) add('다음 판화',drawPaint,'primary'); add('앨범 보기',()=>go('album'));
 }
 function drawAlbum(){
   const el=$('#albumGrid'); el.textContent='';
@@ -1375,7 +1355,7 @@ function drawAlbum(){
     const c=document.createElement('figcaption'), b=document.createElement('b'), d=document.createElement('span'); b.textContent=has?p.title:'아직 칠하지 않은 판화'; d.textContent=has?p.by:''; c.appendChild(b); c.appendChild(d); f.appendChild(c); el.appendChild(f); });
 }
 function drawMenuPaint(){
-  const p=curPaint(), fin=S.paint.cur>=PAINTS.length, done=fin?p.regions.map((r,i)=>i):paintDone(p), box=$('#menuPaintPic');
+  const p=curPaint(), fin=paintIdx()>=PAINTS.length, done=fin?p.regions.map((r,i)=>i):paintDone(p), box=$('#menuPaintPic');
   box.textContent=''; box.appendChild(ptBuild(p,done));
   $('#menuInk').textContent='잉크 '+S.ink;
   $('#menuPaintHint').textContent=fin?'앨범 보기 ›':S.ink>=INK_COST?'판화 칠하기 ›':'판화 칠하기 › 잉크 '+INK_COST+' 필요';
@@ -1448,7 +1428,7 @@ function go(id){
   if(id==='basket'){ startGame('basket'); return; }
   over=true; save();
   if(id==='menu'){
-    drawMenuPaint(); $('#mJour').textContent=S.jour?S.jour+'단계':''; $('#btnNick').textContent='닉네임 · '+(S.nick||'없음'); drawBoard($('#menuBoard'),3); retrySubmit(); $('#mDaily').textContent=S.daily[today()]?'완료':'';
+    drawMenuPaint(); $('#mJour').textContent=S.jour?S.jour+'단계':''; $('#btnNick').textContent='닉네임 · '+(S.nick||'없음'); drawBoard($('#menuBoard'),3); retrySubmit(); $('#mDaily').textContent=S.daily[today()]?'완료':'잉크 +2';
     $('#mCodex').textContent=Object.keys(S.seen).length+'/25';
   }
   if(id==='map'){
