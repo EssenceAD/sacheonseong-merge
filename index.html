@@ -1761,8 +1761,8 @@ const COOP_INK=2, COOP_PRIZE=6;
 let coState=null, coBusy=false, coAt=0;
 const coPrint=id=>PAINTS.find(x=>x.id===COOP[(Math.max(1,id||1)-1)%COOP.length])||PAINTS[0];
 const coGrid=p=>p.w>=p.h?[6,4]:[4,6];
-// 한 사람이 한 판화에 cap 칸, 하루에 day 칸까지(서버가 지킨다). 지금 더 칠할 수 있는 칸 수
-const coLeft=st=>{ const cap=st.cap||4, day=st.day||2, mine=st.cells.filter(c=>c.me).length; return {cap,day,mine,left:Math.max(0,Math.min(cap-mine,day-(st.today||0)))}; };
+// 한 사람이 한 판화에 cap 칸(전체의 3분의 1), 하루에 day 칸까지(서버가 지킨다). 지금 더 칠할 수 있는 칸 수
+const coLeft=st=>{ const cap=st.cap||Math.ceil((st.total||24)/3), day=st.day||2, mine=st.cells.filter(c=>c.me).length; return {cap,day,mine,left:Math.max(0,Math.min(cap-mine,day-(st.today||0)))}; };
 async function coFetch(){ const r=await sb('rpc/scm_coop_state',{method:'POST',body:JSON.stringify({p_player:pid()})}); if(!r.ok) throw {code:r.status}; coAt=Date.now(); return r.json(); }
 // 내가 참여한 판화가 완성됐으면 한 번만 보상
 function coClaim(st){
@@ -1806,7 +1806,7 @@ async function coGive(i){
   try{ const r=await sb('rpc/scm_coop_give',{method:'POST',body:JSON.stringify({p_player:pid(),p_nick:S.nick||'익명',p_cell:i})}); if(!r.ok) throw {code:r.status}; const j=await r.json();
     if(j.ok){ S.ink-=COOP_INK; save(); hiss(0,.6,.08,1400); buzz(20); coState=j.state; coAt=Date.now(); if(j.done) coClaim(j.state); }
     else if(j.why==='taken'){ toast('방금 다른 분이 칠한 칸입니다',1800); if(j.state) coState=j.state; }
-    else if(j.why==='cap'){ toast('한 판화에는 4칸까지 칠할 수 있습니다',2000); if(j.state) coState=j.state; }
+    else if(j.why==='cap'){ if(j.state) coState=j.state; toast('한 판화에는 '+coLeft(coState).cap+'칸까지 칠할 수 있습니다',2000); }
     else if(j.why==='day'){ toast('하루에 2칸까지 칠할 수 있습니다. 내일 또 만나요',2200); if(j.state) coState=j.state; }
     else if(j.why==='fast') toast('조금 천천히 칠해 주세요',1500);
     else toast('칠하지 못했습니다',1500);
