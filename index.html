@@ -195,6 +195,19 @@ button.chip.can{background:var(--ink); color:var(--face); animation:cardcall 1.6
 .rankBox .tabs button{font-size:13px; padding:4px 12px}
 .board tr.me td{font-weight:700}
 #album .pedi{width:min(60%,190px); margin-bottom:0}
+.galHead{display:flex; align-items:center; justify-content:space-between; gap:8px; padding:0 2px 4px}
+.galHead b{font-size:16px; text-align:center; flex:1}
+.bar .plain{white-space:nowrap; flex:none}
+#sheet{word-break:keep-all}
+#albumGrid figcaption{padding:0 7px}
+#albumGrid figcaption span{font-size:12.5px}
+#ptTitle{font-size:clamp(17px,5.2vw,22px); text-wrap:balance; word-break:keep-all; line-height:1.25}
+#skinRow{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; width:100%}
+#skinRow button{font-size:13px; padding:6px 10px; box-shadow:none}
+#skinRow button:disabled{opacity:.72; border-style:dashed}
+#albTabs button{font-size:14px; padding:5px 12px; box-shadow:none}
+#albName{font-size:13.5px; text-wrap:balance}
+#album{justify-content:flex-start; gap:10px; padding-top:6px}
 #recList{width:min(100%,320px); margin:0; display:grid; grid-template-columns:1fr auto; row-gap:12px; font-size:16px}
 #recList dd{margin:0; text-align:right; font-size:22px}
 .tabs{display:flex; gap:8px}
@@ -303,6 +316,7 @@ button.chip.can{background:var(--ink); color:var(--face); animation:cardcall 1.6
 
   <section id="menu" class="screen" hidden>
     <div id="gallery">
+      <div class="galHead"><button id="galPrev" class="plain" type="button" aria-label="앞 전시관">←</button><b id="galName"></b><button id="galNext" class="plain" type="button" aria-label="다음 전시관">→</button></div>
       <div id="galWall" aria-label="판화 전시실"></div>
       <div class="galInfo"><b id="menuInk"></b><button id="menuPaint" class="chip" type="button"><span id="menuPaintHint"></span></button></div>
     </div>
@@ -336,10 +350,11 @@ button.chip.can{background:var(--ink); color:var(--face); animation:cardcall 1.6
     <div class="bar"><button class="plain" type="button" data-go="menu">← 메뉴</button><h2>도감</h2><span style="width:56px"></span></div>
     <div id="cxGrid"></div>
     <p class="note" id="cxNote"></p>
+    <div id="skinRow"></div>
   </section>
 
   <section id="paint" class="screen" hidden>
-    <div class="bar"><button class="plain" type="button" data-go="menu">← 메뉴</button><h2 id="ptTitle"></h2><button class="plain" type="button" data-go="album">앨범</button></div>
+    <div class="bar"><button class="plain" type="button" data-go="menu">← 메뉴</button><h2 id="ptTitle"></h2><button class="plain" type="button" data-go="album">전시관</button></div>
     <p class="note" id="ptBy"></p>
     <div id="ptHud"><div class="hc"><small>잉크</small><b id="ptInkV"></b></div><p id="ptNote"></p></div>
     <div id="ptStage"></div>
@@ -347,8 +362,10 @@ button.chip.can{background:var(--ink); color:var(--face); animation:cardcall 1.6
   </section>
 
   <section id="album" class="screen" hidden>
-    <div class="bar"><button class="plain" type="button" data-go="paint">← 판화</button><h2>판화 앨범</h2><span style="width:56px"></span></div>
+    <div class="bar"><button class="plain" type="button" data-go="paint">← 판화</button><h2>전시관</h2><span style="width:56px"></span></div>
     <div class="pedi" aria-hidden="true"><i class="w1"></i><i class="w2"></i><img src="art/pediment.png" alt=""></div>
+    <div class="tabs" id="albTabs"></div>
+    <p class="note" id="albName"></p>
     <div id="albumGrid"></div>
   </section>
 
@@ -383,15 +400,35 @@ button.chip.can{background:var(--ink); color:var(--face); animation:cardcall 1.6
   </div></div>
 </div>
 
-<script src="art.js?v=33"></script>
-<script src="paints.js?v=33"></script>
+<script src="art.js?v=34"></script>
+<script src="paints.js?v=34"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 (()=>{
 let COLS=8, ROWS=10; const MAXL=5, COMBO_MS=3000, STAGES=30, TUT_N=5, GROW_END=15;
-const P='#F3ECD8', K='#1B1714', G='#E2B437', GL='#F7E391';
-const KC=['#DB3A1C','#2443B0','#A31F70','#178F84','#BF7F17']; // 해 주홍·달 군청·장미 자주·열쇠 청록·왕관 황토
+let P='#F3ECD8', K='#1B1714'; const G='#E2B437', GL='#F7E391';
+let KC=['#DB3A1C','#2443B0','#A31F70','#178F84','#BF7F17']; // 해 주홍·달 군청·장미 자주·열쇠 청록·왕관 황토
 const NS='http://www.w3.org/2000/svg';
+/* ───────── 패 스킨: 전시관을 완성하면 그 화풍의 패가 열린다 ───────── */
+// 우키요에관 스킨은 처음 만들었던 동양 목판화 패(산·물결·학·매화·달)
+const EAST=[
+ {line:'<path d="M12 74 30 40 38 53 50 26 68 74Z"/><path d="M50 26 46 43 52 52 47 66M30 40 32 53 27 63M8 74H72" fill="none"/>',plate:'<path d="M50 26 68 74H47L52 52 46 43Z"/><path d="M30 40 38 53 34 74H27V63L32 53Z"/>',shade:''},
+ {line:'<path d="M11 34q7-13 14 0t14 0 14 0 14 0M11 52q7-13 14 0t14 0 14 0 14 0M11 70q7-13 14 0t14 0 14 0 14 0" fill="none"/>',plate:'<path d="M11 52q7-13 14 0t14 0 14 0 14 0V70q-7 13-14 0t-14 0-14 0-14 0Z"/>',shade:''},
+ {line:'<path d="M24 55C25 43 44 40 51 50 53 59 42 65 32 63 27 62 24 59 24 55Z"/><circle cx="51" cy="19" r="3.8"/><path d="M49 48C58 40 43 32 50 22M54.5 19 68 22M35 63 33 83h-6M42 63 45 83h6M25 52 10 57M25 58 11 67M30 51C36 56 43 55 47 50" fill="none"/>',plate:'<path d="M24 55C25 43 44 40 51 50 53 59 42 65 32 63 27 62 24 59 24 55Z"/><path d="M25 52 10 57 11 67 25 58Z"/><circle cx="51" cy="19" r="3.8"/>',shade:''},
+ {line:'<path d="M10 85C24 79 34 74 46 69 56 65 63 57 69 45M24 79 18 69M41 60 43 70" fill="none"/><circle cx="40" cy="29" r="9.5"/><circle cx="51.4" cy="37.3" r="9.5"/><circle cx="47" cy="50.7" r="9.5"/><circle cx="33" cy="50.7" r="9.5"/><circle cx="28.6" cy="37.3" r="9.5"/><circle cx="40" cy="41" r="2.4"/><circle cx="17" cy="65" r="4"/><circle cx="66" cy="40" r="4"/>',plate:'<circle cx="40" cy="29" r="9.5"/><circle cx="51.4" cy="37.3" r="9.5"/><circle cx="47" cy="50.7" r="9.5"/><circle cx="33" cy="50.7" r="9.5"/><circle cx="28.6" cy="37.3" r="9.5"/><circle cx="17" cy="65" r="4"/><circle cx="66" cy="40" r="4"/>',shade:''},
+ {line:'<circle cx="40" cy="42" r="23"/><path d="M47 20.5A27 27 0 0 0 47 63.5M9 77h15c1-9 13-9 14 0h31M20 86h38" fill="none"/>',plate:'<circle cx="40" cy="42" r="23"/>',shade:''}
+];
+const SKINS={
+ classic:{name:'손 채색 목판',P:'#F3ECD8',K:'#1B1714',KC:['#DB3A1C','#2443B0','#A31F70','#178F84','#BF7F17']},
+ durer:{name:'뒤러 먹판',P:'#F3ECD8',K:'#1B1714',KC:['#6F4E2A','#6F4E2A','#6F4E2A','#6F4E2A','#6F4E2A']},
+ chronicle:{name:'연대기 채색',P:'#F5ECCF',K:'#221B15',KC:['#D9A92B','#2F68A8','#C4442B','#4F8A4B','#C9788C']},
+ bestiary:{name:'우화집 양피지',P:'#EADDBE',K:'#33241A',KC:['#A8432B','#44589A','#7C3B63','#3D6E5B','#B98524']},
+ apocalypse:{name:'묵시록 밤판',P:'#2A2420',K:'#EFE6D0',KC:['#E0553A','#5B7FD6','#C254A0','#3FB3A6','#D9A440'],dark:true},
+ ukiyoe:{name:'우키요에(동양 목판)',P:'#EDE4CF',K:'#1E1A17',KC:['#2B4C7E','#2B4C7E','#2B4C7E','#2B4C7E','#2B4C7E'],vector:true}
+};
+let SK=SKINS.classic;
+function skinVars(id){ SK=SKINS[id]||SKINS.classic; P=SK.P; K=SK.K; KC=SK.KC; }
+
 const $=s=>document.querySelector(s);
 const rnd=Math.random;
 const shuffle=(a,r=rnd)=>{for(let i=a.length-1;i>0;i--){const j=r()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;};
@@ -460,9 +497,9 @@ const RAYS=(()=>{let s='';for(let i=0;i<14;i++){const a=i*Math.PI/7+.11,p=d=>`${
 const MT='transform="translate(38 48) scale(.86) translate(-40 -50)"';
 
 function tileSVG(k,l){
-  const m=MOTIF[k], c=KC[k], seed=3+k*13+l*5;
+  const m=(SK.vector?EAST:MOTIF)[k], c=KC[k], seed=3+k*13+l*5;
   // 실제 목판화에서 오려 낸 문양(art.js). 없으면 예전 선화로 그린다
-  const A=window.ART&&(k===2&&l>=5&&window.ART[5]?window.ART[5]:window.ART[k]); let ax=0, ay=0, aw=0, ah=0, spikes='';
+  const A=!SK.vector&&window.ART&&(k===2&&l>=5&&window.ART[5]?window.ART[5]:window.ART[k]); let ax=0, ay=0, aw=0, ah=0, spikes='';
   if(A){ const r=A.w/A.h, z=(l>=5?.78:1)*(k===0?.76:1); if(r>54/61){ aw=54*z; ah=54*z/r; } else { ah=61*z; aw=61*z*r; } ax=38-aw/2; ay=43-ah/2;
     if(k===0){ // 해: 원판 둘레에 뾰족한 광선
       const rx=aw/2*.97, ry=ah/2*.97, L=aw*.27; let d='';
@@ -477,7 +514,7 @@ function tileSVG(k,l){
   // 4단계: 배경 문양
   if(l>=4) s+=`<g clip-path="url(#in)" fill="none" stroke="${c}" stroke-width="1.2">${BG[k](c)}</g>`;
   // 5단계: 금빛 광채
-  if(l>=5) s+=`<g clip-path="url(#in)"><rect x="9" y="9" width="58" height="78" fill="${K}"/><path d="${RAYS}" fill="${G}"/></g>`;
+  if(l>=5) s+=`<g clip-path="url(#in)"><rect x="9" y="9" width="58" height="78" fill="${SK.dark?'#000':K}"/><path d="${RAYS}" fill="${G}"/></g>`;
   if(l>=5&&A) s+=`<ellipse cx="38" cy="43" rx="23.5" ry="27.5" fill="${P}" stroke="${K}" stroke-width="1.6"/>`;
   else if(l>=4) s+=A?`<g filter="url(#hal)"><rect ${box} fill="${P}" mask="url(#pm)"/></g>`:`<g ${MT} fill="${P}" stroke="${P}" stroke-width="10" stroke-linejoin="round" stroke-linecap="round">${m.line}</g>`;
   // 2단계: 손 채색 (선 밖으로 살짝 삐져나옴)
@@ -491,9 +528,9 @@ function tileSVG(k,l){
     s+=`<rect x="8.5" y="8.5" width="59" height="69" rx="2" fill="none" stroke="${K}" stroke-width="2.5"/>`;
     s+=`<path fill="${K}" d="M8.5 8.5h13a13 13 0 0 1-13 13zM67.5 8.5h-13a13 13 0 0 0 13 13zM8.5 77.5h13a13 13 0 0 0-13-13zM67.5 77.5h-13a13 13 0 0 1 13-13zM38 5.2l4 3.3-4 3.3-4-3.3zM5.4 43l3.1-4 3.1 4-3.1 4zM64.4 43l3.1-4 3.1 4-3.1 4z"/>`;
   }
-  s+=A?`</g>${spikes}<image href="${A.ink}" ${box} preserveAspectRatio="none"/>`:`<g ${MT} fill="none" stroke="${K}" stroke-linejoin="round" stroke-linecap="round"><g stroke-width="4.2">${m.line}</g><g clip-path="url(#sh)"><path d="${HATCH}" stroke-width="1.15"/></g></g></g>`;
+  s+=A?`</g>${spikes}${SK.dark?`<filter id="tk" color-interpolation-filters="sRGB"><feFlood flood-color="${K}"/><feComposite in2="SourceAlpha" operator="in"/></filter>`:''}<image href="${A.ink}" ${box} preserveAspectRatio="none"${SK.dark?' filter="url(#tk)"':''}/>`:`<g ${MT} fill="none" stroke="${K}" stroke-linejoin="round" stroke-linecap="round"><g stroke-width="4.2">${m.line}</g><g clip-path="url(#sh)"><path d="${HATCH}" stroke-width="1.15"/></g></g></g>`;
   // 단계 점: 흑백에서도 단계를 셀 수 있게
-  if(l>=5) s+=`<rect x="8.5" y="79.4" width="59" height="12.2" rx="2" fill="${K}"/>`; // 5단계는 먹 띠 위에 금빛 점
+  if(l>=5) s+=`<rect x="8.5" y="79.4" width="59" height="12.2" rx="2" fill="${SK.dark?'#000':K}"/>`; // 5단계는 먹 띠 위에 금빛 점
   for(let i=0;i<l;i++) s+=`<circle cx="${(38+(i-(l-1)/2)*10.4).toFixed(1)}" cy="85.4" r="4.3" fill="${l>=5?GL:K}" stroke="${l>=5?K:P}" stroke-width="1.3"/>`;
   return s+'</svg>';
 }
@@ -510,12 +547,14 @@ function paperGrain(){
 <feColorMatrix in="b" type="matrix" values="0 0 0 0 .118 0 0 0 0 .102 0 0 0 0 .09 0 0 0 .9 -.5" result="f"/>
 <feMerge><feMergeNode in="g"/><feMergeNode in="f"/></feMerge></filter><rect width="100%" height="100%" filter="url(#p)"/></svg>`;
 }
-{
+const tileStyle=document.createElement('style'); document.head.appendChild(tileStyle);
+function buildTileCSS(){
   let css=`.rock{background-image:${uri(rockSVG())}}`;
   for(let k=0;k<5;k++)for(let l=1;l<=MAXL;l++)css+=`.t${k}${l}{background-image:${uri(tileSVG(k,l))}}`;
-  const st=document.createElement('style'); st.textContent=css; document.head.appendChild(st);
-  $('#grain').style.backgroundImage=uri(paperGrain());
+  tileStyle.textContent=css;
 }
+$('#grain').style.backgroundImage=uri(paperGrain());
+buildTileCSS();
 
 
 // 장애물 추가 종류: 가시덤불(옆에서 한 번 합치면 걷힘), 바위(두 번)
@@ -562,7 +601,7 @@ const sfx={
 
 /* ───────── 저장 ───────── */
 const SAVE='scm-save-v1';
-const S=Object.assign({nick:'',stars:{},tries:{},pending:0,jour:0,ink:0,paint:{cur:0,done:{},album:[]},boost:{hint:1,shuffle:0,bomb:0},daily:{},seen:{}},(()=>{try{return JSON.parse(localStorage.getItem(SAVE))||{};}catch(e){return {};}})());
+const S=Object.assign({nick:'',skin:'classic',skins:['classic'],stars:{},tries:{},pending:0,jour:0,ink:0,paint:{cur:0,done:{},album:[]},boost:{hint:1,shuffle:0,bomb:0},daily:{},seen:{}},(()=>{try{return JSON.parse(localStorage.getItem(SAVE))||{};}catch(e){return {};}})());
 if(!S.rec){ // 모드별 기록 (예전 통합 기록은 여정으로 옮김)
   const z=()=>({score:0,time:0,streak:0,combo:0,games:0,gold:0,cur:0});
   S.rec={journey:z(),daily:z(),basket:z()};
@@ -571,6 +610,8 @@ if(!S.rec){ // 모드별 기록 (예전 통합 기록은 여정으로 옮김)
 }
 if(!S.v3){ if(S.jour>0){ const ns={}; for(const k in S.stars) ns[+k+15]=S.stars[k]; for(let i=1;i<=15;i++) ns[i]=3; S.stars=ns; S.jour+=15; } S.v3=1; }
 if(!S.v31){ if(S.jour>=5&&!S.ink) S.ink=5; S.v31=1; } // 예전부터 하던 사람도 바로 한 칸 칠할 수 있게
+if(!S.skins.includes(S.skin)) S.skin='classic';
+if(S.skin!=='classic'){ skinVars(S.skin); buildTileCSS(); }
 const save=()=>{ try{ localStorage.setItem(SAVE,JSON.stringify(S)); }catch(e){} };
 const fmtT=ms=>{ const s=Math.max(0,Math.round(ms/1000)); return (s/60|0)+':'+String(s%60).padStart(2,'0'); };
 const fmtN=n=>n.toLocaleString('en-US');
@@ -850,7 +891,8 @@ function make3D(simple){
           s:cw*(gold?.16+rnd()*.14:.12+rnd()*.2),asp:gold?.7+rnd()*.6:.35+rnd()*.4,c:woods[i%3],gold,age:0,life:.65+rnd()*.5}); }
       kick(); return true; },
     resize,
-    setAtlas(cv){ const tx=new T.CanvasTexture(cv); tx.minFilter=T.LinearMipmapLinearFilter; tx.magFilter=T.LinearFilter; tx.anisotropy=Math.min(4,rr.capabilities.getMaxAnisotropy()); U.uAtlas.value=tx; ready=true; },
+    colors(){ U.uPaper.value.set(P); U.uInk.value.set(K); kick(); },
+    setAtlas(cv){ if(U.uAtlas.value) U.uAtlas.value.dispose(); const tx=new T.CanvasTexture(cv); tx.minFilter=T.LinearMipmapLinearFilter; tx.magFilter=T.LinearFilter; tx.anisotropy=Math.min(4,rr.capabilities.getMaxAnisotropy()); U.uAtlas.value=tx; ready=true; },
     stats:()=>({simple,pr:rr.getPixelRatio(),pending,tweens:tw.length,chips:parts.length,calls:rr.info.render.calls,frame:rr.info.render.frame})
   };
   canvas.addEventListener('webglcontextlost',ev=>{ ev.preventDefault(); dead=true; use2D(); });
@@ -872,7 +914,7 @@ const GFX=(()=>{ try{ return new URLSearchParams(location.search).get('gfx'); }c
   if(GFX==='2d') return;
   const low=GFX==='simple'||(navigator.deviceMemory&&navigator.deviceMemory<=3)||(navigator.hardwareConcurrency&&navigator.hardwareConcurrency<=3);
   const r3=make3D(!!low); if(!r3) return;
-  buildAtlas().then(cv=>{ r3.setAtlas(cv); board.insertBefore(r3.canvas,pathLayer); board.classList.add('gl'); R=r3; r3.resize(); if(grid.length) paintAll(); })
+  buildAtlas().then(cv=>{ r3.setAtlas(cv); r3.colors(); board.insertBefore(r3.canvas,pathLayer); board.classList.add('gl'); R=r3; r3.resize(); if(grid.length) paintAll(); })
     .catch(()=>{});
 })();
 
@@ -1312,20 +1354,6 @@ async function drawRank(){
 }
 
 /* ───────── 메뉴 상단 전시실: 판화가 액자로 벽에 걸린다 ───────── */
-function drawGallery(){
-  const wall=$('#galWall'), cur=paintIdx(), fin=cur>=PAINTS.length; wall.textContent=''; let nowEl=null;
-  PAINTS.forEach((p,i)=>{ const f=document.createElement('figure'), has=S.paint.album.includes(p.id), now=i===cur;
-    f.className='hang'+(now?' now':has?'':' lock'); f.innerHTML='<svg class="wire" viewBox="0 0 100 22" aria-hidden="true"><path d="M8 22 50 3 92 22" fill="none" stroke="'+K+'" stroke-width="1.6"/><circle cx="50" cy="3.500" r="3" fill="'+K+'"/></svg>'.replace('.500','.5');
-    let pic; if(has||now){ pic=ptBuild(p,has?p.regions.map((r,j)=>j):paintDone(p)); pic.classList.add('framed'); } else { pic=document.createElement('div'); pic.className='pt lock'; pic.style.aspectRatio=p.w+' / '+p.h; pic.textContent='?'; }
-    f.appendChild(pic); const c=document.createElement('figcaption'); c.textContent=has?p.title:now?p.title+' · 칠하는 중':'다음 판화'; f.appendChild(c);
-    f.onclick=()=>{ if(now) go('paint'); else if(has) go('album'); else toast('앞의 판화를 먼저 완성하세요',1500); };
-    wall.appendChild(f); if(now) nowEl=f; });
-  $('#menuInk').textContent='잉크 '+S.ink;
-  $('#menuPaintHint').textContent=fin?'전시실 둘러보기 ›':S.ink>=INK_COST?'판화 칠하기 ›':'판화 칠하기 › 잉크 '+INK_COST+' 필요';
-  $('#menuPaint').classList.toggle('can',!fin&&S.ink>=INK_COST); $('#menuPaint').onclick=()=>go(fin?'album':'paint');
-  requestAnimationFrame(()=>{ const t=nowEl||wall.lastChild; if(t) wall.scrollLeft=Math.max(0,t.offsetLeft-(wall.clientWidth-t.offsetWidth)/2); });
-}
-
 // 첫 시간 초과에는 30초를 한 번 더 준다
 function offerContinue(){
   paused=true; lock=true; const t0=performance.now(); select(null); clearHint();
@@ -1438,8 +1466,9 @@ function showResult(win,msg,t,was,neu){
 }
 
 /* ───────── 판화 채색 메타: 잉크로 명작 판화를 한 칸씩 칠한다 ───────── */
-const INK_COST=3;
-const PAINTS=window.PAINTS||[]; // 판화 목록과 채색 영역은 paints.js 에 있다
+const INK_COST=2;
+const PAINTS=window.PAINTS||[];
+const HALLS=window.HALLS||[{id:1,name:'전시실',skin:''}]; // 판화 목록과 채색 영역은 paints.js 에 있다
 // 지금 칠할 판화 = 목록에서 아직 앨범에 없는 첫 장
 const paintIdx=()=>{ const i=PAINTS.findIndex(p=>!S.paint.album.includes(p.id)); return i<0?PAINTS.length:i; };
 const DROP='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.500c4 5 6 8 6 11a6 6 0 0 1-12 0c0-3 2-6 6-11z"/></svg>'.replace('.500','.5');
@@ -1447,8 +1476,8 @@ const curPaint=()=>PAINTS[Math.min(paintIdx(),PAINTS.length-1)];
 const paintDone=p=>S.paint.done[p.id]||(S.paint.done[p.id]=[]);
 function ptBuild(p,done){
   const el=document.createElement('div'); el.className='pt'; el.style.aspectRatio=p.w+' / '+p.h;
-  let g=''; p.regions.forEach((r,i)=>{ g+=`<g class="rg" data-i="${i}" fill="${KC[r.c]}" stroke="${KC[r.c]}" stroke-width="7" stroke-linejoin="round" stroke-linecap="round" filter="url(#${p.id}r)"${done.includes(i)?'':' style="display:none"'}>${r.s}</g>`; });
-  el.innerHTML=`<svg viewBox="0 0 ${p.w} ${p.h}" preserveAspectRatio="none" aria-hidden="true"><defs><filter id="${p.id}r" x="-8%" y="-8%" width="116%" height="116%"><feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="2" seed="7" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="${(p.w*.022).toFixed(1)}"/></filter>${p.defs||''}</defs><g opacity=".84">${g}</g></svg><img src="${p.src}" alt="" draggable="false" loading="lazy" decoding="async">`;
+  const PC=SKINS.classic.KC, W=p.auto; let g=''; p.regions.forEach((r,i)=>{ g+=`<g class="rg" data-i="${i}" fill="${PC[r.c]}" stroke="${PC[r.c]}" stroke-width="7" stroke-linejoin="round" stroke-linecap="round" filter="url(#${p.id}r)"${done.includes(i)?'':' style="display:none"'}>${r.s}</g>`; });
+  el.innerHTML=`<svg viewBox="0 0 ${p.w} ${p.h}" preserveAspectRatio="none" aria-hidden="true"><defs><filter id="${p.id}r" x="-${W?25:8}%" y="-${W?25:8}%" width="${W?150:116}%" height="${W?150:116}%">${W?`<feGaussianBlur in="SourceGraphic" stdDeviation="${(p.w*.008).toFixed(1)}" result="b"/>`:''}<feTurbulence type="fractalNoise" baseFrequency="${W?0.009:0.018}" numOctaves="${W?3:2}" seed="7" result="n"/><feDisplacementMap in="${W?'b':'SourceGraphic'}" in2="n" xChannelSelector="R" yChannelSelector="G" scale="${(p.w*(W?.11:.022)).toFixed(1)}"/></filter>${p.defs||''}</defs><g opacity="${W?.62:.84}">${g}</g></svg><img src="${p.src}" alt="" draggable="false" loading="lazy" decoding="async">`;
   return el;
 }
 // 손 채색: 물방울 자리에서 색이 번져 나간다
@@ -1488,14 +1517,58 @@ function paintAt(i,btn){
 function framePaint(p){
   if(!S.paint.album.includes(p.id)) S.paint.album.push(p.id); save();
   ptEl.classList.add('framed','in'); knock(120,0,.3,.22); knock(660,.25,.18,.3); buzz([30,50,30]);
-  $('#ptNote').textContent='완성! 판화 앨범에 넣었습니다'; $('#ptInkV').textContent=S.ink;
+  $('#ptNote').textContent='완성! 전시관에 걸었습니다'; $('#ptInkV').textContent=S.ink;
   const bt=$('#ptBtns'); bt.textContent='';
   const add=(label,fn,cls)=>{ const x=document.createElement('button'); x.type='button'; x.textContent=label; if(cls) x.className=cls; x.onclick=fn; bt.appendChild(x); };
-  if(paintIdx()<PAINTS.length) add('다음 판화',drawPaint,'primary'); add('앨범 보기',()=>go('album'));
+  const hall=HALLS.find(h=>h.id===(p.hall||1)), newSkin=unlockSkins();
+  if(hall&&hallDone(hall.id)) $('#ptNote').textContent=hall.id+'관 「'+hall.name+'」 완성!'+(newSkin?' 패 스킨 「'+SKINS[newSkin.skin].name+'」이 열렸습니다':'');
+  if(newSkin) add('패 스킨 보기',()=>go('codex'),'primary');
+  if(paintIdx()<PAINTS.length) add('다음 판화',drawPaint,newSkin?'':'primary'); add('전시관 보기',()=>{ albNext=p.hall||1; go('album'); });
 }
+/* ───────── 전시관: 판화는 관 단위로 걸리고, 한 관을 다 칠하면 패 스킨이 열린다 ───────── */
+const hallList=h=>PAINTS.filter(p=>(p.hall||1)===h);
+const hallDone=h=>{ const l=hallList(h); return l.length>0&&l.every(p=>S.paint.album.includes(p.id)); };
+function unlockSkins(){ let got=null; HALLS.forEach(h=>{ if(h.skin&&hallDone(h.id)&&!S.skins.includes(h.skin)){ S.skins.push(h.skin); got=h; } }); if(got) save(); return got; }
+function setSkin(id){
+  if(!SKINS[id]||!S.skins.includes(id)) return; S.skin=id; save(); skinVars(id); buildTileCSS();
+  if(R.is3d) buildAtlas().then(cv=>{ R.setAtlas(cv); R.colors(); if(grid.length&&!over) paintAll(); }).catch(()=>{});
+}
+function drawSkins(){
+  const el=$('#skinRow'); if(!el) return; el.textContent='';
+  Object.keys(SKINS).forEach(id=>{ const b=document.createElement('button'), has=S.skins.includes(id), h=HALLS.find(x=>x.skin===id); b.type='button';
+    b.textContent=SKINS[id].name+(has?'':' · '+(h?h.id+'관 완성 시':'잠김')); b.disabled=!has; if(S.skin===id) b.className='armed'; b.setAttribute('aria-pressed',S.skin===id);
+    b.onclick=()=>{ setSkin(id); drawSkins(); go('codex'); }; el.appendChild(b); });
+}
+let galHall=0, albHall=0, albNext=0;
+function hangFig(p,cur){
+  const f=document.createElement('figure'), has=S.paint.album.includes(p.id), now=PAINTS.indexOf(p)===cur;
+  f.className='hang'+(now?' now':has?'':' lock'); f.innerHTML='<svg class="wire" viewBox="0 0 100 22" aria-hidden="true"><path d="M8 22 50 3 92 22" fill="none" stroke="#1B1714" stroke-width="1.6"/><circle cx="50" cy="3.5" r="3" fill="#1B1714"/></svg>';
+  let pic; if(has||now){ pic=ptBuild(p,has?p.regions.map((r,j)=>j):paintDone(p)); pic.classList.add('framed'); } else { pic=document.createElement('div'); pic.className='pt lock'; pic.style.aspectRatio=p.w+' / '+p.h; pic.textContent='?'; }
+  f.appendChild(pic); const c=document.createElement('figcaption'); c.textContent=has?p.title:now?p.title+' · 칠하는 중':'아직 못 본 판화'; f.appendChild(c);
+  f.onclick=()=>{ if(now) go('paint'); else if(has){ albNext=p.hall||1; go('album'); } else toast('앞의 판화를 먼저 완성하세요',1500); };
+  return {f,now};
+}
+function drawGallery(keep){
+  const wall=$('#galWall'), cur=paintIdx(), fin=cur>=PAINTS.length;
+  if(!keep||!galHall) galHall=(PAINTS[Math.min(cur,PAINTS.length-1)]||{}).hall||1;
+  const hi=Math.max(0,HALLS.findIndex(h=>h.id===galHall)), H=HALLS[hi], list=hallList(H.id), got=list.filter(p=>S.paint.album.includes(p.id)).length;
+  $('#galName').textContent=H.id+'관 · '+H.name+' · '+got+'/'+list.length+(got>=list.length?' ✓':''); $('#galPrev').disabled=hi<=0; $('#galNext').disabled=hi>=HALLS.length-1;
+  wall.textContent=''; let nowEl=null; list.forEach(p=>{ const h=hangFig(p,cur); wall.appendChild(h.f); if(h.now) nowEl=h.f; });
+  $('#menuInk').textContent='잉크 '+S.ink;
+  $('#menuPaintHint').textContent=fin?'전시관 둘러보기 ›':S.ink>=INK_COST?'판화 칠하기 ›':'판화 칠하기 › 잉크 '+INK_COST+' 필요';
+  $('#menuPaint').classList.toggle('can',!fin&&S.ink>=INK_COST); $('#menuPaint').onclick=()=>go(fin?'album':'paint');
+  requestAnimationFrame(()=>{ const t=nowEl||wall.firstChild; if(t) wall.scrollLeft=Math.max(0,t.offsetLeft-(wall.clientWidth-t.offsetWidth)/2); });
+}
+$('#galPrev').onclick=()=>{ const i=HALLS.findIndex(h=>h.id===galHall); if(i>0){ galHall=HALLS[i-1].id; drawGallery(true); } };
+$('#galNext').onclick=()=>{ const i=HALLS.findIndex(h=>h.id===galHall); if(i<HALLS.length-1){ galHall=HALLS[i+1].id; drawGallery(true); } };
 function drawAlbum(){
+  albHall=albNext||(curPaint()||{}).hall||1; albNext=0;
+  const tabs=$('#albTabs'); tabs.textContent='';
+  HALLS.forEach(h=>{ const b=document.createElement('button'); b.type='button'; b.textContent=h.id+'관'+(hallDone(h.id)?' ✓':''); if(h.id===albHall) b.className='armed'; b.onclick=()=>{ albNext=h.id; drawAlbum(); }; tabs.appendChild(b); });
+  const H=HALLS.find(h=>h.id===albHall)||HALLS[0], list=hallList(H.id);
+  $('#albName').textContent=H.name+(hallDone(H.id)?' · 완성'+(H.skin&&SKINS[H.skin]?' · 패 스킨 「'+SKINS[H.skin].name+'」 열림':''):' · '+list.filter(p=>S.paint.album.includes(p.id)).length+'/'+list.length+(H.skin&&SKINS[H.skin]?' · 완성하면 패 스킨 「'+SKINS[H.skin].name+'」':''));
   const el=$('#albumGrid'); el.textContent='';
-  PAINTS.forEach(p=>{ const f=document.createElement('figure'), slot=document.createElement('div'), has=S.paint.album.includes(p.id); slot.className='slot';
+  list.forEach(p=>{ const f=document.createElement('figure'), slot=document.createElement('div'), has=S.paint.album.includes(p.id); slot.className='slot';
     const pic=has?ptBuild(p,p.regions.map((r,i)=>i)):document.createElement('div');
     if(has) pic.classList.add('framed'); else { pic.className='pt lock'; pic.style.aspectRatio=p.w+' / '+p.h; pic.textContent='?'; }
     pic.style.width=(p.w>=p.h?76:76*p.w/p.h).toFixed(1)+'%'; slot.appendChild(pic); f.appendChild(slot);
@@ -1578,13 +1651,14 @@ function go(id){
   if(id==='records'){
     drawRec();
   }
+  if(id==='codex') drawSkins();
   if(id==='paint') drawPaint();
   if(id==='album') drawAlbum();
   if(id==='codex'){
     let h=''; for(let l=1;l<=MAXL;l++)for(let k=0;k<5;k++) h+=S.seen[''+k+l]?`<i class="pic t${k}${l}"></i>`:'<i class="pic unseen"></i>';
     const total=starTotal(); let lv=0; CX.forEach((c,i)=>{ if(total>=c[0]) lv=i; });
     const g=$('#cxGrid'); g.innerHTML=h; g.className='cx'+lv+(lv>=2?' frame':'');
-    $('#cxNote').textContent='테두리 · '+CX[lv][1]+'  ·  ★ '+total+(CX[lv+1]?'  ·  다음 테두리 ★ '+CX[lv+1][0]:'');
+    $('#cxNote').textContent='도감 테두리: '+CX[lv][1]+' · 여정에서 모은 별 '+total+'개'+(CX[lv+1]?' · 별 '+CX[lv+1][0]+'개에 다음 테두리':'');
   }
   show(id);
 }
@@ -1655,7 +1729,8 @@ function runTitle(){
 $('#title').addEventListener('pointerdown',e=>{ if(!titleDone){ finishTitle(); titleSkipAt=performance.now(); e.preventDefault(); } },true);
 runTitle();
 
-window.scm={ logStage, fetchLeague, leagueBump, PAINTS, paintAt:i=>{ const b=[...document.querySelectorAll('#ptStage .drop')][i]; if(b) b.click(); }, gfx:()=>R.is3d?R.stats():{is3d:false}, stageCfg, fetchBoard, tap, findMove, findPath, startGame, go, endGame, S, grid:()=>grid, set:g=>{grid=g;paintAll();}, state:()=>({mode,score,combo,lock,over,tiles:tileCount(),basket:basket.length}) };
+unlockSkins();
+window.scm={ setSkin, SKINS, HALLS, logStage, fetchLeague, leagueBump, PAINTS, paintAt:i=>{ const b=[...document.querySelectorAll('#ptStage .drop')][i]; if(b) b.click(); }, gfx:()=>R.is3d?R.stats():{is3d:false}, stageCfg, fetchBoard, tap, findMove, findPath, startGame, go, endGame, S, grid:()=>grid, set:g=>{grid=g;paintAll();}, state:()=>({mode,score,combo,lock,over,tiles:tileCount(),basket:basket.length}) };
 })();
 </script>
 </body>
